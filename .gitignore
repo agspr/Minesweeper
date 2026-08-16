@@ -1,0 +1,16 @@
+.DS_Store
+*.log
+
+# Secretos de firma (nunca al repo; ya cubiertos también por app/android/.gitignore)
+app/android/upload-keystore.jks
+app/android/key.properties
+
+# Config local de Claude
+.claude/
+*.aab
+*.ipa
+
+# Sustitución local del paquete compartido: permite iterar contra una copia en
+# disco sin ensuciar el pin de pubspec.yaml. Nunca debe llegar al repo — una
+# build de lanzamiento tiene que enlazar SIEMPRE contra el tag fijado.
+app/pubspec_overrides.yaml
