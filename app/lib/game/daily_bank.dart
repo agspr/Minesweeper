@@ -85,9 +85,16 @@ abstract final class DailyBank {
     try {
       final text = await rootBundle.loadString('assets/bank/$year.json');
       return (jsonDecode(text) as Map).cast<String, dynamic>();
-    } on Exception {
+    } catch (_) {
       // Año fuera del horizonte horneado: se trata como "no está", que es lo
       // que el llamante ya sabe manejar.
+      //
+      // El catch va SIN tipo a propósito. Antes era `on Exception` y no valía:
+      // cuando falta un asset, rootBundle lanza FlutterError, que hereda de
+      // Error y NO de Exception, así que se escapaba y subía sin capturar. Lo
+      // pilló la prueba de "un día fuera del banco". Cualquier fallo al leer un
+      // año significa lo mismo para quien llama —ese día no está—, así que se
+      // traga todo y se responde vacío.
       return const {};
     }
   }
