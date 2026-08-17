@@ -1,121 +1,186 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'firebase_options.dart';
+
+/// ARNÉS DE VERIFICACIÓN A4 — no es la app de Nona.
+///
+/// Existe para contestar UNA pregunta, la que sostiene todo el diseño de
+/// cuentas compartidas: ¿la misma cuenta de Apple produce el mismo `uid` de
+/// Firebase en CINCO y en Nona?
+///
+/// Por qué hay que medirlo en vez de razonarlo: el plan de cuentas §2 da por
+/// hecho que el identificador de Sign in with Apple es estable por equipo de
+/// desarrollo. Ninguna página de documentación de Apple lo afirma tal cual —lo
+/// comprobamos—, y el App ID de Nona está *agrupado* bajo el primario de CINCO,
+/// que es un matiz distinto. Si el uid NO coincidiera, la identidad compartida
+/// se rompería para todo usuario de Apple y habría que enterarse ahora, no
+/// después de publicar.
+///
+/// Dato previo (firebase auth:export sobre cinco-fe5cc): 24 cuentas, TODAS de
+/// google.com y ninguna de Apple. Nadie ha completado nunca un Sign in with
+/// Apple, así que no hay ningún `sub` establecido que romper y la prueba parte
+/// de cero.
+///
+/// Este fichero se sustituye entero cuando empiece la app de verdad.
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const A4Harness());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class A4Harness extends StatelessWidget {
+  const A4Harness({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  Widget build(BuildContext context) => MaterialApp(
+    title: 'Nona · A4',
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData(brightness: Brightness.dark, useMaterial3: true),
+    home: const _A4Screen(),
+  );
+}
+
+class _A4Screen extends StatefulWidget {
+  const _A4Screen();
+
+  @override
+  State<_A4Screen> createState() => _A4ScreenState();
+}
+
+class _A4ScreenState extends State<_A4Screen> {
+  String? _error;
+  bool _busy = false;
+
+  String _randomNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
+  /// Mismo flujo que CINCO (`auth_controller.dart`), a propósito: si la prueba
+  /// usara otro camino, un resultado distinto no diría nada sobre la app real.
+  Future<void> _signInWithApple() async {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _busy = true;
+      _error = null;
     });
+    try {
+      final rawNonce = _randomNonce();
+      final apple = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: sha256.convert(utf8.encode(rawNonce)).toString(),
+      );
+      final credential = OAuthProvider(
+        'apple.com',
+      ).credential(idToken: apple.identityToken, rawNonce: rawNonce);
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      setState(() => _error = '$e');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      body: SafeArea(
+        child: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snap) {
+            final user = snap.data;
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Nona · verificación A4',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    '¿La misma cuenta de Apple da el mismo uid en CINCO y en '
+                    'Nona?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, height: 1.4),
+                  ),
+                  const SizedBox(height: 32),
+                  if (user == null) ...[
+                    FilledButton(
+                      onPressed: _busy ? null : _signInWithApple,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: Text(
+                          _busy ? 'Abriendo…' : 'Entrar con Apple',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    const Text(
+                      'uid de Firebase',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 13, color: Colors.white70),
+                    ),
+                    const SizedBox(height: 6),
+                    SelectableText(
+                      user.uid,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'proveedores: '
+                      '${user.providerData.map((p) => p.providerId).join(', ')}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    const SizedBox(height: 24),
+                    OutlinedButton(
+                      onPressed: () => FirebaseAuth.instance.signOut(),
+                      child: const Text('Cerrar sesión'),
+                    ),
+                  ],
+                  if (_error != null) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
