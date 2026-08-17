@@ -17,21 +17,26 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'game/daily_controller.dart';
-import 'screens/game_screen.dart';
+import 'game/practice_controller.dart';
+import 'screens/home_screen.dart';
 import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final daily = DailyController(prefs);
+  // Solo se espera a la diaria: es a lo que viene la gente. El modo libre se
+  // carga la primera vez que se entra, para no meter una generación de puzle en
+  // el arranque en frío.
   await daily.load();
-  runApp(NonaApp(daily: daily));
+  runApp(NonaApp(daily: daily, practice: PracticeController(prefs)));
 }
 
 class NonaApp extends StatelessWidget {
-  const NonaApp({super.key, required this.daily});
+  const NonaApp({super.key, required this.daily, required this.practice});
 
   final DailyController daily;
+  final PracticeController practice;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +48,9 @@ class NonaApp extends StatelessWidget {
       // así que el idioma casi no toca el juego. Las cadenas se sacan a ARB en
       // N7; de momento el delegado de Material ya responde en los dos.
       supportedLocales: const [Locale('es'), Locale('en')],
-      home: _OrientationGate(child: GameScreen(controller: daily)),
+      home: _OrientationGate(
+        child: HomeScreen(daily: daily, practice: practice),
+      ),
     );
   }
 }
