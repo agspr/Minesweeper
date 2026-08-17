@@ -1,0 +1,25 @@
+{
+  "generatorVersion": 1,
+  "years": {
+    "2026": {
+      "days": 365,
+      "sha256": "29f4bc3f02aa23a26b3d03162ba4f351d628379139cbbf91e9a01396d5c1364c"
+    },
+    "2027": {
+      "days": 365,
+      "sha256": "b85121e7801f10d5d9961f09bdff5460b60f0c547d9c44deae263df6baf581a9"
+    },
+    "2028": {
+      "days": 366,
+      "sha256": "9a8485d5cbfc9e613208a295c841bacbe3a39576c4d5f9669dbf8b5fcad1da90"
+    },
+    "2029": {
+      "days": 365,
+      "sha256": "feac36ee5c2df25ffd18b4ecfb4d588aaafc7c8a1f1440e10c826d4b035ae5ba"
+    },
+    "2030": {
+      "days": 365,
+      "sha256": "f9d78b0621238a3d212d5b3eb0703abb5612a3e82453caa2ececf4749ea6f02b"
+    }
+  }
+}

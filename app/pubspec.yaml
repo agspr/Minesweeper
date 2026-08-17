@@ -29,3 +29,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    # Banco diario horneado (tools/bake_bank.dart). Va DENTRO del binario a
+    # propósito: el diario tiene que existir sin red.
+    - assets/bank/
