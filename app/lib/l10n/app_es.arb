@@ -62,5 +62,20 @@
   },
 
   "language": "Idioma",
-  "languageSystem": "Del sistema"
+  "languageSystem": "Del sistema",
+
+  "share": "Compartir",
+  "shareScore": "{points} pts",
+  "@shareScore": {"placeholders": {"points": {"type": "int"}}},
+  "shareStreak": "🔥 {days} días de racha",
+  "@shareStreak": {"placeholders": {"days": {"type": "int"}}},
+  "shareChallenge": "¿Puedes con la de hoy?",
+  "statsTitle": "Tus números",
+  "statsDaysPlayed": "Días jugados",
+  "statsDaysCompleted": "Terminados",
+  "statsStreak": "Racha",
+  "statsBestStreak": "Mejor racha",
+  "statsTotalPoints": "Puntos",
+  "statsAvgMistakes": "Fallos por día",
+  "statsNone": "Todavía no hay nada que contar. Juega la de hoy."
 }

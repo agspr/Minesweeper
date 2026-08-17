@@ -13,15 +13,22 @@ import 'package:flutter/material.dart';
 import '../game/daily_controller.dart';
 import '../game/scoring.dart';
 import '../l10n/app_localizations.dart';
+import '../services/progress_controller.dart';
+import '../services/share_service.dart';
 import '../theme.dart';
 import '../widgets/numpad.dart';
 import '../widgets/result_overlay.dart';
 import '../widgets/sudoku_board_view.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key, required this.controller});
+  const GameScreen({
+    super.key,
+    required this.controller,
+    required this.progress,
+  });
 
   final DailyController controller;
+  final ProgressController progress;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -68,6 +75,20 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     }
   }
 
+  void _share(BuildContext context, DailyController c) {
+    final score = scoreDaily(c.outcome!);
+    final date = DateTime.parse(c.dayKey!);
+    shareText(
+      buildShareText(
+        l: L.of(context),
+        score: score,
+        difficulty: c.difficulty!,
+        dayLabel: MaterialLocalizations.of(context).formatShortDate(date),
+        streak: widget.progress.streakAsOf(date),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,10 +103,17 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               return const Center(child: CircularProgressIndicator(strokeWidth: 2.5));
             }
 
-            // Al completarse, el reloj se para y sale el resultado.
+            // Al completarse, el reloj se para, se registra el día y sale el
+            // resultado. El registro es idempotente, así que que esto viva en
+            // un `build` no duplica puntos aunque la pantalla se reconstruya.
             if (c.isComplete && !_wasComplete) {
               _wasComplete = true;
               _resultDismissed = false;
+              widget.progress.record(
+                scoreDaily(c.outcome!),
+                DateTime.parse(c.dayKey!),
+                seconds: c.elapsed.inSeconds,
+              );
             }
 
             final board = c.board!;
@@ -138,6 +166,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                       score: scoreDaily(c.outcome!),
                       elapsed: c.elapsed,
                       onClose: () => setState(() => _resultDismissed = true),
+                      onShare: () => _share(context, c),
                     ),
                   ),
               ],

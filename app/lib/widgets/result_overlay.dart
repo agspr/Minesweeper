@@ -19,11 +19,13 @@ class ResultOverlay extends StatelessWidget {
     required this.score,
     required this.elapsed,
     required this.onClose,
+    required this.onShare,
   });
 
   final DailyScore score;
   final Duration elapsed;
   final VoidCallback onClose;
+  final VoidCallback onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +125,29 @@ class ResultOverlay extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: OutlinedButton.icon(
+                  onPressed: onShare,
+                  icon: const Icon(Icons.ios_share_rounded, size: 17),
+                  label: Text(
+                    l.share,
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: NonaColors.text,
+                    side: const BorderSide(color: NonaColors.surface),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 height: 48,

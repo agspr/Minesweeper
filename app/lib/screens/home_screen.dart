@@ -10,6 +10,7 @@ import '../game/daily_controller.dart';
 import '../game/practice_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../services/locale_controller.dart';
+import '../services/progress_controller.dart';
 import '../theme.dart';
 import '../widgets/result_overlay.dart' show difficultyLabel;
 import 'game_screen.dart';
@@ -21,11 +22,13 @@ class HomeScreen extends StatefulWidget {
     required this.daily,
     required this.practice,
     required this.locale,
+    required this.progress,
   });
 
   final DailyController daily;
   final PracticeController practice;
   final LocaleController locale;
+  final ProgressController progress;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -39,7 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return switch (_view) {
-      _View.daily => GameScreen(controller: widget.daily),
+      _View.daily => GameScreen(
+        controller: widget.daily,
+        progress: widget.progress,
+      ),
       _View.practice => PracticeScreen(
         controller: widget.practice,
         onExit: () => setState(() => _view = _View.menu),
@@ -47,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _View.menu => _Menu(
         daily: widget.daily,
         locale: widget.locale,
+        progress: widget.progress,
         onDaily: () => setState(() => _view = _View.daily),
         onPractice: () {
           // Se carga al entrar, no al arrancar la app: generar un puzle en el
@@ -64,12 +71,14 @@ class _Menu extends StatelessWidget {
   const _Menu({
     required this.daily,
     required this.locale,
+    required this.progress,
     required this.onDaily,
     required this.onPractice,
   });
 
   final DailyController daily;
   final LocaleController locale;
+  final ProgressController progress;
   final VoidCallback onDaily;
   final VoidCallback onPractice;
 
@@ -132,7 +141,9 @@ class _Menu extends StatelessWidget {
                       icon: Icons.all_inclusive_rounded,
                       onTap: onPractice,
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 26),
+                    _Stats(progress: progress, l: l),
+                    const SizedBox(height: 22),
                     // Un ciclo sistema → ES → EN y no un desplegable: con dos
                     // idiomas, un menú sería más ceremonia de la que merece.
                     // Mucha gente tiene el teléfono en un idioma y prefiere
@@ -248,6 +259,110 @@ class _Card extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Franja de números personales. Vive en el menú y no en una pantalla aparte
+/// porque son cuatro cifras: esconderlas detrás de otro toque sería fingir que
+/// hay más de lo que hay.
+class _Stats extends StatelessWidget {
+  const _Stats({required this.progress, required this.l});
+
+  final ProgressController progress;
+  final L l;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: progress,
+      builder: (context, _) {
+        if (progress.daysPlayed == 0) {
+          return Text(
+            l.statsNone,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 13, color: NonaColors.muted),
+          );
+        }
+        final avg = progress.averageMistakes;
+        return Column(
+          children: [
+            Row(
+              children: [
+                _Stat(
+                  // La racha VIGENTE, no el contador guardado: si el último día
+                  // terminado no es ni hoy ni ayer, ya está rota y hay que
+                  // enseñarla rota.
+                  value: '${progress.streakAsOf(DateTime.now())}',
+                  label: l.statsStreak,
+                ),
+                _Stat(
+                  value: '${progress.bestStreak}',
+                  label: l.statsBestStreak,
+                ),
+                _Stat(
+                  value: '${progress.totalPoints}',
+                  label: l.statsTotalPoints,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _Stat(
+                  value: '${progress.daysCompleted}',
+                  label: l.statsDaysCompleted,
+                ),
+                _Stat(
+                  value: '${progress.daysPlayed}',
+                  label: l.statsDaysPlayed,
+                ),
+                _Stat(
+                  value: avg == null ? '—' : avg.toStringAsFixed(1),
+                  label: l.statsAvgMistakes,
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _Stat extends StatelessWidget {
+  const _Stat({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 22,
+                height: 1,
+                fontWeight: FontWeight.w800,
+                color: NonaColors.text,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 11, color: NonaColors.muted),
+            ),
+          ),
+        ],
       ),
     );
   }

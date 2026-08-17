@@ -41,5 +41,18 @@
   "bankGap": "There's no puzzle for today.\nCheck your device's date.",
 
   "language": "Language",
-  "languageSystem": "System"
+  "languageSystem": "System",
+
+  "share": "Share",
+  "shareScore": "{points} pts",
+  "shareStreak": "🔥 {days}-day streak",
+  "shareChallenge": "Can you beat today’s?",
+  "statsTitle": "Your numbers",
+  "statsDaysPlayed": "Days played",
+  "statsDaysCompleted": "Finished",
+  "statsStreak": "Streak",
+  "statsBestStreak": "Best streak",
+  "statsTotalPoints": "Points",
+  "statsAvgMistakes": "Mistakes per day",
+  "statsNone": "Nothing to show yet. Play today’s puzzle."
 }

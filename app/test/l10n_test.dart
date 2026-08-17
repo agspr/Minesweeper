@@ -43,7 +43,9 @@ void main() {
     test('ninguna traducción quedó idéntica por descuido', () {
       // Algunas coinciden legítimamente ("Nona", "Total"): se listan a mano,
       // así que cualquier OTRA que coincida sale a la luz.
-      const coincidenOk = {'appName', 'breakdownTotal'};
+      // "pts" es igual en los dos idiomas, igual que el nombre de la app y
+      // "Total". Cualquier OTRA coincidencia es una traducción sin hacer.
+      const coincidenOk = {'appName', 'breakdownTotal', 'shareScore'};
       final iguales = <String>[];
       for (final k in keysOf(es)) {
         if (coincidenOk.contains(k)) continue;

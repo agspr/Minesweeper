@@ -294,6 +294,78 @@ abstract class L {
   /// In es, this message translates to:
   /// **'Del sistema'**
   String get languageSystem;
+
+  /// No description provided for @share.
+  ///
+  /// In es, this message translates to:
+  /// **'Compartir'**
+  String get share;
+
+  /// No description provided for @shareScore.
+  ///
+  /// In es, this message translates to:
+  /// **'{points} pts'**
+  String shareScore(int points);
+
+  /// No description provided for @shareStreak.
+  ///
+  /// In es, this message translates to:
+  /// **'🔥 {days} días de racha'**
+  String shareStreak(int days);
+
+  /// No description provided for @shareChallenge.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Puedes con la de hoy?'**
+  String get shareChallenge;
+
+  /// No description provided for @statsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus números'**
+  String get statsTitle;
+
+  /// No description provided for @statsDaysPlayed.
+  ///
+  /// In es, this message translates to:
+  /// **'Días jugados'**
+  String get statsDaysPlayed;
+
+  /// No description provided for @statsDaysCompleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Terminados'**
+  String get statsDaysCompleted;
+
+  /// No description provided for @statsStreak.
+  ///
+  /// In es, this message translates to:
+  /// **'Racha'**
+  String get statsStreak;
+
+  /// No description provided for @statsBestStreak.
+  ///
+  /// In es, this message translates to:
+  /// **'Mejor racha'**
+  String get statsBestStreak;
+
+  /// No description provided for @statsTotalPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntos'**
+  String get statsTotalPoints;
+
+  /// No description provided for @statsAvgMistakes.
+  ///
+  /// In es, this message translates to:
+  /// **'Fallos por día'**
+  String get statsAvgMistakes;
+
+  /// No description provided for @statsNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay nada que contar. Juega la de hoy.'**
+  String get statsNone;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

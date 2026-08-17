@@ -5,6 +5,7 @@ import 'package:nona/game/daily_controller.dart';
 import 'package:nona/game/difficulty.dart';
 import 'package:nona/game/generator.dart';
 import 'package:nona/screens/game_screen.dart';
+import 'package:nona/services/progress_controller.dart';
 
 import 'helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,7 +56,14 @@ void main() {
       );
       await c.load();
 
-      await tester.pumpWidget(testApp(GameScreen(controller: c)));
+      await tester.pumpWidget(
+        testApp(
+          GameScreen(
+            controller: c,
+            progress: ProgressController(await SharedPreferences.getInstance()),
+          ),
+        ),
+      );
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(tester.takeException(), isNull, reason: '${entry.key} desborda');
@@ -86,7 +94,10 @@ void main() {
       testApp(
         MediaQuery(
           data: const MediaQueryData(textScaler: TextScaler.linear(1.6)),
-          child: GameScreen(controller: c),
+          child: GameScreen(
+            controller: c,
+            progress: ProgressController(await SharedPreferences.getInstance()),
+          ),
         ),
       ),
     );

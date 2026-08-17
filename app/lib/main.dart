@@ -22,6 +22,7 @@ import 'game/practice_controller.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'services/locale_controller.dart';
+import 'services/progress_controller.dart';
 import 'theme.dart';
 
 Future<void> main() async {
@@ -37,6 +38,7 @@ Future<void> main() async {
       daily: daily,
       practice: PracticeController(prefs),
       locale: LocaleController(prefs),
+      progress: ProgressController(prefs),
     ),
   );
 }
@@ -47,11 +49,13 @@ class NonaApp extends StatelessWidget {
     required this.daily,
     required this.practice,
     required this.locale,
+    required this.progress,
   });
 
   final DailyController daily;
   final PracticeController practice;
   final LocaleController locale;
+  final ProgressController progress;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +82,7 @@ class NonaApp extends StatelessWidget {
             daily: daily,
             practice: practice,
             locale: locale,
+            progress: progress,
           ),
         ),
       ),

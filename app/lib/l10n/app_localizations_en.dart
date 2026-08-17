@@ -130,4 +130,44 @@ class LEn extends L {
 
   @override
   String get languageSystem => 'System';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String shareScore(int points) {
+    return '$points pts';
+  }
+
+  @override
+  String shareStreak(int days) {
+    return '🔥 $days-day streak';
+  }
+
+  @override
+  String get shareChallenge => 'Can you beat today’s?';
+
+  @override
+  String get statsTitle => 'Your numbers';
+
+  @override
+  String get statsDaysPlayed => 'Days played';
+
+  @override
+  String get statsDaysCompleted => 'Finished';
+
+  @override
+  String get statsStreak => 'Streak';
+
+  @override
+  String get statsBestStreak => 'Best streak';
+
+  @override
+  String get statsTotalPoints => 'Points';
+
+  @override
+  String get statsAvgMistakes => 'Mistakes per day';
+
+  @override
+  String get statsNone => 'Nothing to show yet. Play today’s puzzle.';
 }

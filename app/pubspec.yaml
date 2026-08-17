@@ -24,6 +24,7 @@ dependencies:
   sign_in_with_apple: ^8.1.0
 
   # Estado local de la partida: la diaria tiene que poder jugarse sin red.
+  share_plus: ^13.3.0
   shared_preferences: ^2.5.5
 
   cupertino_icons: ^1.0.8

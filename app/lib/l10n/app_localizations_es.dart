@@ -130,4 +130,44 @@ class LEs extends L {
 
   @override
   String get languageSystem => 'Del sistema';
+
+  @override
+  String get share => 'Compartir';
+
+  @override
+  String shareScore(int points) {
+    return '$points pts';
+  }
+
+  @override
+  String shareStreak(int days) {
+    return '🔥 $days días de racha';
+  }
+
+  @override
+  String get shareChallenge => '¿Puedes con la de hoy?';
+
+  @override
+  String get statsTitle => 'Tus números';
+
+  @override
+  String get statsDaysPlayed => 'Días jugados';
+
+  @override
+  String get statsDaysCompleted => 'Terminados';
+
+  @override
+  String get statsStreak => 'Racha';
+
+  @override
+  String get statsBestStreak => 'Mejor racha';
+
+  @override
+  String get statsTotalPoints => 'Puntos';
+
+  @override
+  String get statsAvgMistakes => 'Fallos por día';
+
+  @override
+  String get statsNone => 'Todavía no hay nada que contar. Juega la de hoy.';
 }
