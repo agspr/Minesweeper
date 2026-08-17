@@ -9,6 +9,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../game/grid.dart';
 import '../game/sudoku_board.dart';
 import '../theme.dart';
@@ -39,6 +41,7 @@ class Numpad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = L.of(context);
     return Column(
       children: [
         Row(
@@ -64,7 +67,7 @@ class Numpad extends StatelessWidget {
             Expanded(
               child: _ActionKey(
                 icon: Icons.undo_rounded,
-                label: 'Deshacer',
+                label: l.undo,
                 enabled: enabled && board.canUndo,
                 onTap: onUndo,
               ),
@@ -73,7 +76,7 @@ class Numpad extends StatelessWidget {
             Expanded(
               child: _ActionKey(
                 icon: Icons.backspace_outlined,
-                label: 'Borrar',
+                label: l.erase,
                 enabled: enabled,
                 onTap: onErase,
               ),
@@ -82,7 +85,7 @@ class Numpad extends StatelessWidget {
             Expanded(
               child: _ActionKey(
                 icon: Icons.edit_outlined,
-                label: 'Notas',
+                label: l.notes,
                 enabled: enabled,
                 active: notesMode,
                 onTap: onToggleNotes,

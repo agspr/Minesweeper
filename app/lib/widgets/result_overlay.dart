@@ -9,6 +9,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../game/difficulty.dart';
+import '../l10n/app_localizations.dart';
 import '../game/scoring.dart';
 import '../theme.dart';
 
@@ -24,14 +25,14 @@ class ResultOverlay extends StatelessWidget {
   final Duration elapsed;
   final VoidCallback onClose;
 
-  String get _difficultyLabel => switch (score.base) {
-    50 => 'Fácil',
-    100 => 'Medio',
-    _ => 'Difícil',
-  };
-
   @override
   Widget build(BuildContext context) {
+    final l = L.of(context);
+    final difficulty = switch (score.base) {
+      50 => l.difficultyEasy,
+      100 => l.difficultyMedium,
+      _ => l.difficultyHard,
+    };
     return Container(
       color: Colors.black.withValues(alpha: 0.72),
       child: Center(
@@ -47,7 +48,7 @@ class ResultOverlay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                score.completed ? '¡Resuelto!' : 'Por hoy lo dejamos aquí',
+                score.completed ? l.solved : l.unfinished,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 22,
@@ -57,7 +58,7 @@ class ResultOverlay extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '$_difficultyLabel · ${_clock(elapsed)}',
+                '$difficulty · ${_clock(elapsed)}',
                 style: const TextStyle(fontSize: 13, color: NonaColors.muted),
               ),
               const SizedBox(height: 22),
@@ -71,35 +72,34 @@ class ResultOverlay extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
-                'puntos',
-                style: TextStyle(fontSize: 13, color: NonaColors.muted),
+              Text(
+                l.points,
+                style: const TextStyle(fontSize: 13, color: NonaColors.muted),
               ),
               const SizedBox(height: 22),
               // El desglose. Suma exactamente lo de arriba, a la vista.
-              _Line(label: 'Base del día', value: '${score.base}'),
+              _Line(label: l.breakdownBase, value: '${score.base}'),
               if (score.completed) ...[
                 if (score.countedMistakes > 0)
                   _Line(
-                    label: score.countedMistakes == 1
-                        ? '1 fallo'
-                        : '${score.countedMistakes} fallos'
-                              '${score.countedMistakes == 5 ? ' (tope)' : ''}',
+                    label:
+                        l.mistakeCount(score.countedMistakes) +
+                        (score.countedMistakes == 5 ? l.mistakeCapSuffix : ''),
                     value: '−${score.mistakePenalty}',
                     negative: true,
                   )
                 else
-                  const _Line(label: 'Sin fallos', value: '−0'),
+                  _Line(label: l.breakdownNoMistakes, value: '−0'),
               ] else
                 _Line(
-                  label: '${score.completionPercent}% completado',
+                  label: l.breakdownCompleted(score.completionPercent),
                   value: '×${(score.partialFraction ?? 0) * 100 ~/ 1}%',
                 ),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
                 child: Divider(height: 1, color: NonaColors.surface),
               ),
-              _Line(label: 'Total', value: '${score.points}', strong: true),
+              _Line(label: l.breakdownTotal, value: '${score.points}', strong: true),
               const SizedBox(height: 18),
               // La racha solo la da terminar (§1); decirlo aquí evita que
               // alguien crea que el crédito parcial se la mantiene.
@@ -112,9 +112,7 @@ class ResultOverlay extends StatelessWidget {
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
-                  score.extendsStreak
-                      ? '🔥 Racha mantenida'
-                      : 'La racha pide terminarlo',
+                  score.extendsStreak ? l.streakKept : l.streakNeedsFinish,
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
@@ -136,9 +134,9 @@ class ResultOverlay extends StatelessWidget {
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  child: const Text(
-                    'Listo',
-                    style: TextStyle(
+                  child: Text(
+                    l.done,
+                    style: const TextStyle(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       color: NonaColors.accentDeep,
@@ -206,9 +204,13 @@ String _clock(Duration d) {
   return '$m:$s';
 }
 
-/// Etiqueta corta de dificultad para el resto de la interfaz.
-String difficultyLabel(Difficulty d) => switch (d) {
-  Difficulty.easy => 'Fácil',
-  Difficulty.medium => 'Medio',
-  Difficulty.hard => 'Difícil',
-};
+/// Etiqueta de dificultad, traducida. Vive aquí porque la usan varias
+/// pantallas y no merece un fichero propio.
+String difficultyLabel(BuildContext context, Difficulty d) {
+  final l = L.of(context);
+  return switch (d) {
+    Difficulty.easy => l.difficultyEasy,
+    Difficulty.medium => l.difficultyMedium,
+    Difficulty.hard => l.difficultyHard,
+  };
+}

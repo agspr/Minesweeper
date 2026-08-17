@@ -8,16 +8,24 @@ import 'package:flutter/material.dart';
 
 import '../game/daily_controller.dart';
 import '../game/practice_controller.dart';
+import '../l10n/app_localizations.dart';
+import '../services/locale_controller.dart';
 import '../theme.dart';
 import '../widgets/result_overlay.dart' show difficultyLabel;
 import 'game_screen.dart';
 import 'practice_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.daily, required this.practice});
+  const HomeScreen({
+    super.key,
+    required this.daily,
+    required this.practice,
+    required this.locale,
+  });
 
   final DailyController daily;
   final PracticeController practice;
+  final LocaleController locale;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -38,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       _View.menu => _Menu(
         daily: widget.daily,
+        locale: widget.locale,
         onDaily: () => setState(() => _view = _View.daily),
         onPractice: () {
           // Se carga al entrar, no al arrancar la app: generar un puzle en el
@@ -54,11 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
 class _Menu extends StatelessWidget {
   const _Menu({
     required this.daily,
+    required this.locale,
     required this.onDaily,
     required this.onPractice,
   });
 
   final DailyController daily;
+  final LocaleController locale;
   final VoidCallback onDaily;
   final VoidCallback onPractice;
 
@@ -73,13 +84,14 @@ class _Menu extends StatelessWidget {
               listenable: daily,
               builder: (context, _) {
                 final done = daily.isComplete;
+                final l = L.of(context);
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(22, 40, 22, 24),
                   children: [
-                    const Text(
-                      'Nona',
+                    Text(
+                      l.appName,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.w800,
                         color: NonaColors.accent,
@@ -87,19 +99,26 @@ class _Menu extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Sudoku del día',
+                    Text(
+                      l.appTagline,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14, color: NonaColors.muted),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: NonaColors.muted,
+                      ),
                     ),
                     const SizedBox(height: 44),
                     _Card(
-                      title: 'La diaria',
+                      title: l.menuDaily,
                       subtitle: daily.difficulty == null
-                          ? 'Cargando…'
+                          ? l.menuLoading
                           : done
-                          ? 'Hecha · ${difficultyLabel(daily.difficulty!)}'
-                          : '${difficultyLabel(daily.difficulty!)} · hoy',
+                          ? l.menuDailyDone(
+                              difficultyLabel(context, daily.difficulty!),
+                            )
+                          : l.menuDailyToday(
+                              difficultyLabel(context, daily.difficulty!),
+                            ),
                       icon: done
                           ? Icons.check_circle_rounded
                           : Icons.today_rounded,
@@ -108,10 +127,49 @@ class _Menu extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _Card(
-                      title: 'Modo libre',
-                      subtitle: 'Puzles infinitos · no puntúa',
+                      title: l.menuPractice,
+                      subtitle: l.menuPracticeSubtitle,
                       icon: Icons.all_inclusive_rounded,
                       onTap: onPractice,
+                    ),
+                    const SizedBox(height: 28),
+                    // Un ciclo sistema → ES → EN y no un desplegable: con dos
+                    // idiomas, un menú sería más ceremonia de la que merece.
+                    // Mucha gente tiene el teléfono en un idioma y prefiere
+                    // jugar en otro, así que seguir solo al sistema no basta.
+                    Center(
+                      child: GestureDetector(
+                        onTap: locale.cycle,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: NonaColors.surface,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.language_rounded,
+                                size: 15,
+                                color: NonaColors.muted,
+                              ),
+                              const SizedBox(width: 7),
+                              Text(
+                                locale.labelFor(l.languageSystem),
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: NonaColors.muted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 );

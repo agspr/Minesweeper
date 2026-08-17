@@ -1,0 +1,66 @@
+{
+  "@@locale": "es",
+
+  "appName": "Nona",
+  "appTagline": "Sudoku del día",
+
+  "menuDaily": "La diaria",
+  "menuDailyToday": "{difficulty} · hoy",
+  "@menuDailyToday": {
+    "placeholders": { "difficulty": { "type": "String" } }
+  },
+  "menuDailyDone": "Hecha · {difficulty}",
+  "@menuDailyDone": {
+    "placeholders": { "difficulty": { "type": "String" } }
+  },
+  "menuLoading": "Cargando…",
+  "menuPractice": "Modo libre",
+  "menuPracticeSubtitle": "Puzles infinitos · no puntúa",
+
+  "difficultyEasy": "Fácil",
+  "difficultyMedium": "Medio",
+  "difficultyHard": "Difícil",
+
+  "noMistakes": "sin fallos",
+  "mistakeCount": "{count, plural, one{1 fallo} other{{count} fallos}}",
+  "@mistakeCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "mistakeCapSuffix": " (tope)",
+  "@mistakeCapSuffix": {
+    "description": "Se añade al contador de fallos al llegar al tope de 5, donde la penalización deja de crecer."
+  },
+
+  "hintCount": "{count, plural, one{1 pista} other{{count} pistas}}",
+  "@hintCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "undo": "Deshacer",
+  "erase": "Borrar",
+  "notes": "Notas",
+  "hint": "Pista",
+  "newPuzzle": "Otro puzle",
+
+  "solved": "¡Resuelto!",
+  "unfinished": "Por hoy lo dejamos aquí",
+  "points": "puntos",
+  "breakdownBase": "Base del día",
+  "breakdownNoMistakes": "Sin fallos",
+  "breakdownCompleted": "{percent}% completado",
+  "@breakdownCompleted": {
+    "placeholders": { "percent": { "type": "int" } }
+  },
+  "breakdownTotal": "Total",
+  "streakKept": "🔥 Racha mantenida",
+  "streakNeedsFinish": "La racha pide terminarlo",
+  "done": "Listo",
+
+  "bankGap": "No hay puzle para hoy.\nRevisa la fecha de tu dispositivo.",
+  "@bankGap": {
+    "description": "Solo debería verse si se agota el horizonte horneado del banco o si el reloj del aparato está en otra era."
+  },
+
+  "language": "Idioma",
+  "languageSystem": "Del sistema"
+}

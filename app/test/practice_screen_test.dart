@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nona/game/practice_controller.dart';
 import 'package:nona/screens/practice_screen.dart';
-import 'package:nona/theme.dart';
+
+import 'helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Los botones de "Pista" y "Otro puzle" no reaccionaban en el simulador aunque
@@ -16,8 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  Widget wrap(PracticeController c) =>
-      MaterialApp(theme: nonaTheme(), home: PracticeScreen(controller: c));
+  Widget wrap(PracticeController c) => testApp(PracticeScreen(controller: c));
 
   Future<PracticeController> loadedIn(WidgetTester tester) async {
     late PracticeController c;

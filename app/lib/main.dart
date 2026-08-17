@@ -14,11 +14,14 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'game/daily_controller.dart';
 import 'game/practice_controller.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
+import 'services/locale_controller.dart';
 import 'theme.dart';
 
 Future<void> main() async {
@@ -29,27 +32,54 @@ Future<void> main() async {
   // carga la primera vez que se entra, para no meter una generación de puzle en
   // el arranque en frío.
   await daily.load();
-  runApp(NonaApp(daily: daily, practice: PracticeController(prefs)));
+  runApp(
+    NonaApp(
+      daily: daily,
+      practice: PracticeController(prefs),
+      locale: LocaleController(prefs),
+    ),
+  );
 }
 
 class NonaApp extends StatelessWidget {
-  const NonaApp({super.key, required this.daily, required this.practice});
+  const NonaApp({
+    super.key,
+    required this.daily,
+    required this.practice,
+    required this.locale,
+  });
 
   final DailyController daily;
   final PracticeController practice;
+  final LocaleController locale;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Nona',
-      debugShowCheckedModeBanner: false,
-      theme: nonaTheme(),
-      // Bilingüe desde el primer día (diseño §0): Nona es un juego de números,
-      // así que el idioma casi no toca el juego. Las cadenas se sacan a ARB en
-      // N7; de momento el delegado de Material ya responde en los dos.
-      supportedLocales: const [Locale('es'), Locale('en')],
-      home: _OrientationGate(
-        child: HomeScreen(daily: daily, practice: practice),
+    // Escucha el idioma: cambiarlo reconstruye MaterialApp entera, que es lo
+    // que hace que la app se traduzca sin reiniciar.
+    return ListenableBuilder(
+      listenable: locale,
+      builder: (context, _) => MaterialApp(
+        title: 'Nona',
+        debugShowCheckedModeBanner: false,
+        theme: nonaTheme(),
+        // Bilingüe desde el primer día (diseño §0). `locale: null` significa
+        // seguir al sistema; con un idioma elegido a mano, manda ese.
+        locale: locale.locale,
+        supportedLocales: L.supportedLocales,
+        localizationsDelegates: const [
+          L.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: _OrientationGate(
+          child: HomeScreen(
+            daily: daily,
+            practice: practice,
+            locale: locale,
+          ),
+        ),
       ),
     );
   }

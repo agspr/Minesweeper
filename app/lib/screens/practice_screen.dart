@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import '../game/difficulty.dart';
 import '../game/practice_controller.dart';
+import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../widgets/numpad.dart';
 import '../widgets/result_overlay.dart' show difficultyLabel;
@@ -132,7 +133,7 @@ class _Header extends StatelessWidget {
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: Text(
-                          difficultyLabel(d),
+                          difficultyLabel(context, d),
                           style: TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
@@ -150,7 +151,7 @@ class _Header extends StatelessWidget {
         ),
         if (hintsUsed > 0)
           Text(
-            hintsUsed == 1 ? '1 pista' : '$hintsUsed pistas',
+            L.of(context).hintCount(hintsUsed),
             style: const TextStyle(fontSize: 12, color: NonaColors.muted),
           ),
       ],
@@ -171,7 +172,7 @@ class _PracticeActions extends StatelessWidget {
         Expanded(
           child: _Bar(
             icon: Icons.lightbulb_outline_rounded,
-            label: 'Pista',
+            label: L.of(context).hint,
             onTap: onHint,
           ),
         ),
@@ -179,7 +180,7 @@ class _PracticeActions extends StatelessWidget {
         Expanded(
           child: _Bar(
             icon: Icons.refresh_rounded,
-            label: 'Otro puzle',
+            label: L.of(context).newPuzzle,
             onTap: onNew,
           ),
         ),
@@ -197,10 +198,10 @@ class _SolvedBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: Text(
-            '¡Resuelto!',
-            style: TextStyle(
+            L.of(context).solved,
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: NonaColors.accent,
@@ -211,7 +212,7 @@ class _SolvedBar extends StatelessWidget {
           width: 160,
           child: _Bar(
             icon: Icons.refresh_rounded,
-            label: 'Otro puzle',
+            label: L.of(context).newPuzzle,
             onTap: onNew,
             filled: true,
           ),

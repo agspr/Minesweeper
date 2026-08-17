@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
   # Identidad compartida. Estas tres van ya —antes que el paquete
   # juegos_senda— porque hacen falta para la verificación A4: comprobar que la
@@ -32,6 +35,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # Genera AppLocalizations desde lib/l10n/*.arb (ver l10n.yaml).
+  generate: true
 
   assets:
     # Banco diario horneado (tools/bake_bank.dart). Va DENTRO del binario a

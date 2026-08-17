@@ -5,7 +5,8 @@ import 'package:nona/game/daily_controller.dart';
 import 'package:nona/game/difficulty.dart';
 import 'package:nona/game/generator.dart';
 import 'package:nona/screens/game_screen.dart';
-import 'package:nona/theme.dart';
+
+import 'helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Pruebas de desbordes. El tablero es cuadrado y el numpad no se comprime, así
@@ -54,9 +55,7 @@ void main() {
       );
       await c.load();
 
-      await tester.pumpWidget(
-        MaterialApp(theme: nonaTheme(), home: GameScreen(controller: c)),
-      );
+      await tester.pumpWidget(testApp(GameScreen(controller: c)));
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(tester.takeException(), isNull, reason: '${entry.key} desborda');
@@ -84,9 +83,8 @@ void main() {
     await c.load();
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: nonaTheme(),
-        home: MediaQuery(
+      testApp(
+        MediaQuery(
           data: const MediaQueryData(textScaler: TextScaler.linear(1.6)),
           child: GameScreen(controller: c),
         ),

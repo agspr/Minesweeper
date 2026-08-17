@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import '../game/daily_controller.dart';
 import '../game/scoring.dart';
+import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../widgets/numpad.dart';
 import '../widgets/result_overlay.dart';
@@ -98,7 +99,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                       child: Column(
                         children: [
                           _Header(
-                            difficulty: difficultyLabel(c.difficulty!),
+                            difficulty: difficultyLabel(context, c.difficulty!),
                             mistakes: board.mistakes,
                             elapsed: c.elapsed,
                           ),
@@ -161,6 +162,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = L.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       // Flexible + FittedBox porque esta fila desbordaba en TODOS los móviles
@@ -196,9 +198,9 @@ class _Header extends StatelessWidget {
                   // que la primera resta pareciera salir de la nada.
                   _Chip(
                     label: mistakes == 0
-                        ? 'sin fallos'
-                        : '$mistakes ${mistakes == 1 ? 'fallo' : 'fallos'}'
-                              '${mistakes >= 5 ? ' (tope)' : ''}',
+                        ? l.noMistakes
+                        : l.mistakeCount(mistakes) +
+                              (mistakes >= 5 ? l.mistakeCapSuffix : ''),
                     highlight: mistakes > 0,
                   ),
                   const SizedBox(width: 8),
@@ -246,13 +248,17 @@ class _BankGap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Text(
-          'No hay puzle para hoy.\nRevisa la fecha de tu dispositivo.',
+          L.of(context).bankGap,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 15, height: 1.5, color: NonaColors.muted),
+          style: const TextStyle(
+            fontSize: 15,
+            height: 1.5,
+            color: NonaColors.muted,
+          ),
         ),
       ),
     );

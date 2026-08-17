@@ -1,0 +1,45 @@
+{
+  "@@locale": "en",
+
+  "appName": "Nona",
+  "appTagline": "Daily Sudoku",
+
+  "menuDaily": "Today's puzzle",
+  "menuDailyToday": "{difficulty} · today",
+  "menuDailyDone": "Done · {difficulty}",
+  "menuLoading": "Loading…",
+  "menuPractice": "Free play",
+  "menuPracticeSubtitle": "Endless puzzles · unscored",
+
+  "difficultyEasy": "Easy",
+  "difficultyMedium": "Medium",
+  "difficultyHard": "Hard",
+
+  "noMistakes": "no mistakes",
+  "mistakeCount": "{count, plural, one{1 mistake} other{{count} mistakes}}",
+  "mistakeCapSuffix": " (max)",
+
+  "hintCount": "{count, plural, one{1 hint} other{{count} hints}}",
+
+  "undo": "Undo",
+  "erase": "Erase",
+  "notes": "Notes",
+  "hint": "Hint",
+  "newPuzzle": "New puzzle",
+
+  "solved": "Solved!",
+  "unfinished": "Let's leave it here for today",
+  "points": "points",
+  "breakdownBase": "Today's base",
+  "breakdownNoMistakes": "No mistakes",
+  "breakdownCompleted": "{percent}% complete",
+  "breakdownTotal": "Total",
+  "streakKept": "🔥 Streak kept",
+  "streakNeedsFinish": "The streak needs a finish",
+  "done": "Done",
+
+  "bankGap": "There's no puzzle for today.\nCheck your device's date.",
+
+  "language": "Language",
+  "languageSystem": "System"
+}

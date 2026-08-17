@@ -1,0 +1,10 @@
+# Configuración de gen_l10n.
+#
+# El español es la plantilla porque es el idioma en el que se escribe el
+# producto; el inglés se traduce a partir de él. `nullable-getter: false` evita
+# el `AppLocalizations.of(context)!` con admiración por toda la app.
+arb-dir: lib/l10n
+template-arb-file: app_es.arb
+output-localization-file: app_localizations.dart
+output-class: L
+nullable-getter: false
