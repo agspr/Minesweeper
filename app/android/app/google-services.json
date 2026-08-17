@@ -1,0 +1,114 @@
+{
+  "project_info": {
+    "project_number": "708221297560",
+    "project_id": "cinco-fe5cc",
+    "storage_bucket": "cinco-fe5cc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708221297560:android:855d9ed37b6977f4c301ed",
+        "android_client_info": {
+          "package_name": "com.cincoapp.cinco"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708221297560-0nlu5hgtub1jkbjgka6269hd5qse0br4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cincoapp.cinco",
+            "certificate_hash": "133c54e0f4138e176de0a520541190c7f1564f8a"
+          }
+        },
+        {
+          "client_id": "708221297560-1bvt5vab0p6jqs8iiid93shpqfne7lna.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cincoapp.cinco",
+            "certificate_hash": "be2a4f3f48f16e7c11badcdcde15cefefc5c812f"
+          }
+        },
+        {
+          "client_id": "708221297560-d2c5731egknabqe0mhnhs2l1ncfqbme6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cincoapp.cinco",
+            "certificate_hash": "dea102d055887d392b67bd0b25dc9ac5c583b77d"
+          }
+        },
+        {
+          "client_id": "708221297560-t6oql4cn0oqucoi714otkel18b655ru3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cincoapp.cinco",
+            "certificate_hash": "fed646e855bf7aff3ba57b3ad25d5a968570909f"
+          }
+        },
+        {
+          "client_id": "708221297560-t19lg0p1pht4l5hf401ccpr765t85jf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAecrNRR3i7O2Ej9DgMt3Gsjl5HYgii4ko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708221297560-t19lg0p1pht4l5hf401ccpr765t85jf9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "708221297560-958vn0d067n99a1su5pn81i3fi4lcfqq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cincoapp.cinco"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708221297560:android:2948386e6483bbd9c301ed",
+        "android_client_info": {
+          "package_name": "com.nonaapp.nona"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708221297560-t19lg0p1pht4l5hf401ccpr765t85jf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAecrNRR3i7O2Ej9DgMt3Gsjl5HYgii4ko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708221297560-t19lg0p1pht4l5hf401ccpr765t85jf9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "708221297560-958vn0d067n99a1su5pn81i3fi4lcfqq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cincoapp.cinco"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
