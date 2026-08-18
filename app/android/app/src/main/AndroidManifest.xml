@@ -34,7 +34,7 @@
              app se cierra al arrancar. De prueba hasta que Nona tenga cuenta. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-5030233210775781~4088527589" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

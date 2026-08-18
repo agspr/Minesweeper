@@ -28,7 +28,12 @@ final GameConfig nonaConfig = GameConfig(
   // Sin cuenta de AdMob todavía: el paquete cae a las unidades de prueba de
   // Google. Se cambia por las reales cuando el agente de listings las cree, y
   // mientras tanto la app se puede construir y enseñar entera.
-  ads: const AdConfig.testOnly(),
+  ads: const AdConfig(
+    bannerAndroid: 'ca-app-pub-5030233210775781/8790973745',
+    bannerIos: 'ca-app-pub-5030233210775781/5154197249',
+    interstitialAndroid: 'ca-app-pub-5030233210775781/2444273423',
+    interstitialIos: 'ca-app-pub-5030233210775781/2528033906',
+  ),
 
   iap: const IapConfig(removeAdsId: 'com.nonaapp.nona.removeads'),
 
