@@ -42,6 +42,15 @@ void main() {
     'iPhone 15 Pro Max': Size(430, 932),
     'iPad mini': Size(744, 1133),
     'iPad Pro 12.9"': Size(1024, 1366),
+    // APAISADAS. Faltaban, y son justo donde vive el reparto de tablet: con
+    // solo medidas verticales, la rama ancha de PuzzleLayout no la montaba
+    // ninguna prueba. Es el mismo agujero que tenía este fichero cuando
+    // probaba la pantalla sin barra inferior.
+    'iPad mini apaisado': Size(1133, 744),
+    'iPad Pro 12.9" apaisado': Size(1366, 1024),
+    // Split View: media pantalla de un 12.9". Sigue siendo "tablet" por el
+    // lado corto, pero el ancho ya no da para el reparto de dos columnas.
+    'iPad Pro 12.9" a media pantalla': Size(683, 1024),
   };
 
   for (final entry in sizes.entries) {

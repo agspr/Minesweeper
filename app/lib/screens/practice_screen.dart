@@ -12,6 +12,7 @@ import '../game/practice_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../widgets/numpad.dart';
+import '../widgets/puzzle_layout.dart';
 import '../widgets/result_overlay.dart' show difficultyLabel;
 import '../widgets/sudoku_board_view.dart';
 
@@ -29,33 +30,29 @@ class PracticeScreen extends StatelessWidget {
           listenable: controller,
           builder: (context, _) {
             final c = controller;
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Column(
-                    children: [
-                      _Header(
-                        difficulty: c.difficulty,
-                        hintsUsed: c.hintsUsed,
-                        onPick: c.setDifficulty,
-                        onExit: onExit,
-                      ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: Center(
-                          child: c.generating || c.board == null
-                              ? const CircularProgressIndicator(strokeWidth: 2.5)
-                              : SudokuBoardView(
-                                  board: c.board!,
-                                  selected: c.selected,
-                                  onTapCell: c.select,
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (c.board != null && !c.generating) ...[
+            return PuzzleLayout(
+              header: _Header(
+                difficulty: c.difficulty,
+                hintsUsed: c.hintsUsed,
+                onPick: c.setDifficulty,
+                onExit: onExit,
+              ),
+              board: c.generating || c.board == null
+                  ? const CircularProgressIndicator(strokeWidth: 2.5)
+                  : SudokuBoardView(
+                      board: c.board!,
+                      selected: c.selected,
+                      onTapCell: c.select,
+                    ),
+              // El modo práctica mete una barra de acciones —pista, otro
+              // puzle— entre el tablero y el numpad. Van juntos en la misma
+              // ranura: en tablet apaisada bajan los dos a la columna de la
+              // derecha, que es donde deben estar los controles.
+              numpad: c.board == null || c.generating
+                  ? const SizedBox.shrink()
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         if (c.isComplete)
                           _SolvedBar(onNew: c.newPuzzle)
                         else
@@ -71,11 +68,7 @@ class PracticeScreen extends StatelessWidget {
                           onUndo: c.undo,
                         ),
                       ],
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             );
           },
         ),

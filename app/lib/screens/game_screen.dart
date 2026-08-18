@@ -20,6 +20,7 @@ import '../services/theme_controller.dart';
 import '../services/share_service.dart';
 import '../theme.dart';
 import '../widgets/numpad.dart';
+import '../widgets/puzzle_layout.dart';
 import '../widgets/result_overlay.dart';
 import '../widgets/sudoku_board_view.dart';
 
@@ -124,46 +125,26 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             final board = c.board!;
             return Stack(
               children: [
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 520),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Column(
-                        children: [
-                          _Header(
-                            difficulty: difficultyLabel(context, c.difficulty!),
-                            mistakes: board.mistakes,
-                            elapsed: c.elapsed,
-                            theme: widget.theme,
-                          ),
-                          const SizedBox(height: 10),
-                          // El tablero se queda con el espacio que sobre y
-                          // siempre cuadrado; el numpad no se comprime nunca,
-                          // porque un numpad estrujado se falla al tocar.
-                          Expanded(
-                            child: Center(
-                              child: SudokuBoardView(
-                                board: board,
-                                selected: c.selected,
-                                onTapCell: c.select,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Numpad(
-                            board: board,
-                            notesMode: c.notesMode,
-                            enabled: !c.isComplete,
-                            onDigit: c.tapDigit,
-                            onErase: c.erase,
-                            onToggleNotes: c.toggleNotesMode,
-                            onUndo: c.undo,
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                      ),
-                    ),
+                PuzzleLayout(
+                  header: _Header(
+                    difficulty: difficultyLabel(context, c.difficulty!),
+                    mistakes: board.mistakes,
+                    elapsed: c.elapsed,
+                    theme: widget.theme,
+                  ),
+                  board: SudokuBoardView(
+                    board: board,
+                    selected: c.selected,
+                    onTapCell: c.select,
+                  ),
+                  numpad: Numpad(
+                    board: board,
+                    notesMode: c.notesMode,
+                    enabled: !c.isComplete,
+                    onDigit: c.tapDigit,
+                    onErase: c.erase,
+                    onToggleNotes: c.toggleNotesMode,
+                    onUndo: c.undo,
                   ),
                 ),
                 if (c.isComplete && !_resultDismissed)

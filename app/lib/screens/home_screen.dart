@@ -15,6 +15,7 @@ import 'settings_tab.dart';
 import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
 import '../theme.dart';
+import '../widgets/puzzle_layout.dart' show kTabletShortestSide;
 import '../widgets/result_overlay.dart' show difficultyLabel;
 import 'game_screen.dart';
 import 'practice_screen.dart';
@@ -135,18 +136,29 @@ class _Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // En tablet el menú se CENTRA en vertical. Con el reparto de móvil quedaba
+    // una columna estrecha pegada al borde de arriba y media pantalla vacía
+    // debajo: no desbordaba, simplemente parecía sin terminar.
+    final tablet =
+        MediaQuery.sizeOf(context).shortestSide >= kTabletShortestSide;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
+            constraints: BoxConstraints(maxWidth: tablet ? 560 : 460),
             child: ListenableBuilder(
               listenable: daily,
               builder: (context, _) {
                 final done = daily.isComplete;
                 final l = L.of(context);
                 return ListView(
-                  padding: const EdgeInsets.fromLTRB(22, 40, 22, 24),
+                  // `shrinkWrap` para que la lista mida su contenido y el
+                  // Center pueda colocarla en medio. En móvil NO se toca: ahí
+                  // el contenido llena la pantalla y encoger la lista solo
+                  // gastaría medidas de más.
+                  shrinkWrap: tablet,
+                  padding: EdgeInsets.fromLTRB(22, tablet ? 24 : 40, 22, 24),
                   children: [
                     Text(
                       l.appName,
