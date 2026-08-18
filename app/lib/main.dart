@@ -14,19 +14,35 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:juegos_senda/juegos_senda.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'firebase_options.dart';
 import 'game/daily_controller.dart';
 import 'game/practice_controller.dart';
 import 'l10n/app_localizations.dart';
+import 'nona_config.dart';
 import 'screens/home_screen.dart';
-import 'services/locale_controller.dart';
 import 'services/progress_controller.dart';
 import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Sin Firebase configurado la app arranca igual, en modo local: la diaria y
+  // el modo libre no necesitan cuenta ni red, y esa es la promesa del juego.
+  var firebaseReady = false;
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    firebaseReady = true;
+  } catch (_) {
+    // Se juega igual; lo social simplemente no aparece.
+  }
+
   final prefs = await SharedPreferences.getInstance();
   final daily = DailyController(prefs);
   // Solo se espera a la diaria: es a lo que viene la gente. El modo libre se
@@ -39,6 +55,9 @@ Future<void> main() async {
       practice: PracticeController(prefs),
       locale: LocaleController(prefs),
       progress: ProgressController(prefs),
+      auth: AuthController(firebaseReady: firebaseReady, prefs: prefs),
+      friends: FriendsService(firebaseReady: firebaseReady),
+      purchases: PurchaseService(prefs, nonaConfig.iap)..init(),
     ),
   );
 }
@@ -50,12 +69,18 @@ class NonaApp extends StatelessWidget {
     required this.practice,
     required this.locale,
     required this.progress,
+    required this.auth,
+    required this.friends,
+    required this.purchases,
   });
 
   final DailyController daily;
   final PracticeController practice;
   final LocaleController locale;
   final ProgressController progress;
+  final AuthController auth;
+  final FriendsService friends;
+  final PurchaseService purchases;
 
   @override
   Widget build(BuildContext context) {
@@ -72,17 +97,29 @@ class NonaApp extends StatelessWidget {
         locale: locale.locale,
         supportedLocales: L.supportedLocales,
         localizationsDelegates: const [
+          // Dos delegados: el del juego y el de la plataforma. Cada capa es
+          // dueña de su texto.
           L.delegate,
+          SendaL.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        home: _OrientationGate(
-          child: HomeScreen(
-            daily: daily,
-            practice: practice,
-            locale: locale,
-            progress: progress,
+        // La marca viaja por el árbol: las pantallas del paquete la leen de
+        // aquí en vez de una global, así que olvidarla es un error de
+        // compilación y no un color equivocado en producción.
+        home: SendaBrandScope(
+          brand: nonaBrand,
+          child: _OrientationGate(
+            child: HomeScreen(
+              daily: daily,
+              practice: practice,
+              locale: locale,
+              progress: progress,
+              auth: auth,
+              friends: friends,
+              purchases: purchases,
+            ),
           ),
         ),
       ),

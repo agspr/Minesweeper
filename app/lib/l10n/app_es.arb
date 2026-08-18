@@ -77,5 +77,10 @@
   "statsBestStreak": "Mejor racha",
   "statsTotalPoints": "Puntos",
   "statsAvgMistakes": "Fallos por día",
-  "statsNone": "Todavía no hay nada que contar. Juega la de hoy."
+  "statsNone": "Todavía no hay nada que contar. Juega la de hoy.",
+
+  "more": "Más",
+  "aboutNona": "Sobre Nona",
+  "aboutSubtitle": "Quiénes somos, términos, privacidad y contacto",
+  "aboutBody": "Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo libre con puzles ilimitados que no puntúa, y una clasificación para competir con tus amistades."
 }

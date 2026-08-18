@@ -366,6 +366,30 @@ abstract class L {
   /// In es, this message translates to:
   /// **'Todavía no hay nada que contar. Juega la de hoy.'**
   String get statsNone;
+
+  /// No description provided for @more.
+  ///
+  /// In es, this message translates to:
+  /// **'Más'**
+  String get more;
+
+  /// No description provided for @aboutNona.
+  ///
+  /// In es, this message translates to:
+  /// **'Sobre Nona'**
+  String get aboutNona;
+
+  /// No description provided for @aboutSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Quiénes somos, términos, privacidad y contacto'**
+  String get aboutSubtitle;
+
+  /// No description provided for @aboutBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo libre con puzles ilimitados que no puntúa, y una clasificación para competir con tus amistades.'**
+  String get aboutBody;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

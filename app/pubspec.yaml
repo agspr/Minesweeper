@@ -13,15 +13,23 @@ dependencies:
     sdk: flutter
   intl: any
 
-  # Identidad compartida. Estas tres van ya —antes que el paquete
-  # juegos_senda— porque hacen falta para la verificación A4: comprobar que la
-  # misma cuenta de Apple produce el MISMO uid de Firebase en CINCO y en Nona.
-  # Es lo que sostiene todo el diseño de cuentas compartidas y ningún documento
-  # de Apple lo afirma con claridad, así que se mide.
-  crypto: ^3.0.7
-  firebase_auth: ^6.5.7
+  # Plataforma compartida de Juegos Senda: identidad, amistades, clasificación,
+  # ajustes, anuncios y compras. Se fija por TAG y nunca por rama — hay builds
+  # en tiendas que dependen de que lo etiquetado hoy siga siendo lo mismo
+  # mañana—, y `path:` porque en ese repo conviven el paquete y el backend.
+  juegos_senda:
+    git:
+      url: https://github.com/agspr/juegos-senda.git
+      ref: package-v0.1.0
+      path: package
+
+  # Firebase Core se declara aquí porque main() lo inicializa; el resto de la
+  # identidad (auth, amistades, avisos) llega por juegos_senda.
   firebase_core: ^4.13.0
-  sign_in_with_apple: ^8.1.0
+
+  # Lo usan el horneado del banco y su auditoría (sha256 del manifest), no la
+  # app en tiempo de ejecución.
+  crypto: ^3.0.7
 
   # Estado local de la partida: la diaria tiene que poder jugarse sin red.
   share_plus: ^13.3.0

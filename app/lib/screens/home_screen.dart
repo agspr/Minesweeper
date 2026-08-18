@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import '../game/daily_controller.dart';
 import '../game/practice_controller.dart';
 import '../l10n/app_localizations.dart';
-import '../services/locale_controller.dart';
+import 'package:juegos_senda/juegos_senda.dart';
+
+import 'settings_tab.dart';
 import '../services/progress_controller.dart';
 import '../theme.dart';
 import '../widgets/result_overlay.dart' show difficultyLabel;
@@ -23,18 +25,24 @@ class HomeScreen extends StatefulWidget {
     required this.practice,
     required this.locale,
     required this.progress,
+    required this.auth,
+    required this.friends,
+    required this.purchases,
   });
 
   final DailyController daily;
   final PracticeController practice;
   final LocaleController locale;
   final ProgressController progress;
+  final AuthController auth;
+  final FriendsService friends;
+  final PurchaseService purchases;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-enum _View { menu, daily, practice }
+enum _View { menu, daily, practice, settings }
 
 class _HomeScreenState extends State<HomeScreen> {
   _View _view = _View.menu;
@@ -50,10 +58,24 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: widget.practice,
         onExit: () => setState(() => _view = _View.menu),
       ),
+      _View.settings => Scaffold(
+        appBar: AppBar(
+          leading: BackButton(onPressed: () => setState(() => _view = _View.menu)),
+          backgroundColor: NonaColors.appBg,
+        ),
+        body: SettingsTab(
+          auth: widget.auth,
+          friends: widget.friends,
+          purchases: widget.purchases,
+          locale: widget.locale,
+          progress: widget.progress,
+        ),
+      ),
       _View.menu => _Menu(
         daily: widget.daily,
         locale: widget.locale,
         progress: widget.progress,
+        onSettings: () => setState(() => _view = _View.settings),
         onDaily: () => setState(() => _view = _View.daily),
         onPractice: () {
           // Se carga al entrar, no al arrancar la app: generar un puzle en el
@@ -72,9 +94,12 @@ class _Menu extends StatelessWidget {
     required this.daily,
     required this.locale,
     required this.progress,
+    required this.onSettings,
     required this.onDaily,
     required this.onPractice,
   });
+
+  final VoidCallback onSettings;
 
   final DailyController daily;
   final LocaleController locale;
@@ -144,40 +169,20 @@ class _Menu extends StatelessWidget {
                     const SizedBox(height: 26),
                     _Stats(progress: progress, l: l),
                     const SizedBox(height: 22),
-                    // Un ciclo sistema → ES → EN y no un desplegable: con dos
-                    // idiomas, un menú sería más ceremonia de la que merece.
-                    // Mucha gente tiene el teléfono en un idioma y prefiere
-                    // jugar en otro, así que seguir solo al sistema no basta.
                     Center(
-                      child: GestureDetector(
-                        onTap: locale.cycle,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: NonaColors.surface,
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.language_rounded,
-                                size: 15,
-                                color: NonaColors.muted,
-                              ),
-                              const SizedBox(width: 7),
-                              Text(
-                                locale.labelFor(l.languageSystem),
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: NonaColors.muted,
-                                ),
-                              ),
-                            ],
+                      child: TextButton.icon(
+                        onPressed: onSettings,
+                        icon: const Icon(
+                          Icons.tune_rounded,
+                          size: 17,
+                          color: NonaColors.muted,
+                        ),
+                        label: Text(
+                          l.more,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: NonaColors.muted,
                           ),
                         ),
                       ),

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nona/l10n/app_localizations.dart';
-import 'package:nona/services/locale_controller.dart';
+import 'package:juegos_senda/juegos_senda.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Nona es bilingüe desde el primer día (diseño §0). Estas pruebas vigilan lo
@@ -90,13 +90,15 @@ void main() {
     });
 
     test('el ciclo recorre sistema → es → en → sistema', () async {
+      // Los idiomas los pone el GameConfig: Nona tiene dos, CINCO tendrá uno.
+      const supported = [Locale('es'), Locale('en')];
       final c = LocaleController(await SharedPreferences.getInstance());
-      await c.cycle();
+      await c.cycle(supported);
       expect(c.locale, const Locale('es'));
-      await c.cycle();
+      await c.cycle(supported);
       expect(c.locale, const Locale('en'));
-      await c.cycle();
-      expect(c.locale, isNull);
+      await c.cycle(supported);
+      expect(c.locale, isNull, reason: 'vuelve a seguir al sistema');
     });
 
     test('la elección sobrevive a cerrar la app', () async {
