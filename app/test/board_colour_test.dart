@@ -9,25 +9,36 @@ import 'package:nona/theme.dart';
 ///
 /// El acento es ELEGIBLE, así que el tablero cambia de color sin que nadie
 /// toque este código. Un tema nuevo —o retocar uno— puede acercar dos estados
-/// hasta volverlos indistinguibles, y eso no lo cazaría ninguna prueba de las
-/// otras: compila igual, no desborda, y el fallo solo se ve mirando.
+/// hasta volverlos indistinguibles, y eso no lo cazaría ninguna otra prueba:
+/// compila igual, no desborda, y el fallo solo se ve mirando.
 ///
-/// Lo que se comprueba es la regla del paquete: **ningún estado con significado
-/// puede depender solo del tono.** Aquí se mide el tono, y donde el margen es
-/// estrecho a propósito se documenta cuál es el segundo canal.
+/// ## Por qué comprueba TODAS las parejas y no unas cuantas
+///
+/// La primera versión enumeraba a mano cuatro parejas que me parecían las
+/// arriesgadas. Eso es una lista negra: cubre lo que a alguien se le ocurrió
+/// temer, y un estado nuevo entra sin que lo mire nadie. De diez parejas que
+/// existen, comprobaba cuatro.
+///
+/// Ahora la invariante es de lista blanca: **todo par de estados que se
+/// distinga por TONO tiene que superar el umbral**, y el bucle las recorre
+/// todas. Añadir un estado al mapa lo compara automáticamente contra los
+/// demás.
+///
+/// (La forma me la corrigió el agente de CINCO, que me pilló proponiéndole a
+/// él una lista negra para su generador de páginas legales.)
 void main() {
   /// Distancia euclídea en RGB. No es percepción humana fina, pero para
-  /// "¿estos dos grises oscuros se confunden?" separa bien y no necesita
-  /// dependencias.
+  /// "¿estos dos grises oscuros se confunden?" separa bien.
   double dist(Color a, Color b) => sqrt(
     pow((a.r - b.r) * 255, 2) +
         pow((a.g - b.g) * 255, 2) +
         pow((a.b - b.b) * 255, 2),
   );
 
-  /// Umbral: por debajo de esto, dos fondos oscuros se leen igual en un móvil
-  /// a media luz. Sale de medir el peor par que había ANTES de teñir
-  /// —pista contra misma cifra, 8,8— y de que teñir lo subiera a 25.
+  /// Por debajo de esto, dos fondos oscuros se leen igual en un móvil a media
+  /// luz. El peor par real que NO está exento es 25,4 (fila/columna contra
+  /// misma cifra, con Cobalto), así que 20 deja margen sin volverse
+  /// decorativo.
   const minima = 20.0;
 
   tearDown(() {
@@ -35,76 +46,104 @@ void main() {
     NonaColors.tinted = true;
   });
 
+  /// Los fondos que se distinguen SOLO por tono.
+  ///
+  /// La casilla seleccionada NO está aquí, y no por olvido: es la única que
+  /// lleva borde, así que su canal es la PRESENCIA y no el tono. Medida por
+  /// tono llega a quedarse a 12,8 de la fila/columna con Lavanda, y da igual,
+  /// porque el borde la separa de todo. Se comprueba aparte, más abajo.
+  Map<String, Color> fondosPorTono() => {
+    'normal': NonaColors.cell,
+    'fila/columna/caja': NonaColors.cellPeer,
+    'misma cifra': NonaColors.cellSameDigit,
+    'equivocada': NonaColors.cellWrong,
+  };
+
+  /// Los dígitos.
+  Map<String, Color> digitos() => {
+    'pista': NonaColors.given,
+    'escrito': NonaColors.entered,
+    'equivocado': NonaColors.wrong,
+    'anotación': NonaColors.note,
+  };
+
+  /// Parejas que pueden estar cerca en tono PORQUE tienen un segundo canal.
+  /// Cada excepción dice cuál es; una excepción sin canal es un fallo
+  /// disfrazado.
+  const exentas = <String, String>{
+    // Con Coral el acento (#FF8A93) y el rojo de error (#FF7A8A) son el mismo
+    // color a ojo. Se separan por PESO: lo equivocado va en w800, lo escrito
+    // en w500. Ver sudoku_board_view.dart.
+    'escrito|equivocado': 'peso de la tipografía',
+  };
+
+  bool exenta(String a, String b) =>
+      exentas.containsKey('$a|$b') || exentas.containsKey('$b|$a');
+
+  void todasLasParejas(Map<String, Color> st, String tema, String modo) {
+    final ks = st.keys.toList();
+    for (var i = 0; i < ks.length; i++) {
+      for (var j = i + 1; j < ks.length; j++) {
+        if (exenta(ks[i], ks[j])) continue;
+        expect(
+          dist(st[ks[i]]!, st[ks[j]]!),
+          greaterThan(minima),
+          reason: '$tema $modo: "${ks[i]}" y "${ks[j]}" se ven igual',
+        );
+      }
+    }
+  }
+
   for (final p in SendaPalettes.all) {
-    group('tema ${p.name}', () {
-      setUp(() {
-        NonaColors.current = p;
-        NonaColors.tinted = true;
-      });
+    for (final tinted in [true, false]) {
+      final modo = tinted ? 'en color' : 'en gris';
 
-      test('las dos ayudas de orientación no se confunden entre sí', () {
-        // Antes de teñir estaban a 8,8: eran el mismo gris a efectos
-        // prácticos. Es el par que MÁS gana con el color.
-        expect(
-          dist(NonaColors.cellPeer, NonaColors.cellSameDigit),
-          greaterThan(minima),
-          reason: '${p.name}: fila/columna y misma cifra se ven igual',
-        );
-      });
+      group('${p.name} · $modo', () {
+        setUp(() {
+          NonaColors.current = p;
+          NonaColors.tinted = tinted;
+        });
 
-      test('ninguna ayuda se confunde con la casilla normal', () {
-        expect(dist(NonaColors.cellPeer, NonaColors.cell), greaterThan(minima));
-        expect(
-          dist(NonaColors.cellSameDigit, NonaColors.cell),
-          greaterThan(minima),
-        );
-      });
+        test('todos los fondos se distinguen entre sí', () {
+          todasLasParejas(fondosPorTono(), p.name, modo);
+        });
 
-      test('"misma cifra" no se confunde con "equivocada"', () {
-        // El peor caso de este par es Coral, que comparte familia de tono con
-        // el rojo de error. Si un tema nuevo lo bajara del umbral, "hay otro 7
-        // aquí" se leería como "esto está mal".
-        expect(
-          dist(NonaColors.cellSameDigit, NonaColors.cellWrong),
-          greaterThan(minima),
-          reason: '${p.name}: la ayuda de misma cifra parece un error',
-        );
-      });
+        test('todos los dígitos se distinguen entre sí', () {
+          todasLasParejas(digitos(), p.name, modo);
+        });
 
-      test('la equivocada no sigue al tema: siempre el mismo rojo', () {
-        final wrong = NonaColors.cellWrong;
-        NonaColors.tinted = false;
-        expect(
-          NonaColors.cellWrong,
-          wrong,
-          reason: 'el fondo de error cambió con el tinte, y no debe',
-        );
-        expect(NonaColors.wrong, const Color(0xFFFF7A8A));
-      });
+        test('la seleccionada tiene borde visible: ese es su canal', () {
+          // Está exenta de la comparación por tono, así que su segundo canal
+          // TIENE que existir. Si el borde dejara de verse, la exención se
+          // quedaría sin nada detrás.
+          expect(
+            dist(NonaColors.cellSelectedBorder, NonaColors.cellSelected),
+            greaterThan(minima),
+            reason: '${p.name} $modo: el borde de la seleccionada no se ve',
+          );
+          expect(
+            dist(NonaColors.cellSelectedBorder, NonaColors.cell),
+            greaterThan(minima),
+            reason: '${p.name} $modo: el borde no se ve contra el tablero',
+          );
+        });
 
-      test('la seleccionada tiene borde: segundo canal frente a la errónea', () {
-        // Este par SÍ queda justo con Coral (22,7 entre el chip y el rojo de
-        // error) y es anterior al tinte. No se arregla con tono, se arregla
-        // con el borde — así que lo que se comprueba es que el borde exista y
-        // contraste, no que los fondos se separen.
-        expect(
-          dist(NonaColors.cellSelectedBorder, NonaColors.cellSelected),
-          greaterThan(minima),
-          reason: '${p.name}: el borde de la seleccionada no se ve',
-        );
+        test('lo equivocado nunca sigue al tema', () {
+          // El único estado que no puede depender de una elección de quien
+          // juega: rojo, siempre el mismo, con tema y sin tema.
+          expect(NonaColors.cellWrong, const Color(0xFF3A1218));
+          expect(NonaColors.wrong, const Color(0xFFFF7A8A));
+        });
       });
-    });
+    }
   }
 
   test('apagar el color devuelve TODO el cromo del tablero a los grises', () {
-    // "Todo" incluye la casilla seleccionada. Se quedaba con el chip del tema
-    // mientras el resto ya era gris, así que con el color apagado quedaba una
-    // única casilla de color y el interruptor parecía a medio hacer.
     for (final p in SendaPalettes.all) {
       NonaColors.current = p;
       NonaColors.tinted = false;
-      expect(NonaColors.cellPeer, const Color(0xFF1E1E26));
-      expect(NonaColors.cellSameDigit, const Color(0xFF262029));
+      expect(NonaColors.cellPeer, const Color(0xFF24242E));
+      expect(NonaColors.cellSameDigit, const Color(0xFF33333F));
       expect(NonaColors.gridThin, const Color(0xFF26262E));
       expect(NonaColors.gridThick, const Color(0xFF4A4A58));
       expect(
@@ -117,20 +156,22 @@ void main() {
 
   test('apagar el color NO toca el dígito escrito', () {
     // El límite del interruptor: apaga la decoración, no el acento de lo que
-    // ha escrito quien juega. Eso distingue lo suyo de las pistas y no es
-    // adorno.
+    // ha escrito quien juega. Eso distingue lo suyo de las pistas.
     NonaColors.current = SendaPalettes.cobalto;
     NonaColors.tinted = false;
     expect(NonaColors.entered, SendaPalettes.cobalto.brand.accent);
   });
 
-  test('con el color apagado la seleccionada conserva su borde', () {
-    // Apagar el color no debe costar legibilidad: el borde es lo que separa
-    // "seleccionada" de "equivocada", y esa distinción no es decorativa.
-    NonaColors.tinted = false;
-    expect(
-      dist(NonaColors.cellSelectedBorder, NonaColors.cellSelected),
-      greaterThan(minima),
-    );
+  test('cada excepción declara su segundo canal', () {
+    // Una excepción sin motivo escrito es un fallo esperando. Si alguien añade
+    // una pareja aquí para que deje de fallar, tiene que decir por qué se
+    // distingue — y esa es justo la conversación que hay que tener.
+    for (final e in exentas.entries) {
+      expect(
+        e.value.trim(),
+        isNotEmpty,
+        reason: '${e.key} está exenta sin declarar su canal',
+      );
+    }
   });
 }

@@ -106,7 +106,15 @@ abstract final class NonaColors {
 
   /// Casilla de la fila/columna/caja de la seleccionada. Un paso más clara,
   /// para orientar sin gritar.
-  static Color get cellPeer => _tint(const Color(0xFF1E1E26), 0.10);
+  ///
+  /// El gris de base es MÁS claro que el que tenía (`#1E1E26`), y eso arregla
+  /// un fallo que metí con el interruptor: con el color apagado, esta casilla
+  /// quedaba a 13,4 de la normal y a 8,8 de "misma cifra" — o sea, los números
+  /// exactos que hacían del tablero neutro el diseño arriesgado. Al teñir se
+  /// arreglaban solos, así que monté el interruptor sin medir nunca el estado
+  /// que produce. Sin tono disponible, la separación tiene que salir del
+  /// BRILLO.
+  static Color get cellPeer => _tint(const Color(0xFF24242E), 0.10);
 
   /// Casilla seleccionada. Es el chip del tema: el mismo tinte que usan las
   /// pastillas del resto de la app, para que "seleccionado" signifique lo
@@ -133,8 +141,10 @@ abstract final class NonaColors {
   /// tablero buscando dónde falta ese número.
   ///
   /// Se tiñe MÁS que [cellPeer] porque son dos ayudas distintas y antes se
-  /// diferenciaban por 8,8 — es decir, no se diferenciaban.
-  static Color get cellSameDigit => _tint(const Color(0xFF262029), 0.18);
+  /// diferenciaban por 8,8 — es decir, no se diferenciaban. El gris de base
+  /// también sube, por lo mismo que [cellPeer]: con el color apagado la
+  /// escalera de brillo es lo único que queda.
+  static Color get cellSameDigit => _tint(const Color(0xFF33333F), 0.18);
 
   /// Fondo de una casilla equivocada. La comprobación automática va activa
   /// (§1), así que esto se ve en el acto.
