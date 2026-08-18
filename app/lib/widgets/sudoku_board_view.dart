@@ -72,7 +72,12 @@ class SudokuBoardView extends StatelessWidget {
                 // tape, y sin capturar toques.
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: CustomPaint(painter: _GridPainter()),
+                    child: CustomPaint(
+                      painter: _GridPainter(
+                        thinColour: NonaColors.gridThin,
+                        thickColour: NonaColors.gridThick,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -124,8 +129,17 @@ class _Cell extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        color: bg,
         alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: bg,
+          // Borde solo en la seleccionada. La separa de la equivocada por
+          // PRESENCIA y no por tono, que es lo que hace falta con Coral: su
+          // chip y el rojo de error quedan a 22,7 de distancia, el par más
+          // justo del tablero. Con borde, da igual el tema.
+          border: isSelected && !wrong
+              ? Border.all(color: NonaColors.cellSelectedBorder, width: 2)
+              : null,
+        ),
         child: value != 0
             ? Text(
                 '$value',
@@ -202,14 +216,23 @@ class _Notes extends StatelessWidget {
 }
 
 class _GridPainter extends CustomPainter {
+  _GridPainter({required this.thinColour, required this.thickColour});
+
+  // Los colores ENTRAN por el constructor en vez de leerse de NonaColors
+  // dentro de `paint`. Es lo que permite que `shouldRepaint` los compare: si
+  // los leyera dentro, el pintor no tendría forma de saber que cambiaron y las
+  // líneas se quedarían del tema anterior hasta que algo forzara un repintado.
+  final Color thinColour;
+  final Color thickColour;
+
   @override
   void paint(Canvas canvas, Size size) {
     final cell = size.width / boardSize;
     final thin = Paint()
-      ..color = NonaColors.gridThin
+      ..color = thinColour
       ..strokeWidth = 1;
     final thick = Paint()
-      ..color = NonaColors.gridThick
+      ..color = thickColour
       ..strokeWidth = 2.5;
 
     for (var i = 0; i <= boardSize; i++) {
@@ -221,6 +244,10 @@ class _GridPainter extends CustomPainter {
     }
   }
 
+  // Antes devolvía `false` siempre, que era correcto mientras las líneas eran
+  // dos constantes. Con el tablero teñido dejó de serlo: cambiar de tema o
+  // apagar el color no repintaba la rejilla.
   @override
-  bool shouldRepaint(covariant _GridPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _GridPainter old) =>
+      old.thinColour != thinColour || old.thickColour != thickColour;
 }

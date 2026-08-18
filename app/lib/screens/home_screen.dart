@@ -84,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _Play.daily => GameScreen(
               controller: widget.daily,
               progress: widget.progress,
+              theme: widget.theme,
             ),
             _Play.practice => PracticeScreen(
               controller: widget.practice,

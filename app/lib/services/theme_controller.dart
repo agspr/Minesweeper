@@ -24,12 +24,16 @@ class ThemeController extends ChangeNotifier {
     // lo leen widgets que pueden pintarse antes: un fotograma con el tema
     // equivocado sería un parpadeo de color en cada arranque.
     NonaColors.current = SendaPalettes.byName(_prefs.getString(_kTheme));
+    // `?? true`: el tablero nace en color. Quien no quiera, lo apaga desde la
+    // propia pantalla de juego y se le recuerda.
+    NonaColors.tinted = _prefs.getBool(_kBoardColour) ?? true;
   }
 
   /// Sin prefijo `game.` ni `progress.`: el tema es del APARATO, no de la
   /// cuenta. Está fuera de `ownedPrefKeyPrefixes` a propósito — cambiar de
   /// sesión en un teléfono compartido no debe repintar la app de otro color.
   static const _kTheme = 'settings.theme';
+  static const _kBoardColour = 'settings.boardColour';
 
   final SharedPreferences _prefs;
 
@@ -40,5 +44,19 @@ class ThemeController extends ChangeNotifier {
     NonaColors.current = value;
     notifyListeners();
     await _prefs.setString(_kTheme, value.name);
+  }
+
+  /// Si el tablero sigue al tema o se queda en grises.
+  ///
+  /// Se apaga desde la propia pantalla de juego y no desde ajustes: es una
+  /// decisión que se toma MIRANDO el tablero, y mandar a alguien a otra
+  /// pantalla para verla aplicada aquí sería pedirle que recuerde dos estados a
+  /// la vez.
+  bool get boardColour => NonaColors.tinted;
+
+  Future<void> toggleBoardColour() async {
+    NonaColors.tinted = !NonaColors.tinted;
+    notifyListeners();
+    await _prefs.setBool(_kBoardColour, NonaColors.tinted);
   }
 }

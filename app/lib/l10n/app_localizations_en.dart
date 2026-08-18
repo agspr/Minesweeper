@@ -182,5 +182,11 @@ class LEn extends L {
 
   @override
   String get aboutBody =>
-      'Nona is a daily sudoku built by SENDA LLC in Puerto Rico. Every day brings a new puzzle, the same one for everyone, with difficulty set by the day of the week. There’s also a free-play mode with unlimited puzzles that doesn’t score, and a leaderboard to play alongside your friends.';
+      'Nona is a daily sudoku built by SENDA LLC in Puerto Rico. Every day brings a new puzzle, the same one for everyone, with difficulty set by the day of the week. There’s also a practice mode with unlimited puzzles that gives no points or streak, and a leaderboard to play alongside your friends.';
+
+  @override
+  String get boardColourOn => 'Board in colour';
+
+  @override
+  String get boardColourOff => 'Board in grey';
 }

@@ -50,25 +50,66 @@ abstract final class NonaColors {
   static Color get accentChip => current.brand.accentChip;
 
   // ── Tablero ────────────────────────────────────────────
-  /// Fondo de una casilla normal.
+  //
+  // El tablero se TIÑE con el tema, y se puede apagar desde la propia pantalla
+  // de juego (`ThemeController.boardColour`). Lo controla esta bandera.
+  //
+  // Qué se tiñe y qué no NO es cuestión de gusto: se tiñen los canales
+  // ESPACIALES —dónde estoy, qué casillas se relacionan con esta— y nunca los
+  // SEMÁNTICOS —esto está mal, esto es una pista—. Un acento elegible no puede
+  // decidir el color de algo que significa una cosa concreta, que es la regla
+  // de los dos canales que el paquete ya documenta.
+  //
+  // Medido antes de escribirlo, en distancia RGB entre pares de estados:
+  //
+  //                        hoy (neutro)   teñido
+  //   pista/misma cifra          8,8      25-32     <- eran casi el mismo gris
+  //   pista/casilla normal      13,4      38-45
+  //   misma cifra/equivocada    29,7      52-70
+  //
+  // O sea que el tablero neutro era lo ARRIESGADO: las dos ayudas de
+  // orientación se distinguían por 8,8, que a ojo es nada. Teñir no gasta
+  // margen de legibilidad, lo multiplica.
+  static bool tinted = true;
+
+  static Color _tint(Color base, double t) =>
+      tinted ? Color.lerp(base, current.brand.accent, t)! : base;
+
+  /// Fondo de una casilla normal. NUNCA se tiñe: son 81 casillas y teñirlas
+  /// dejaría sin contraste a todo lo que va encima.
   static const cell = Color(0xFF17171D);
 
   /// Casilla de la fila/columna/caja de la seleccionada. Un paso más clara,
   /// para orientar sin gritar.
-  static const cellPeer = Color(0xFF1E1E26);
+  static Color get cellPeer => _tint(const Color(0xFF1E1E26), 0.10);
 
   /// Casilla seleccionada. Es el chip del tema: el mismo tinte que usan las
   /// pastillas del resto de la app, para que "seleccionado" signifique lo
   /// mismo en el tablero y fuera de él.
-  static Color get cellSelected => current.brand.accentChip;
+  ///
+  /// Con el color apagado se va a un gris, igual que el resto del cromo. Es el
+  /// límite del interruptor: apaga la DECORACIÓN del tablero —fondos, líneas—
+  /// pero no el acento de los dígitos que ha escrito quien juega, porque eso no
+  /// es adorno sino la diferencia entre lo suyo y las pistas.
+  static Color get cellSelected =>
+      tinted ? current.brand.accentChip : const Color(0xFF2C2C36);
+
+  /// Borde de la casilla seleccionada.
+  ///
+  /// Existe por Coral: su chip (#3A2129) queda a 22,7 de [cellWrong]
+  /// (#3A1218), que es el par más justo de todo el tablero — y es anterior al
+  /// tinte, viene de adoptar los cuatro temas. Un borde separa "seleccionada"
+  /// de "equivocada" por PRESENCIA, no por tono, así que aguanta el tema que
+  /// sea. Se mantiene con el color apagado, donde también ayuda.
+  static Color get cellSelectedBorder =>
+      tinted ? current.brand.accent : const Color(0xFF6E6E7D);
 
   /// Casillas con el MISMO dígito que la seleccionada: ayuda a barrer el
   /// tablero buscando dónde falta ese número.
   ///
-  /// Neutro y no teñido del acento a propósito: si esto siguiera al tema,
-  /// con Coral quedaría a un paso de [cellWrong] y "hay otro 7 aquí" se leería
-  /// como "esto está mal".
-  static const cellSameDigit = Color(0xFF262029);
+  /// Se tiñe MÁS que [cellPeer] porque son dos ayudas distintas y antes se
+  /// diferenciaban por 8,8 — es decir, no se diferenciaban.
+  static Color get cellSameDigit => _tint(const Color(0xFF262029), 0.18);
 
   /// Fondo de una casilla equivocada. La comprobación automática va activa
   /// (§1), así que esto se ve en el acto.
@@ -86,8 +127,11 @@ abstract final class NonaColors {
   /// Anotaciones a lápiz.
   static const note = Color(0xFF7B7B8C);
 
-  static const gridThin = Color(0xFF26262E);
-  static const gridThick = Color(0xFF4A4A58);
+  /// Líneas finas entre casillas y gruesas entre cajas de 3×3. Se tiñen: son
+  /// pura geometría, no significan ningún estado, así que el acento puede
+  /// mandar sin pisar nada.
+  static Color get gridThin => _tint(const Color(0xFF26262E), 0.15);
+  static Color get gridThick => _tint(const Color(0xFF4A4A58), 0.28);
 
   // ── Numpad ─────────────────────────────────────────────
   static const keyBg = Color(0xFF23232B);

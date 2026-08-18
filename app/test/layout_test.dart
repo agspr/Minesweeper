@@ -7,6 +7,7 @@ import 'package:nona/game/generator.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 import 'package:nona/screens/game_screen.dart';
 import 'package:nona/services/progress_controller.dart';
+import 'package:nona/services/theme_controller.dart';
 
 import 'helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,6 +73,7 @@ void main() {
               progress: ProgressController(
                 await SharedPreferences.getInstance(),
               ),
+              theme: ThemeController(await SharedPreferences.getInstance()),
             ),
             bottomNavigationBar: SendaBottomNav(
               current: SendaTab.play,
@@ -113,6 +115,7 @@ void main() {
           child: GameScreen(
             controller: c,
             progress: ProgressController(await SharedPreferences.getInstance()),
+            theme: ThemeController(await SharedPreferences.getInstance()),
           ),
         ),
       ),

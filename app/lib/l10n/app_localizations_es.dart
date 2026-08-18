@@ -183,4 +183,10 @@ class LEs extends L {
   @override
   String get aboutBody =>
       'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.';
+
+  @override
+  String get boardColourOn => 'Tablero en color';
+
+  @override
+  String get boardColourOff => 'Tablero en gris';
 }

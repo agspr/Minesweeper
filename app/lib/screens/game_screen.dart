@@ -13,7 +13,10 @@ import 'package:flutter/material.dart';
 import '../game/daily_controller.dart';
 import '../game/scoring.dart';
 import '../l10n/app_localizations.dart';
+import 'package:juegos_senda/juegos_senda.dart';
+
 import '../services/progress_controller.dart';
+import '../services/theme_controller.dart';
 import '../services/share_service.dart';
 import '../theme.dart';
 import '../widgets/numpad.dart';
@@ -25,10 +28,12 @@ class GameScreen extends StatefulWidget {
     super.key,
     required this.controller,
     required this.progress,
+    required this.theme,
   });
 
   final DailyController controller;
   final ProgressController progress;
+  final ThemeController theme;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -130,6 +135,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                             difficulty: difficultyLabel(context, c.difficulty!),
                             mistakes: board.mistakes,
                             elapsed: c.elapsed,
+                            theme: widget.theme,
                           ),
                           const SizedBox(height: 10),
                           // El tablero se queda con el espacio que sobre y
@@ -180,11 +186,13 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
 class _Header extends StatelessWidget {
   const _Header({
+    required this.theme,
     required this.difficulty,
     required this.mistakes,
     required this.elapsed,
   });
 
+  final ThemeController theme;
   final String difficulty;
   final int mistakes;
   final Duration elapsed;
@@ -238,8 +246,47 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
+          // Fuera del FittedBox a propósito: ahí dentro se encogería con los
+          // chips y un área de toque encogida deja de poder tocarse. Aquí
+          // conserva sus 40x40 pase lo que pase con el resto de la fila.
+          _BoardColourButton(theme: theme),
         ],
       ),
+    );
+  }
+}
+
+/// Apagar o encender el color del tablero, sin salir del tablero.
+///
+/// Va aquí y no en ajustes porque es una decisión que se toma MIRÁNDOLO: quien
+/// lo encuentre chillón lo piensa jugando, y mandarle a otra pantalla para
+/// volver a comprobar el efecto sería pedirle que recuerde dos estados a la
+/// vez. Es el mismo criterio por el que el selector de color SÍ vive en Más:
+/// allí se elige identidad, aquí se ajusta lo que se está mirando.
+class _BoardColourButton extends StatelessWidget {
+  const _BoardColourButton({required this.theme});
+
+  final ThemeController theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = L.of(context);
+    final on = theme.boardColour;
+    return IconButton(
+      onPressed: () {
+        Haptics.selection();
+        theme.toggleBoardColour();
+      },
+      visualDensity: VisualDensity.compact,
+      // El icono dice en qué ESTADO está, no qué pasará al pulsarlo: un icono
+      // que anuncia la acción obliga a deducir el estado actual por descarte.
+      icon: Icon(
+        on ? Icons.palette_rounded : Icons.palette_outlined,
+        size: 20,
+        color: on ? NonaColors.accent : NonaColors.muted,
+      ),
+      tooltip: on ? l.boardColourOn : l.boardColourOff,
+      // Lo que leen los lectores de pantalla: el estado, no el icono.
     );
   }
 }
