@@ -66,6 +66,13 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // R8 borraba las clases `_Impl` que Room genera y busca por
+            // reflexión, y la app moría al arrancar antes de llegar a Dart.
+            // Ver el porqué entero en proguard-rules.pro.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
