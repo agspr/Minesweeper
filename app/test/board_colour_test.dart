@@ -31,7 +31,7 @@ void main() {
   const minima = 20.0;
 
   tearDown(() {
-    NonaColors.current = SendaPalettes.menta;
+    NonaColors.current = NonaColors.defaultPalette;
     NonaColors.tinted = true;
   });
 

@@ -10,6 +10,7 @@ import 'package:nona/services/progress_controller.dart';
 import 'package:nona/services/theme_controller.dart';
 
 import 'helpers.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Pruebas de desbordes. El tablero es cuadrado y el numpad no se comprime, así
@@ -53,84 +54,74 @@ void main() {
     'iPad Pro 12.9" a media pantalla': Size(683, 1024),
   };
 
+  /// Las DOS escalas, cruzadas con todas las medidas.
+  ///
+  /// Aviso del agente de CINCO, y tenía razón: el eje que de verdad caza
+  /// desbordes no es la orientación, es la escala del texto. Un tamaño cómodo
+  /// con el texto al máximo revienta antes que un tamaño raro con texto normal.
+  /// Añadir las apaisadas y probarlas solo a escala normal daba la SENSACIÓN de
+  /// cobertura sin la cobertura.
+  ///
+  /// Importa especialmente aquí porque el numpad de tablet apaisada va con
+  /// ancho fijo topado: ancho fijo + texto al máximo es exactamente donde una
+  /// tecla se queda sin sitio para su etiqueta.
+  const escalas = <String, double>{'texto normal': 1.0, 'texto al máximo': 1.6};
+
   for (final entry in sizes.entries) {
-    testWidgets('sin desbordes en ${entry.key}', (tester) async {
-      tester.view.physicalSize = entry.value * tester.view.devicePixelRatio;
-      tester.view.devicePixelRatio = 1.0;
-      tester.view.physicalSize = entry.value;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    for (final escala in escalas.entries) {
+      testWidgets('sin desbordes en ${entry.key} · ${escala.key}', (
+        tester,
+      ) async {
+        tester.view.physicalSize = entry.value * tester.view.devicePixelRatio;
+        tester.view.devicePixelRatio = 1.0;
+        tester.view.physicalSize = entry.value;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      final c = DailyController(
-        await SharedPreferences.getInstance(),
-        clock: () => DateTime(2026, 8, 17, 10),
-      );
-      await c.load();
+        final c = DailyController(
+          await SharedPreferences.getInstance(),
+          clock: () => DateTime(2026, 8, 17, 10),
+        );
+        await c.load();
 
-      // Con la barra inferior DEBAJO, no la pantalla suelta.
-      //
-      // La barra le quita 68 puntos de alto al tablero, y este fichero existe
-      // justo para eso: la primera versión probaba `GameScreen` a pelo, así
-      // que cuando se añadió la barra las seis medidas siguieron en verde sin
-      // haber medido nunca el caso real. Una prueba de desbordes que no monta
-      // lo que se monta en la app no prueba nada.
-      await tester.pumpWidget(
-        testApp(
-          Scaffold(
-            body: GameScreen(
-              controller: c,
-              progress: ProgressController(
-                await SharedPreferences.getInstance(),
+        // Con la barra inferior DEBAJO, no la pantalla suelta.
+        //
+        // La barra le quita 68 puntos de alto al tablero, y este fichero existe
+        // justo para eso: la primera versión probaba `GameScreen` a pelo, así
+        // que cuando se añadió la barra las seis medidas siguieron en verde sin
+        // haber medido nunca el caso real. Una prueba de desbordes que no monta
+        // lo que se monta en la app no prueba nada.
+        await tester.pumpWidget(
+          testApp(
+            MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(escala.value)),
+              child: Scaffold(
+                body: GameScreen(
+                  controller: c,
+                  progress: ProgressController(
+                    await SharedPreferences.getInstance(),
+                  ),
+                  theme: ThemeController(await SharedPreferences.getInstance()),
+                ),
+                bottomNavigationBar: SendaBottomNav(
+                  current: SendaTab.play,
+                  onSelect: (_) {},
+                ),
               ),
-              theme: ThemeController(await SharedPreferences.getInstance()),
-            ),
-            bottomNavigationBar: SendaBottomNav(
-              current: SendaTab.play,
-              onSelect: (_) {},
             ),
           ),
-        ),
-      );
-      await tester.pump(const Duration(milliseconds: 100));
+        );
+        await tester.pump(const Duration(milliseconds: 100));
 
-      expect(tester.takeException(), isNull, reason: '${entry.key} desborda');
-      // Y el tablero tiene que estar en pantalla de verdad, no simplemente
-      // recortado a cero.
-      expect(find.byType(GameScreen), findsOneWidget);
-    });
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '${entry.key} desborda con ${escala.key}',
+        );
+        // Y el tablero tiene que estar en pantalla de verdad, no simplemente
+        // recortado a cero.
+        expect(find.byType(GameScreen), findsOneWidget);
+      });
+    }
   }
-
-  testWidgets('con el texto del sistema al máximo tampoco desborda', (
-    tester,
-  ) async {
-    // El tablero ignora el escalado a propósito (sus dígitos se dimensionan
-    // desde el lado de la casilla), pero cabecera y numpad SÍ lo siguen, y ahí
-    // es donde un ajuste de accesibilidad extremo rompería la pantalla.
-    tester.view.physicalSize = const Size(375, 667);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final c = DailyController(
-      await SharedPreferences.getInstance(),
-      clock: () => DateTime(2026, 8, 17, 10),
-    );
-    await c.load();
-
-    await tester.pumpWidget(
-      testApp(
-        MediaQuery(
-          data: const MediaQueryData(textScaler: TextScaler.linear(1.6)),
-          child: GameScreen(
-            controller: c,
-            progress: ProgressController(await SharedPreferences.getInstance()),
-            theme: ThemeController(await SharedPreferences.getInstance()),
-          ),
-        ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 100));
-
-    expect(tester.takeException(), isNull);
-  });
 }

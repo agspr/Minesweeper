@@ -28,13 +28,33 @@ import 'package:flutter/material.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 
 abstract final class NonaColors {
+  /// Con qué tema arranca Nona quien no ha elegido ninguno.
+  ///
+  /// **Cobalto y no Menta, y el motivo no es estético.** Los dos juegos ofrecen
+  /// los mismos cuatro temas —eso es deliberado, la pantalla "Más" es la misma
+  /// en las dos apps— pero además arrancaban los dos en Menta, y eso ya no era
+  /// deliberado: era que ninguno había elegido. El resultado es que las fichas
+  /// de tienda de CINCO y de Nona se veían como la misma app en el scroll, y
+  /// que el icono cargaba solo con toda la diferenciación. Lo detectó el agente
+  /// de listings mirando qué implicaba la paleta compartida en su terreno.
+  ///
+  /// Cambiar el DEFECTO lo arregla sin tocar nada de lo compartido: las cuatro
+  /// tarjetas de color siguen siendo las mismas, con los mismos nombres y en el
+  /// mismo orden, y quien quiera Menta la tiene a un toque. Lo único que cambia
+  /// es con qué color se abre la app por primera vez.
+  ///
+  /// Cobalto de los tres posibles: es el más lejano en tono al menta de CINCO
+  /// —que es justo el punto—, y el azul le sienta bien a un juego de números.
+  /// Coral se descartó porque comparte familia con el rojo de "equivocado".
+  static const SendaPalette defaultPalette = SendaPalettes.cobalto;
+
   /// Tema activo. No es `const` a propósito: se elige en ajustes y toda la app
   /// se reconstruye con el nuevo tono. Mismo patrón que `CincoColors.current`.
   ///
   /// Quien lo cambia es `ThemeController`, que además lo guarda; asignarlo a
   /// mano desde otro sitio dejaría la pantalla y el disco diciendo cosas
   /// distintas.
-  static SendaPalette current = SendaPalettes.menta;
+  static SendaPalette current = defaultPalette;
 
   // Neutros compartidos con CINCO.
   static const bg = SendaColors.bg;
