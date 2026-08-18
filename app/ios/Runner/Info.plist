@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Identificador de aplicación de AdMob. SIN ESTA CLAVE la app se CIERRA al
+	     arrancar: el SDK lanza GADInvalidInitializationException, no un aviso.
+	     Hoy es el identificador de PRUEBA público de Google porque Nona todavía
+	     no tiene cuenta de AdMob; se sustituye por el real cuando exista. -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
