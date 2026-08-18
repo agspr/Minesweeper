@@ -45,6 +45,13 @@ final GameConfig nonaConfig = GameConfig(
   // español; el paquete no supone ninguno de los dos.
   supportedLocales: const [Locale('es'), Locale('en')],
 
+  // Con qué color se abre Nona la primera vez. NO es Menta, que es el de
+  // CINCO: las dos ofrecen los mismos cuatro temas a propósito, pero arrancar
+  // las dos en el mismo hacía que las fichas de tienda parecieran la misma app.
+  // Cobalto es el más lejano en tono al menta, y el azul le sienta bien a un
+  // juego de números.
+  defaultPalette: SendaPalettes.cobalto,
+
   // El handle es de toda la familia, así que reservar "nona" aquí lo protege
   // también dentro de CINCO.
   reservedHandles: const {'nona', 'nonaapp'},

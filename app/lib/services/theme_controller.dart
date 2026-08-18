@@ -26,10 +26,10 @@ class ThemeController extends ChangeNotifier {
     // `byName` cae en Menta cuando no reconoce el nombre, que es el defecto de
     // la FAMILIA. El de Nona es otro, así que sin guardar nada se usa el suyo;
     // guardado, manda lo guardado.
-    final saved = _prefs.getString(_kTheme);
-    NonaColors.current = saved == null
-        ? NonaColors.defaultPalette
-        : SendaPalettes.byName(saved);
+    NonaColors.current = SendaPalettes.byName(
+      _prefs.getString(_kTheme),
+      fallback: NonaColors.defaultPalette,
+    );
     // `?? true`: el tablero nace en color. Quien no quiera, lo apaga desde la
     // propia pantalla de juego y se le recuerda.
     NonaColors.tinted = _prefs.getBool(_kBoardColour) ?? true;

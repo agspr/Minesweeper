@@ -27,6 +27,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 
+import 'nona_config.dart';
+
 abstract final class NonaColors {
   /// Con qué tema arranca Nona quien no ha elegido ninguno.
   ///
@@ -46,7 +48,10 @@ abstract final class NonaColors {
   /// Cobalto de los tres posibles: es el más lejano en tono al menta de CINCO
   /// —que es justo el punto—, y el azul le sienta bien a un juego de números.
   /// Coral se descartó porque comparte familia con el rojo de "equivocado".
-  static const SendaPalette defaultPalette = SendaPalettes.cobalto;
+  /// Lo declara `nona_config.dart`, que es la costura donde va todo lo que
+  /// distingue a Nona. Aquí solo se reexporta para que el tablero no tenga que
+  /// conocer el GameConfig entero.
+  static SendaPalette get defaultPalette => nonaConfig.defaultPalette;
 
   /// Tema activo. No es `const` a propósito: se elige en ajustes y toda la app
   /// se reconstruye con el nuevo tono. Mismo patrón que `CincoColors.current`.
@@ -54,7 +59,7 @@ abstract final class NonaColors {
   /// Quien lo cambia es `ThemeController`, que además lo guarda; asignarlo a
   /// mano desde otro sitio dejaría la pantalla y el disco diciendo cosas
   /// distintas.
-  static SendaPalette current = defaultPalette;
+  static SendaPalette current = SendaPalettes.cobalto;
 
   // Neutros compartidos con CINCO.
   static const bg = SendaColors.bg;

@@ -11,6 +11,7 @@ import 'package:juegos_senda/juegos_senda.dart';
 
 import '../l10n/app_localizations.dart';
 import '../nona_config.dart';
+import '../theme.dart';
 import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
 
@@ -102,8 +103,15 @@ class SettingsTab extends StatelessWidget {
             ),
         ],
         selectedTheme: theme.palette.name,
-        onPickTheme: (option) =>
-            theme.select(SendaPalettes.byName(option.name)),
+        // El fallback no debería usarse nunca —el nombre sale de la propia
+        // lista— pero obligarlo es lo que hizo aparecer esta línea al cambiar
+        // la API: antes caía en Menta en silencio.
+        onPickTheme: (option) => theme.select(
+          SendaPalettes.byName(
+            option.name,
+            fallback: NonaColors.defaultPalette,
+          ),
+        ),
         aboutTitle: l.aboutNona,
         aboutSubtitle: l.aboutSubtitle,
         onAbout: () => Navigator.of(context).push(
