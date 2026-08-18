@@ -357,14 +357,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  google_fonts:
-    dependency: transitive
-    description:
-      name: google_fonts
-      sha256: e3cb3ee6b47fd2472c23de6da5744796a4da195137759ddb3fbcc9467b7b3c7d
-      url: "https://pub.dev"
-    source: hosted
-    version: "8.2.1"
   google_identity_services_web:
     dependency: transitive
     description:
@@ -505,11 +497,11 @@ packages:
     dependency: "direct main"
     description:
       path: package
-      ref: "package-v0.2.0"
-      resolved-ref: "0aa57786cab94ab1f09145b7adaba8fb8ce9d592"
+      ref: "package-v0.4.1"
+      resolved-ref: "307dc1a5731b8f858b3ebfe8c2627325860f4cd5"
       url: "https://github.com/agspr/juegos-senda.git"
     source: git
-    version: "0.2.0"
+    version: "0.4.1"
   leak_tracker:
     dependency: transitive
     description:

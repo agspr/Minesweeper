@@ -32,10 +32,10 @@ class LEn extends L {
   String get menuLoading => 'Loading…';
 
   @override
-  String get menuPractice => 'Free play';
+  String get menuPractice => 'Practice mode';
 
   @override
-  String get menuPracticeSubtitle => 'Endless puzzles · unscored';
+  String get menuPracticeSubtitle => 'Endless puzzles · no points or streak';
 
   @override
   String get difficultyEasy => 'Easy';

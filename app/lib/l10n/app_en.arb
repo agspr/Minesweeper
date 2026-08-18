@@ -8,8 +8,8 @@
   "menuDailyToday": "{difficulty} · today",
   "menuDailyDone": "Done · {difficulty}",
   "menuLoading": "Loading…",
-  "menuPractice": "Free play",
-  "menuPracticeSubtitle": "Endless puzzles · unscored",
+  "menuPractice": "Practice mode",
+  "menuPracticeSubtitle": "Endless puzzles · no points or streak",
 
   "difficultyEasy": "Easy",
   "difficultyMedium": "Medium",

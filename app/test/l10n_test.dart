@@ -66,8 +66,8 @@ void main() {
     test('los plurales concuerdan en los dos idiomas', () async {
       final es = await load(const Locale('es'));
       final en = await load(const Locale('en'));
-      expect(es.mistakeCount(1), '1 fallo');
-      expect(es.mistakeCount(3), '3 fallos');
+      expect(es.mistakeCount(1), '1 error');
+      expect(es.mistakeCount(3), '3 errores');
       expect(en.mistakeCount(1), '1 mistake');
       expect(en.mistakeCount(3), '3 mistakes');
       expect(es.hintCount(1), '1 pista');
@@ -143,7 +143,7 @@ void main() {
         ),
       ),
     );
-    expect(find.text('Free play'), findsOneWidget);
-    expect(find.text('Modo libre'), findsNothing);
+    expect(find.text('Practice mode'), findsOneWidget);
+    expect(find.text('Modo práctica'), findsNothing);
   });
 }

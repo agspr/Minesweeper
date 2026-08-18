@@ -4,7 +4,7 @@
   "appName": "Nona",
   "appTagline": "Sudoku del día",
 
-  "menuDaily": "La diaria",
+  "menuDaily": "Reto del día",
   "menuDailyToday": "{difficulty} · hoy",
   "@menuDailyToday": {
     "placeholders": { "difficulty": { "type": "String" } }
@@ -14,21 +14,21 @@
     "placeholders": { "difficulty": { "type": "String" } }
   },
   "menuLoading": "Cargando…",
-  "menuPractice": "Modo libre",
-  "menuPracticeSubtitle": "Puzles infinitos · no puntúa",
+  "menuPractice": "Modo práctica",
+  "menuPracticeSubtitle": "Puzles infinitos · sin puntos ni racha",
 
   "difficultyEasy": "Fácil",
   "difficultyMedium": "Medio",
   "difficultyHard": "Difícil",
 
-  "noMistakes": "sin fallos",
-  "mistakeCount": "{count, plural, one{1 fallo} other{{count} fallos}}",
+  "noMistakes": "sin errores",
+  "mistakeCount": "{count, plural, one{1 error} other{{count} errores}}",
   "@mistakeCount": {
     "placeholders": { "count": { "type": "int" } }
   },
   "mistakeCapSuffix": " (tope)",
   "@mistakeCapSuffix": {
-    "description": "Se añade al contador de fallos al llegar al tope de 5, donde la penalización deja de crecer."
+    "description": "Se añade al contador de errores al llegar al tope de 5, donde la penalización deja de crecer."
   },
 
   "hintCount": "{count, plural, one{1 pista} other{{count} pistas}}",
@@ -46,7 +46,7 @@
   "unfinished": "Por hoy lo dejamos aquí",
   "points": "puntos",
   "breakdownBase": "Base del día",
-  "breakdownNoMistakes": "Sin fallos",
+  "breakdownNoMistakes": "Sin errores",
   "breakdownCompleted": "{percent}% completado",
   "@breakdownCompleted": {
     "placeholders": { "percent": { "type": "int" } }
@@ -76,11 +76,11 @@
   "statsStreak": "Racha",
   "statsBestStreak": "Mejor racha",
   "statsTotalPoints": "Puntos",
-  "statsAvgMistakes": "Fallos por día",
+  "statsAvgMistakes": "Errores por día",
   "statsNone": "Todavía no hay nada que contar. Juega la de hoy.",
 
   "more": "Más",
   "aboutNona": "Sobre Nona",
   "aboutSubtitle": "Quiénes somos, términos, privacidad y contacto",
-  "aboutBody": "Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo libre con puzles ilimitados que no puntúa, y una clasificación para competir con tus amistades."
+  "aboutBody": "Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos."
 }

@@ -16,7 +16,7 @@ class LEs extends L {
   String get appTagline => 'Sudoku del día';
 
   @override
-  String get menuDaily => 'La diaria';
+  String get menuDaily => 'Reto del día';
 
   @override
   String menuDailyToday(String difficulty) {
@@ -32,10 +32,10 @@ class LEs extends L {
   String get menuLoading => 'Cargando…';
 
   @override
-  String get menuPractice => 'Modo libre';
+  String get menuPractice => 'Modo práctica';
 
   @override
-  String get menuPracticeSubtitle => 'Puzles infinitos · no puntúa';
+  String get menuPracticeSubtitle => 'Puzles infinitos · sin puntos ni racha';
 
   @override
   String get difficultyEasy => 'Fácil';
@@ -47,15 +47,15 @@ class LEs extends L {
   String get difficultyHard => 'Difícil';
 
   @override
-  String get noMistakes => 'sin fallos';
+  String get noMistakes => 'sin errores';
 
   @override
   String mistakeCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fallos',
-      one: '1 fallo',
+      other: '$count errores',
+      one: '1 error',
     );
     return '$_temp0';
   }
@@ -102,7 +102,7 @@ class LEs extends L {
   String get breakdownBase => 'Base del día';
 
   @override
-  String get breakdownNoMistakes => 'Sin fallos';
+  String get breakdownNoMistakes => 'Sin errores';
 
   @override
   String breakdownCompleted(int percent) {
@@ -166,7 +166,7 @@ class LEs extends L {
   String get statsTotalPoints => 'Puntos';
 
   @override
-  String get statsAvgMistakes => 'Fallos por día';
+  String get statsAvgMistakes => 'Errores por día';
 
   @override
   String get statsNone => 'Todavía no hay nada que contar. Juega la de hoy.';
@@ -182,5 +182,5 @@ class LEs extends L {
 
   @override
   String get aboutBody =>
-      'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo libre con puzles ilimitados que no puntúa, y una clasificación para competir con tus amistades.';
+      'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.';
 }

@@ -4,6 +4,7 @@ import 'package:nona/game/daily_bank.dart';
 import 'package:nona/game/daily_controller.dart';
 import 'package:nona/game/difficulty.dart';
 import 'package:nona/game/generator.dart';
+import 'package:juegos_senda/juegos_senda.dart';
 import 'package:nona/screens/game_screen.dart';
 import 'package:nona/services/progress_controller.dart';
 
@@ -56,11 +57,26 @@ void main() {
       );
       await c.load();
 
+      // Con la barra inferior DEBAJO, no la pantalla suelta.
+      //
+      // La barra le quita 68 puntos de alto al tablero, y este fichero existe
+      // justo para eso: la primera versión probaba `GameScreen` a pelo, así
+      // que cuando se añadió la barra las seis medidas siguieron en verde sin
+      // haber medido nunca el caso real. Una prueba de desbordes que no monta
+      // lo que se monta en la app no prueba nada.
       await tester.pumpWidget(
         testApp(
-          GameScreen(
-            controller: c,
-            progress: ProgressController(await SharedPreferences.getInstance()),
+          Scaffold(
+            body: GameScreen(
+              controller: c,
+              progress: ProgressController(
+                await SharedPreferences.getInstance(),
+              ),
+            ),
+            bottomNavigationBar: SendaBottomNav(
+              current: SendaTab.play,
+              onSelect: (_) {},
+            ),
           ),
         ),
       );

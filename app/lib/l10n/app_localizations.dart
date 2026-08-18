@@ -112,7 +112,7 @@ abstract class L {
   /// No description provided for @menuDaily.
   ///
   /// In es, this message translates to:
-  /// **'La diaria'**
+  /// **'Reto del día'**
   String get menuDaily;
 
   /// No description provided for @menuDailyToday.
@@ -136,13 +136,13 @@ abstract class L {
   /// No description provided for @menuPractice.
   ///
   /// In es, this message translates to:
-  /// **'Modo libre'**
+  /// **'Modo práctica'**
   String get menuPractice;
 
   /// No description provided for @menuPracticeSubtitle.
   ///
   /// In es, this message translates to:
-  /// **'Puzles infinitos · no puntúa'**
+  /// **'Puzles infinitos · sin puntos ni racha'**
   String get menuPracticeSubtitle;
 
   /// No description provided for @difficultyEasy.
@@ -166,16 +166,16 @@ abstract class L {
   /// No description provided for @noMistakes.
   ///
   /// In es, this message translates to:
-  /// **'sin fallos'**
+  /// **'sin errores'**
   String get noMistakes;
 
   /// No description provided for @mistakeCount.
   ///
   /// In es, this message translates to:
-  /// **'{count, plural, one{1 fallo} other{{count} fallos}}'**
+  /// **'{count, plural, one{1 error} other{{count} errores}}'**
   String mistakeCount(int count);
 
-  /// Se añade al contador de fallos al llegar al tope de 5, donde la penalización deja de crecer.
+  /// Se añade al contador de errores al llegar al tope de 5, donde la penalización deja de crecer.
   ///
   /// In es, this message translates to:
   /// **' (tope)'**
@@ -244,7 +244,7 @@ abstract class L {
   /// No description provided for @breakdownNoMistakes.
   ///
   /// In es, this message translates to:
-  /// **'Sin fallos'**
+  /// **'Sin errores'**
   String get breakdownNoMistakes;
 
   /// No description provided for @breakdownCompleted.
@@ -358,7 +358,7 @@ abstract class L {
   /// No description provided for @statsAvgMistakes.
   ///
   /// In es, this message translates to:
-  /// **'Fallos por día'**
+  /// **'Errores por día'**
   String get statsAvgMistakes;
 
   /// No description provided for @statsNone.
@@ -388,7 +388,7 @@ abstract class L {
   /// No description provided for @aboutBody.
   ///
   /// In es, this message translates to:
-  /// **'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo libre con puzles ilimitados que no puntúa, y una clasificación para competir con tus amistades.'**
+  /// **'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.'**
   String get aboutBody;
 }
 

@@ -45,51 +45,75 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-enum _View { menu, daily, practice, settings }
+/// Qué se ve dentro de la pestaña Jugar.
+enum _Play { menu, daily, practice }
 
 class _HomeScreenState extends State<HomeScreen> {
-  _View _view = _View.menu;
+  SendaTab _tab = SendaTab.play;
+  _Play _play = _Play.menu;
+
+  void _goPlay(_Play v) => setState(() {
+    _play = v;
+    _tab = SendaTab.play;
+  });
 
   @override
   Widget build(BuildContext context) {
-    return switch (_view) {
-      _View.daily => GameScreen(
-        controller: widget.daily,
-        progress: widget.progress,
+    return Scaffold(
+      // IndexedStack y no un `switch`: mantiene VIVAS las tres pestañas, así
+      // que ir a Más a mitad de un puzle y volver no reinicia el tablero ni el
+      // cronómetro. Con un switch, cada cambio de pestaña destruiría la partida
+      // en curso.
+      body: IndexedStack(
+        index: SendaTab.values.indexOf(_tab),
+        children: [
+          switch (_play) {
+            _Play.menu => _Menu(
+              daily: widget.daily,
+              locale: widget.locale,
+              progress: widget.progress,
+              onDaily: () => _goPlay(_Play.daily),
+              onPractice: () {
+                // Se carga al entrar, no al arrancar la app: generar un puzle
+                // en el arranque en frío retrasaría la diaria, que es a lo que
+                // viene la gente.
+                if (widget.practice.board == null) widget.practice.load();
+                _goPlay(_Play.practice);
+              },
+            ),
+            _Play.daily => GameScreen(
+              controller: widget.daily,
+              progress: widget.progress,
+            ),
+            _Play.practice => PracticeScreen(
+              controller: widget.practice,
+              onExit: () => _goPlay(_Play.menu),
+            ),
+          },
+
+          // Lo social es lo único que necesita cuenta: sin ella no hay con
+          // quién compararse. La clasificación de verdad llega en la fase B
+          // —está atada a Firebase y a los guardarraíles—, así que hoy esta
+          // pestaña enseña siempre la invitación a entrar. Cuando exista
+          // LeaderboardService, aquí va SendaLeaderboardScreen para quien haya
+          // iniciado sesión.
+          SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
+
+          SettingsTab(
+            auth: widget.auth,
+            friends: widget.friends,
+            purchases: widget.purchases,
+            locale: widget.locale,
+            theme: widget.theme,
+            progress: widget.progress,
+          ),
+        ],
       ),
-      _View.practice => PracticeScreen(
-        controller: widget.practice,
-        onExit: () => setState(() => _view = _View.menu),
+      bottomNavigationBar: SendaBottomNav(
+        current: _tab,
+        onSelect: (t) => setState(() => _tab = t),
       ),
-      _View.settings => Scaffold(
-        appBar: AppBar(
-          leading: BackButton(onPressed: () => setState(() => _view = _View.menu)),
-          backgroundColor: NonaColors.appBg,
-        ),
-        body: SettingsTab(
-          auth: widget.auth,
-          friends: widget.friends,
-          purchases: widget.purchases,
-          locale: widget.locale,
-          theme: widget.theme,
-          progress: widget.progress,
-        ),
-      ),
-      _View.menu => _Menu(
-        daily: widget.daily,
-        locale: widget.locale,
-        progress: widget.progress,
-        onSettings: () => setState(() => _view = _View.settings),
-        onDaily: () => setState(() => _view = _View.daily),
-        onPractice: () {
-          // Se carga al entrar, no al arrancar la app: generar un puzle en el
-          // arranque en frío retrasaría la diaria, que es a lo que viene la
-          // gente.
-          if (widget.practice.board == null) widget.practice.load();
-          setState(() => _view = _View.practice);
-        },
-      ),
-    };
+    );
   }
 }
 
@@ -98,12 +122,9 @@ class _Menu extends StatelessWidget {
     required this.daily,
     required this.locale,
     required this.progress,
-    required this.onSettings,
     required this.onDaily,
     required this.onPractice,
   });
-
-  final VoidCallback onSettings;
 
   final DailyController daily;
   final LocaleController locale;
@@ -172,25 +193,9 @@ class _Menu extends StatelessWidget {
                     ),
                     const SizedBox(height: 26),
                     _Stats(progress: progress, l: l),
-                    const SizedBox(height: 22),
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: onSettings,
-                        icon: const Icon(
-                          Icons.tune_rounded,
-                          size: 17,
-                          color: NonaColors.muted,
-                        ),
-                        label: Text(
-                          l.more,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: NonaColors.muted,
-                          ),
-                        ),
-                      ),
-                    ),
+                    // El botón "Más" que había aquí se va: ahora vive en la
+                    // barra inferior, y dos caminos al mismo sitio en la misma
+                    // pantalla sobran.
                   ],
                 );
               },
