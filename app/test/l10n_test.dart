@@ -89,16 +89,33 @@ void main() {
       expect(c.locale, isNull);
     });
 
-    test('el ciclo recorre sistema → es → en → sistema', () async {
+    // El selector es un segmentado ES/EN, así que siempre hay que saber qué
+    // pastilla encender — incluso cuando nadie ha elegido nada.
+    group('resolvedCode', () {
       // Los idiomas los pone el GameConfig: Nona tiene dos, CINCO tendrá uno.
       const supported = [Locale('es'), Locale('en')];
-      final c = LocaleController(await SharedPreferences.getInstance());
-      await c.cycle(supported);
-      expect(c.locale, const Locale('es'));
-      await c.cycle(supported);
-      expect(c.locale, const Locale('en'));
-      await c.cycle(supported);
-      expect(c.locale, isNull, reason: 'vuelve a seguir al sistema');
+
+      test('sin elegir nada, sigue al teléfono', () async {
+        final c = LocaleController(await SharedPreferences.getInstance());
+        expect(c.resolvedCode(const Locale('en'), supported), 'en');
+        expect(c.resolvedCode(const Locale('es'), supported), 'es');
+        expect(c.locale, isNull, reason: 'resolver no debe elegir por nadie');
+      });
+
+      test('un idioma elegido manda sobre el del teléfono', () async {
+        final c = LocaleController(await SharedPreferences.getInstance());
+        await c.setLocale(const Locale('es'));
+        expect(c.resolvedCode(const Locale('en'), supported), 'es');
+      });
+
+      test('un teléfono en un idioma que el juego no habla cae en el primero',
+          () async {
+        // Alemán: ni español ni inglés. Cae en español, que es lo mismo que
+        // resolvería Flutter — si aquí saliera otra cosa, el segmentado
+        // enseñaría encendido un idioma distinto del que se está leyendo.
+        final c = LocaleController(await SharedPreferences.getInstance());
+        expect(c.resolvedCode(const Locale('de'), supported), 'es');
+      });
     });
 
     test('la elección sobrevive a cerrar la app', () async {

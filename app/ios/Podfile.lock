@@ -1364,11 +1364,11 @@ PODS:
     - PromisesSwift (~> 2.1)
   - FirebaseSharedSwift (12.17.0)
   - Flutter (1.0.0)
-  - Google-Mobile-Ads-SDK (13.8.0):
+  - Google-Mobile-Ads-SDK (13.3.0):
     - GoogleUserMessagingPlatform (>= 1.1)
-  - google_mobile_ads (9.1.0):
+  - google_mobile_ads (9.0.0):
     - Flutter
-    - Google-Mobile-Ads-SDK (~> 13.7)
+    - Google-Mobile-Ads-SDK (~> 13.3.0)
     - webview_flutter_wkwebview
   - google_sign_in_ios (0.0.1):
     - Flutter
@@ -1713,8 +1713,8 @@ SPEC CHECKSUMS:
   FirebaseSessions: 83cf567ddcef20303eb85e003dfdbe030343ef8d
   FirebaseSharedSwift: 983820e9aa55d2acd6af77f9a1f252ba0afb3150
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
-  Google-Mobile-Ads-SDK: 9818000c50be41d5289dff425c7e3338cfbf323d
-  google_mobile_ads: 6b1c16497394528f4a59e76e2fc947cb32b101e2
+  Google-Mobile-Ads-SDK: 7692126a35ed859f20635af281c50a2162be8bea
+  google_mobile_ads: bab325fd4e31c9705cab0cb298e4f5a9bdb7370f
   google_sign_in_ios: 000870aa06da9b28d1d0bf7ef70ff0213059dd28
   GoogleAdsOnDeviceConversion: e3b71da24ff4cf01cf520756ac1c2b93c07b86ff
   GoogleAppMeasurement: 2234668e2451f9da37b93dad7830e457600c008f

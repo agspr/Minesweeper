@@ -201,7 +201,7 @@ class _SolvedBar extends StatelessWidget {
         Expanded(
           child: Text(
             L.of(context).solved,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: NonaColors.accent,

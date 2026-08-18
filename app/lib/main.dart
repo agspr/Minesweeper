@@ -26,6 +26,7 @@ import 'l10n/app_localizations.dart';
 import 'nona_config.dart';
 import 'screens/home_screen.dart';
 import 'services/progress_controller.dart';
+import 'services/theme_controller.dart';
 import 'theme.dart';
 
 Future<void> main() async {
@@ -54,6 +55,9 @@ Future<void> main() async {
       daily: daily,
       practice: PracticeController(prefs),
       locale: LocaleController(prefs),
+      // Antes que `runApp`: el constructor aplica el tema guardado, y hacerlo
+      // aquí evita que el primer fotograma salga con el de por defecto.
+      theme: ThemeController(prefs),
       progress: ProgressController(prefs),
       auth: AuthController(firebaseReady: firebaseReady, prefs: prefs),
       friends: FriendsService(firebaseReady: firebaseReady),
@@ -68,6 +72,7 @@ class NonaApp extends StatelessWidget {
     required this.daily,
     required this.practice,
     required this.locale,
+    required this.theme,
     required this.progress,
     required this.auth,
     required this.friends,
@@ -77,6 +82,7 @@ class NonaApp extends StatelessWidget {
   final DailyController daily;
   final PracticeController practice;
   final LocaleController locale;
+  final ThemeController theme;
   final ProgressController progress;
   final AuthController auth;
   final FriendsService friends;
@@ -84,10 +90,13 @@ class NonaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Escucha el idioma: cambiarlo reconstruye MaterialApp entera, que es lo
-    // que hace que la app se traduzca sin reiniciar.
+    // Escucha el idioma Y el tema: cambiar cualquiera de los dos reconstruye
+    // MaterialApp entera, que es lo que hace que la app se traduzca y se
+    // repinte sin reiniciar. El tema tiene que estar aquí arriba y no solo en
+    // ajustes porque el acento lo usan el tablero, el numpad y la barra
+    // inferior, que están en otra rama del árbol.
     return ListenableBuilder(
-      listenable: locale,
+      listenable: Listenable.merge([locale, theme]),
       builder: (context, _) => MaterialApp(
         title: 'Nona',
         debugShowCheckedModeBanner: false,
@@ -115,6 +124,7 @@ class NonaApp extends StatelessWidget {
               daily: daily,
               practice: practice,
               locale: locale,
+              theme: theme,
               progress: progress,
               auth: auth,
               friends: friends,

@@ -66,7 +66,7 @@ class ResultOverlay extends StatelessWidget {
               const SizedBox(height: 22),
               Text(
                 '+${score.points}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 46,
                   height: 1,
                   fontWeight: FontWeight.w800,
@@ -161,7 +161,7 @@ class ResultOverlay extends StatelessWidget {
                   ),
                   child: Text(
                     l.done,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       color: NonaColors.accentDeep,

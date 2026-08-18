@@ -56,8 +56,9 @@ final GameConfig nonaConfig = GameConfig(
 );
 
 /// La marca de Nona para las pantallas de plataforma.
-const SendaBrand nonaBrand = SendaBrand(
-  accent: NonaColors.accent,
-  accentDeep: NonaColors.accentDeep,
-  accentChip: NonaColors.accentChip,
-);
+///
+/// Ya no es constante: Nona ofrece los cuatro temas de la familia y el acento
+/// depende del elegido. Se lee cada vez en vez de guardarse porque quien la
+/// consume la mete en un `SendaBrandScope` que se reconstruye con el
+/// `ThemeController`; una copia guardada se quedaría con el tema de arranque.
+SendaBrand get nonaBrand => NonaColors.current.brand;

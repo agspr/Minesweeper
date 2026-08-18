@@ -13,6 +13,7 @@ import 'package:juegos_senda/juegos_senda.dart';
 
 import 'settings_tab.dart';
 import '../services/progress_controller.dart';
+import '../services/theme_controller.dart';
 import '../theme.dart';
 import '../widgets/result_overlay.dart' show difficultyLabel;
 import 'game_screen.dart';
@@ -24,6 +25,7 @@ class HomeScreen extends StatefulWidget {
     required this.daily,
     required this.practice,
     required this.locale,
+    required this.theme,
     required this.progress,
     required this.auth,
     required this.friends,
@@ -33,6 +35,7 @@ class HomeScreen extends StatefulWidget {
   final DailyController daily;
   final PracticeController practice;
   final LocaleController locale;
+  final ThemeController theme;
   final ProgressController progress;
   final AuthController auth;
   final FriendsService friends;
@@ -68,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
           friends: widget.friends,
           purchases: widget.purchases,
           locale: widget.locale,
+          theme: widget.theme,
           progress: widget.progress,
         ),
       ),
@@ -125,7 +129,7 @@ class _Menu extends StatelessWidget {
                     Text(
                       l.appName,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.w800,
                         color: NonaColors.accent,

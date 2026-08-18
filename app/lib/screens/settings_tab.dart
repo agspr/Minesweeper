@@ -12,6 +12,7 @@ import 'package:juegos_senda/juegos_senda.dart';
 import '../l10n/app_localizations.dart';
 import '../nona_config.dart';
 import '../services/progress_controller.dart';
+import '../services/theme_controller.dart';
 
 class SettingsTab extends StatelessWidget {
   const SettingsTab({
@@ -20,6 +21,7 @@ class SettingsTab extends StatelessWidget {
     required this.friends,
     required this.purchases,
     required this.locale,
+    required this.theme,
     required this.progress,
   });
 
@@ -27,6 +29,7 @@ class SettingsTab extends StatelessWidget {
   final FriendsService friends;
   final PurchaseService purchases;
   final LocaleController locale;
+  final ThemeController theme;
   final ProgressController progress;
 
   @override
@@ -86,8 +89,21 @@ class SettingsTab extends StatelessWidget {
             ],
           ),
         ],
-        // Nona tiene un solo tema, así que no pasa ninguno: la sección de color
-        // no se pinta. CINCO pasará sus cuatro.
+        // Los CUATRO de la familia, los mismos que CINCO y en el mismo orden.
+        // No son "los temas de Nona": son los de Juegos Senda, y por eso los
+        // define el paquete. Que las dos apps ofrezcan lo mismo aquí es el
+        // motivo de que esta pantalla se sienta la misma en las dos.
+        themes: [
+          for (final p in SendaPalettes.all)
+            SendaThemeOption(
+              name: p.name,
+              brand: p.brand,
+              swatches: p.swatches,
+            ),
+        ],
+        selectedTheme: theme.palette.name,
+        onPickTheme: (option) =>
+            theme.select(SendaPalettes.byName(option.name)),
         aboutTitle: l.aboutNona,
         aboutSubtitle: l.aboutSubtitle,
         onAbout: () => Navigator.of(context).push(
