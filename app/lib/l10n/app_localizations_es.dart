@@ -148,9 +148,6 @@ class LEs extends L {
   String get shareChallenge => '¿Puedes con la de hoy?';
 
   @override
-  String get statsTitle => 'Tus números';
-
-  @override
   String get statsDaysPlayed => 'Días jugados';
 
   @override
@@ -167,9 +164,6 @@ class LEs extends L {
 
   @override
   String get statsAvgMistakes => 'Errores por día';
-
-  @override
-  String get statsNone => 'Todavía no hay nada que contar. Juega la de hoy.';
 
   @override
   String get more => 'Más';
@@ -189,4 +183,15 @@ class LEs extends L {
 
   @override
   String get boardColourOff => 'Tablero en gris';
+
+  @override
+  String menuStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '🔥 $count días de racha',
+      one: '🔥 1 día de racha',
+    );
+    return '$_temp0';
+  }
 }

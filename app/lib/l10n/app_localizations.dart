@@ -319,12 +319,6 @@ abstract class L {
   /// **'¿Puedes con la de hoy?'**
   String get shareChallenge;
 
-  /// No description provided for @statsTitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Tus números'**
-  String get statsTitle;
-
   /// No description provided for @statsDaysPlayed.
   ///
   /// In es, this message translates to:
@@ -361,12 +355,6 @@ abstract class L {
   /// **'Errores por día'**
   String get statsAvgMistakes;
 
-  /// No description provided for @statsNone.
-  ///
-  /// In es, this message translates to:
-  /// **'Todavía no hay nada que contar. Juega la de hoy.'**
-  String get statsNone;
-
   /// No description provided for @more.
   ///
   /// In es, this message translates to:
@@ -402,6 +390,12 @@ abstract class L {
   /// In es, this message translates to:
   /// **'Tablero en gris'**
   String get boardColourOff;
+
+  /// No description provided for @menuStreak.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, one{🔥 1 día de racha} other{🔥 {count} días de racha}}'**
+  String menuStreak(int count);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

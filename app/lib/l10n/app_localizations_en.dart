@@ -148,9 +148,6 @@ class LEn extends L {
   String get shareChallenge => 'Can you beat today’s?';
 
   @override
-  String get statsTitle => 'Your numbers';
-
-  @override
   String get statsDaysPlayed => 'Days played';
 
   @override
@@ -167,9 +164,6 @@ class LEn extends L {
 
   @override
   String get statsAvgMistakes => 'Mistakes per day';
-
-  @override
-  String get statsNone => 'Nothing to show yet. Play today’s puzzle.';
 
   @override
   String get more => 'More';
@@ -189,4 +183,15 @@ class LEn extends L {
 
   @override
   String get boardColourOff => 'Board in grey';
+
+  @override
+  String menuStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '🔥 $count day streak',
+      one: '🔥 1 day streak',
+    );
+    return '$_temp0';
+  }
 }

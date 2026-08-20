@@ -70,19 +70,19 @@
   "shareStreak": "🔥 {days} días de racha",
   "@shareStreak": {"placeholders": {"days": {"type": "int"}}},
   "shareChallenge": "¿Puedes con la de hoy?",
-  "statsTitle": "Tus números",
   "statsDaysPlayed": "Días jugados",
   "statsDaysCompleted": "Terminados",
   "statsStreak": "Racha",
   "statsBestStreak": "Mejor racha",
   "statsTotalPoints": "Puntos",
   "statsAvgMistakes": "Errores por día",
-  "statsNone": "Todavía no hay nada que contar. Juega la de hoy.",
 
   "more": "Más",
   "aboutNona": "Sobre Nona",
   "aboutSubtitle": "Quiénes somos, términos, privacidad y contacto",
   "aboutBody": "Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.",
   "boardColourOn": "Tablero en color",
-  "boardColourOff": "Tablero en gris"
+  "boardColourOff": "Tablero en gris",
+  "menuStreak": "{count, plural, one{🔥 1 día de racha} other{🔥 {count} días de racha}}",
+  "@menuStreak": { "placeholders": { "count": { "type": "int" } } }
 }

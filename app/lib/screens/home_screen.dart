@@ -15,7 +15,6 @@ import 'settings_tab.dart';
 import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
 import '../theme.dart';
-import '../widgets/puzzle_layout.dart' show kTabletShortestSide;
 import '../widgets/result_overlay.dart' show difficultyLabel;
 import 'game_screen.dart';
 import 'practice_screen.dart';
@@ -136,260 +135,234 @@ class _Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // En tablet el menú se CENTRA en vertical. Con el reparto de móvil quedaba
-    // una columna estrecha pegada al borde de arriba y media pantalla vacía
-    // debajo: no desbordaba, simplemente parecía sin terminar.
-    final tablet =
-        MediaQuery.sizeOf(context).shortestSide >= kTabletShortestSide;
-
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: tablet ? 560 : 460),
-            child: ListenableBuilder(
-              listenable: daily,
-              builder: (context, _) {
-                final done = daily.isComplete;
-                final l = L.of(context);
-                return ListView(
-                  // `shrinkWrap` para que la lista mida su contenido y el
-                  // Center pueda colocarla en medio. En móvil NO se toca: ahí
-                  // el contenido llena la pantalla y encoger la lista solo
-                  // gastaría medidas de más.
-                  shrinkWrap: tablet,
-                  padding: EdgeInsets.fromLTRB(22, tablet ? 24 : 40, 22, 24),
-                  children: [
-                    Text(
-                      l.appName,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.w800,
-                        color: NonaColors.accent,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l.appTagline,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: NonaColors.muted,
-                      ),
-                    ),
-                    const SizedBox(height: 44),
-                    _Card(
-                      title: l.menuDaily,
-                      subtitle: daily.difficulty == null
-                          ? l.menuLoading
-                          : done
-                          ? l.menuDailyDone(
-                              difficultyLabel(context, daily.difficulty!),
-                            )
-                          : l.menuDailyToday(
-                              difficultyLabel(context, daily.difficulty!),
+        bottom: false,
+        child: ListenableBuilder(
+          listenable: Listenable.merge([daily, progress]),
+          builder: (context, _) {
+            final done = daily.isComplete;
+            final l = L.of(context);
+            // La racha VIGENTE, no el contador guardado: si el último día
+            // terminado no es ni hoy ni ayer, ya está rota.
+            final streak = progress.streakAsOf(DateTime.now());
+
+            return Center(
+              child: ConstrainedBox(
+                // 520 es el de CINCO (`Adaptive.gameMaxWidth`). En tablet el
+                // menú no se estira: se queda de este ancho y centrado.
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: LayoutBuilder(
+                  builder: (context, c) => SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(22, 12, 22, 16),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: c.maxHeight - 28),
+                      child: Column(
+                        // Centrado vertical, que es lo que hace que esto
+                        // funcione igual en un iPhone SE y en un iPad sin
+                        // casos especiales.
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 8),
+                          // Banda de 64 de alto: es el tamaño del logo de
+                          // CINCO. El logo de Nona todavía no existe, así que
+                          // va la palabra dentro de la MISMA banda — así los
+                          // huecos de abajo son los de CINCO hoy y lo seguirán
+                          // siendo cuando llegue el logo de verdad.
+                          SizedBox(
+                            height: 64,
+                            child: Center(
+                              child: Text(
+                                l.appName,
+                                style: TextStyle(
+                                  fontSize: 44,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 2,
+                                  color: NonaColors.accent,
+                                ),
+                              ),
                             ),
-                      icon: done
-                          ? Icons.check_circle_rounded
-                          : Icons.today_rounded,
-                      primary: true,
-                      onTap: onDaily,
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
+                            // En VERSALITAS como CINCO. Se hace aquí y no en
+                            // el ARB para no obligar a cada traducción a
+                            // acordarse de las mayúsculas.
+                            l.appTagline.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 4,
+                              color: NonaColors.muted,
+                            ),
+                          ),
+                          if (streak > 0) ...[
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                color: NonaColors.accentChip,
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                l.menuStreak(streak),
+                                style: TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: NonaColors.accent,
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 40),
+                          _ModeCard(
+                            title: l.menuDaily,
+                            subtitle: daily.difficulty == null
+                                ? l.menuLoading
+                                : done
+                                ? l.menuDailyDone(
+                                    difficultyLabel(context, daily.difficulty!),
+                                  )
+                                : l.menuDailyToday(
+                                    difficultyLabel(context, daily.difficulty!),
+                                  ),
+                            icon: Icons.today_rounded,
+                            // La recomendada AHORA: la diaria si no se ha
+                            // jugado, el modo práctica si ya está hecha.
+                            primary: !done,
+                            trailing: done
+                                ? const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: Color(0xFF3DDC84),
+                                    size: 22,
+                                  )
+                                : null,
+                            onTap: onDaily,
+                          ),
+                          const SizedBox(height: 12),
+                          _ModeCard(
+                            title: l.menuPractice,
+                            subtitle: l.menuPracticeSubtitle,
+                            icon: Icons.all_inclusive_rounded,
+                            primary: done,
+                            onTap: onPractice,
+                          ),
+                          // 8 de separación + 40 de sesgo. La columna va
+                          // centrada, así que un hueco al final empuja el
+                          // bloque visible hacia arriba la MITAD: 20 pt.
+                          // Centrado óptico — el contenido centrado de verdad
+                          // se lee un poco bajo. Copiado de CINCO con su
+                          // motivo.
+                          const SizedBox(height: 8 + 40),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    _Card(
-                      title: l.menuPractice,
-                      subtitle: l.menuPracticeSubtitle,
-                      icon: Icons.all_inclusive_rounded,
-                      onTap: onPractice,
-                    ),
-                    const SizedBox(height: 26),
-                    _Stats(progress: progress, l: l),
-                    // El botón "Más" que había aquí se va: ahora vive en la
-                    // barra inferior, y dos caminos al mismo sitio en la misma
-                    // pantalla sobran.
-                  ],
-                );
-              },
-            ),
-          ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class _Card extends StatelessWidget {
-  const _Card({
+/// Tarjeta de modo de juego. Copiada de CINCO con sus medidas: radio 20,
+/// relleno 16x18, caja de icono de 46 con radio 14, título de 18 en w800 y
+/// subtítulo de 13,5.
+///
+/// La recomendada se distingue con **borde e icono en acento**, no rellenando
+/// la tarjeta de color: rellenarla chocaba con las superficies oscuras del
+/// resto (lección de CINCO, copiada con su motivo). Por eso el título va
+/// siempre en el color de texto normal, también en la primaria.
+class _ModeCard extends StatelessWidget {
+  const _ModeCard({
     required this.title,
     required this.subtitle,
     required this.icon,
+    required this.primary,
     required this.onTap,
-    this.primary = false,
+    this.trailing,
   });
 
   final String title;
   final String subtitle;
   final IconData icon;
-  final VoidCallback onTap;
   final bool primary;
+  final VoidCallback onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-        decoration: BoxDecoration(
-          color: primary ? NonaColors.accentChip : NonaColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: primary
-              ? Border.all(color: NonaColors.accent.withValues(alpha: 0.35))
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 26,
-              color: primary ? NonaColors.accent : NonaColors.muted,
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: primary ? NonaColors.accent : NonaColors.text,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: NonaColors.muted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              size: 22,
-              color: NonaColors.muted,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Franja de números personales. Vive en el menú y no en una pantalla aparte
-/// porque son cuatro cifras: esconderlas detrás de otro toque sería fingir que
-/// hay más de lo que hay.
-class _Stats extends StatelessWidget {
-  const _Stats({required this.progress, required this.l});
-
-  final ProgressController progress;
-  final L l;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: progress,
-      builder: (context, _) {
-        if (progress.daysPlayed == 0) {
-          return Text(
-            l.statsNone,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: NonaColors.muted),
-          );
-        }
-        final avg = progress.averageMistakes;
-        return Column(
-          children: [
-            Row(
-              children: [
-                _Stat(
-                  // La racha VIGENTE, no el contador guardado: si el último día
-                  // terminado no es ni hoy ni ayer, ya está rota y hay que
-                  // enseñarla rota.
-                  value: '${progress.streakAsOf(DateTime.now())}',
-                  label: l.statsStreak,
-                ),
-                _Stat(
-                  value: '${progress.bestStreak}',
-                  label: l.statsBestStreak,
-                ),
-                _Stat(
-                  value: '${progress.totalPoints}',
-                  label: l.statsTotalPoints,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _Stat(
-                  value: '${progress.daysCompleted}',
-                  label: l.statsDaysCompleted,
-                ),
-                _Stat(
-                  value: '${progress.daysPlayed}',
-                  label: l.statsDaysPlayed,
-                ),
-                _Stat(
-                  value: avg == null ? '—' : avg.toStringAsFixed(1),
-                  label: l.statsAvgMistakes,
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _Stat extends StatelessWidget {
-  const _Stat({required this.value, required this.label});
-
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 22,
-                height: 1,
-                fontWeight: FontWeight.w800,
-                color: NonaColors.text,
-              ),
+    return Material(
+      color: NonaColors.sheet,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: primary ? NonaColors.accent : Colors.transparent,
+              width: 1.5,
             ),
           ),
-          const SizedBox(height: 4),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              label,
-              style: const TextStyle(fontSize: 11, color: NonaColors.muted),
-            ),
+          child: Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: primary
+                      ? NonaColors.accentDeep
+                      : NonaColors.accentChip,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  icon,
+                  size: 24,
+                  color: primary ? NonaColors.accent : NonaColors.muted,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: NonaColors.text,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 13.5,
+                        color: NonaColors.muted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              trailing ??
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: primary ? NonaColors.accent : NonaColors.muted,
+                  ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
