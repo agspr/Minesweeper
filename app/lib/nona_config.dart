@@ -19,6 +19,12 @@ final GameConfig nonaConfig = GameConfig(
   gameId: nonaGameId,
   appName: 'Nona',
   appleBundleId: 'com.nonaapp.nona',
+  // No es 'Nona'. El App ID de Nona esta agrupado bajo el primario de CINCO,
+  // y esta MEDIDO (2026-08-17) que quien solo tenga Nona ve *CINCO* en
+  // Ajustes -> Iniciar sesion con Apple. Poner aqui el nombre del juego
+  // mandaria a buscar una entrada que no existe, justo cuando esa persona ya
+  // borro su cuenta y no puede volver a preguntar.
+  appleSignInEntryName: 'CINCO',
 
   // Disposición LIMPIA, nunca la heredada de CINCO: los puntos van a
   // users/{uid}/apps/nona y los días a .../days/{día}. Escribir en `games`

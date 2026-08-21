@@ -15,7 +15,7 @@ import '../theme.dart';
 import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
 
-class SettingsTab extends StatelessWidget {
+class SettingsTab extends StatefulWidget {
   const SettingsTab({
     super.key,
     required this.auth,
@@ -34,18 +34,38 @@ class SettingsTab extends StatelessWidget {
   final ProgressController progress;
 
   @override
+  State<SettingsTab> createState() => _SettingsTabState();
+}
+
+class _SettingsTabState extends State<SettingsTab> {
+  // Se crea aquí y no en `main`: sale entero de `auth` más el gameId, y su
+  // vida es la de esta pestaña. Pasarlo por main → NonaApp → HomeScreen serían
+  // tres ficheros tocados para no ganar nada.
+  late final SendaAccountDeletion _deletion = SendaAccountDeletion(
+    auth: widget.auth,
+    gameId: nonaGameId,
+  );
+
+  @override
+  void dispose() {
+    _deletion.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l = L.of(context);
+    final progress = widget.progress;
     final avg = progress.averageMistakes;
 
     return ListenableBuilder(
       listenable: progress,
       builder: (context, _) => SendaSettingsScreen(
         config: nonaConfig,
-        auth: auth,
-        friends: friends,
-        purchases: purchases,
-        locale: locale,
+        auth: widget.auth,
+        friends: widget.friends,
+        purchases: widget.purchases,
+        locale: widget.locale,
         title: l.more,
         statRows: [
           SendaStatRow(
@@ -102,11 +122,11 @@ class SettingsTab extends StatelessWidget {
               swatches: p.swatches,
             ),
         ],
-        selectedTheme: theme.palette.name,
+        selectedTheme: widget.theme.palette.name,
         // El fallback no debería usarse nunca —el nombre sale de la propia
         // lista— pero obligarlo es lo que hizo aparecer esta línea al cambiar
         // la API: antes caía en Menta en silencio.
-        onPickTheme: (option) => theme.select(
+        onPickTheme: (option) => widget.theme.select(
           SendaPalettes.byName(
             option.name,
             fallback: NonaColors.defaultPalette,
@@ -126,9 +146,9 @@ class SettingsTab extends StatelessWidget {
             ),
           ),
         ),
-        // onDeleteAccount va nulo a propósito: el borrado de cuenta es de la
-        // fase B y sus textos dependen de la republicación de las políticas.
-        // Es OBLIGATORIO antes de publicar (Apple 5.1.1(v)).
+        // La fila de borrar cuenta la pinta el paquete al recibir esto, y
+        // lleva a su pantalla. Obligatoria para publicar (Apple 5.1.1(v)).
+        deletion: _deletion,
       ),
     );
   }
