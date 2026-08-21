@@ -49,7 +49,7 @@ final GameConfig nonaConfig = GameConfig(
     // sendapr; estas URLs son las acordadas para Nona.
     privacy: Uri.parse('https://sendapr.com/privacy/nona/'),
     terms: Uri.parse('https://sendapr.com/terms/nona/'),
-    accountDeletion: Uri.parse('https://sendapr.com/eliminar-cuenta/nona/'),
+    accountDeletion: Uri.parse('https://sendapr.com/delete-account/nona/'),
   ),
 
   // Bilingüe desde el primer día (diseño §0). CINCO seguirá siendo solo
