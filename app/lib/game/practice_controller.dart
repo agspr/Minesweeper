@@ -128,7 +128,12 @@ class PracticeController extends ChangeNotifier {
   }
 
   void select(int cell) {
+    if (cell < 0 || cell >= cellCount) return;
+    // Igual que en la diaria: re-tocar la seleccionada no mueve nada, así que
+    // no repinta ni vibra. (El guardia de rango faltaba aquí.)
+    if (cell == _selected) return;
     _selected = cell;
+    NonaHaptics.select();
     notifyListeners();
   }
 

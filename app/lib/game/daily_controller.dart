@@ -22,6 +22,7 @@ import '../services/haptics.dart';
 import 'daily_bank.dart';
 import 'day_key.dart';
 import 'difficulty.dart';
+import 'grid.dart';
 import 'sudoku_board.dart';
 
 /// Lo que la partida entrega a la puntuación (N4) cuando el día se cierra.
@@ -161,8 +162,13 @@ class DailyController extends ChangeNotifier {
   // ── Entrada ──────────────────────────────────────────────
 
   void select(int cell) {
-    if (cell < 0 || cell >= 81) return;
+    if (cell < 0 || cell >= cellCount) return;
+    // Volver a tocar la casilla ya seleccionada no cambia nada: ni repinta ni
+    // vibra. Aquí es el único sitio que sabe si la selección se ha movido de
+    // verdad, y por eso la háptica de selección sale de aquí y no del widget.
+    if (cell == _selected) return;
     _selected = cell;
+    NonaHaptics.select();
     notifyListeners();
   }
 

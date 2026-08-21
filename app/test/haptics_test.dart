@@ -43,6 +43,11 @@ void main() {
   /// cosas y no deben colarse aquí.
   int fallos() => vibraciones.where((v) => v == 'larga').length;
 
+  /// El tic corto de la selección. Es una primitiva DISTINTA del golpe de los
+  /// botones, así que contarlos por separado prueba que no se han mezclado.
+  int clics() =>
+      vibraciones.where((v) => v == 'HapticFeedbackType.selectionClick').length;
+
   int primeraVacia(List<int> givens) => givens.indexWhere((v) => v == 0);
   int otro(int right) => right == 9 ? 1 : right + 1;
 
@@ -84,6 +89,51 @@ void main() {
         expect(fallos(), 1);
       },
     );
+
+    test('mover la selección da un tic corto, no el zumbido largo', () async {
+      final c = await make();
+      final a = primeraVacia(c.board!.givens);
+      final b = c.board!.givens.indexWhere((v) => v == 0, a + 1);
+      c.select(a);
+      c.select(b);
+      expect(clics(), 2);
+      expect(fallos(), 0);
+    });
+
+    test('re-tocar la casilla ya seleccionada no vibra', () async {
+      // El tic dice "te has movido". Repetirlo sin moverse lo convertiría en
+      // ruido, y además delataría que `select` está repintando de más.
+      final c = await make();
+      final cell = primeraVacia(c.board!.givens);
+      c.select(cell);
+      c.select(cell);
+      c.select(cell);
+      expect(clics(), 1);
+    });
+
+    test('una pista NO vibra: la rellena la app, no el dedo', () async {
+      final c = await make();
+      c.hint();
+      expect(clics(), 0);
+      expect(fallos(), 0);
+    });
+
+    test('deshacer, borrar y notas nunca dan el zumbido largo', () async {
+      // Solo un dígito equivocado puede producirlo, y estos caminos no pasan
+      // por `place`. Si alguien colgara la vibración del widget en vez de del
+      // resultado de la jugada, esto lo cazaría.
+      final c = await make();
+      final cell = primeraVacia(c.board!.givens);
+      c.select(cell);
+      c.tapDigit(otro(c.board!.solution[cell]));
+      final antes = fallos();
+
+      c.undo();
+      c.erase();
+      c.toggleNotesMode();
+      c.tapDigit(3); // ahora es una anotación
+      expect(fallos(), antes);
+    });
 
     test(
       'anotar un dígito equivocado no vibra: una nota no es un fallo',
@@ -136,6 +186,21 @@ void main() {
       final cell = primeraVacia(c.board!.givens);
       c.select(cell);
       c.tapDigit(c.board!.solution[cell]);
+      expect(fallos(), 0);
+    });
+
+    // Los dos controladores deciden por su cuenta cuándo vibrar, así que lo de
+    // la selección hay que medirlo en LOS DOS: que el modo práctica respete el
+    // guardia no dice nada de la diaria. (Lo dice la experiencia: probarlo solo
+    // en práctica dejaba pasar quitarle el guardia a la diaria.)
+    test('mover la selección da un tic; re-tocarla, ninguno', () async {
+      final c = await make();
+      final a = primeraVacia(c.board!.givens);
+      final b = c.board!.givens.indexWhere((v) => v == 0, a + 1);
+      c.select(a);
+      c.select(a);
+      c.select(b);
+      expect(clics(), 2);
       expect(fallos(), 0);
     });
   });

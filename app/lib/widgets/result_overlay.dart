@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../game/difficulty.dart';
 import '../l10n/app_localizations.dart';
 import '../game/scoring.dart';
+import '../services/haptics.dart';
 import '../theme.dart';
 
 class ResultOverlay extends StatelessWidget {
@@ -101,12 +102,19 @@ class ResultOverlay extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 12),
                 child: Divider(height: 1, color: NonaColors.surface),
               ),
-              _Line(label: l.breakdownTotal, value: '${score.points}', strong: true),
+              _Line(
+                label: l.breakdownTotal,
+                value: '${score.points}',
+                strong: true,
+              ),
               const SizedBox(height: 18),
               // La racha solo la da terminar (§1); decirlo aquí evita que
               // alguien crea que el crédito parcial se la mantiene.
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 9,
+                ),
                 decoration: BoxDecoration(
                   color: score.extendsStreak
                       ? NonaColors.accentChip
@@ -129,7 +137,10 @@ class ResultOverlay extends StatelessWidget {
                 width: double.infinity,
                 height: 46,
                 child: OutlinedButton.icon(
-                  onPressed: onShare,
+                  onPressed: () {
+                    NonaHaptics.tap();
+                    onShare();
+                  },
                   icon: const Icon(Icons.ios_share_rounded, size: 17),
                   label: Text(
                     l.share,
@@ -152,7 +163,10 @@ class ResultOverlay extends StatelessWidget {
                 width: double.infinity,
                 height: 48,
                 child: FilledButton(
-                  onPressed: onClose,
+                  onPressed: () {
+                    NonaHaptics.tap();
+                    onClose();
+                  },
                   style: FilledButton.styleFrom(
                     backgroundColor: NonaColors.accent,
                     shape: RoundedRectangleBorder(
