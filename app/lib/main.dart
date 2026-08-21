@@ -4,9 +4,9 @@
 /// cumplió su papel: dejó demostrado que la misma cuenta de Apple da el mismo
 /// uid en CINCO y en Nona.
 ///
-/// Todavía NO se enciende nada de plataforma —cuentas, amistades,
-/// clasificación, anuncios, notificaciones— porque eso llega con el paquete
-/// `juegos_senda` en la fase N8, y hasta entonces el juego se sostiene solo:
+/// La plataforma ya está encendida: cuentas, amistades y compras vienen del
+/// paquete `juegos_senda`. Lo que sigue sin encender es la CLASIFICACIÓN, que
+/// necesita `LeaderboardService` (fase B). El juego se sostiene solo igualmente:
 /// la diaria sale del banco horneado y el progreso vive en el dispositivo. Así
 /// que esta app funciona entera sin red y sin cuenta, que es como debe ser el
 /// día que alguien la abra en un avión.
@@ -120,19 +120,85 @@ class NonaApp extends StatelessWidget {
         home: SendaBrandScope(
           brand: nonaBrand,
           child: _OrientationGate(
-            child: HomeScreen(
-              daily: daily,
-              practice: practice,
-              locale: locale,
-              theme: theme,
-              progress: progress,
+            child: _AuthGate(
               auth: auth,
-              friends: friends,
-              purchases: purchases,
+              child: HomeScreen(
+                daily: daily,
+                practice: practice,
+                locale: locale,
+                theme: theme,
+                progress: progress,
+                auth: auth,
+                friends: friends,
+                purchases: purchases,
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Entrada a la app: sesión, identidad y luego el juego.
+///
+/// Misma forma que CINCO (`main.dart`), y por el mismo motivo: la cuenta es de
+/// **Juegos Senda**, no de un juego, así que quien entra en Nona entra en la
+/// familia entera y la pantalla que lo explica tiene que ser la misma.
+///
+/// El orden importa y no es arbitrario:
+///
+/// 1. Sin sesión y **sin haber elegido jugar como invitado** → pantalla de
+///    entrada. Jugar sin cuenta es una elección explícita, no el defecto: si lo
+///    fuera, nadie vería nunca que existe una cuenta compartida.
+/// 2. Con sesión pero **sin perfil cargado todavía** → espera. Decidir antes de
+///    que llegue el perfil enseñaría el onboarding a quien ya tiene username.
+/// 3. Con sesión y sin username → onboarding de identidad, una sola vez.
+///
+/// El invitado se salta 2 y 3 enteros: no tiene perfil que esperar.
+class _AuthGate extends StatelessWidget {
+  const _AuthGate({required this.auth, required this.child});
+
+  final AuthController auth;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: auth,
+      builder: (context, _) {
+        final l = L.of(context);
+
+        // Sin Firebase (arranque en modo local) no hay nada que decidir: se
+        // juega, que es la promesa del juego.
+        if (!auth.firebaseReady) return child;
+
+        if (!auth.signedIn && !auth.guest) {
+          return SendaSignInScreen(
+            auth: auth,
+            appName: l.appName,
+            tagline: l.appTagline,
+          );
+        }
+
+        if (auth.signedIn) {
+          if (!auth.profileReady) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
+            );
+          }
+          if (auth.needsOnboarding) {
+            return SendaOnboardingScreen(
+              auth: auth,
+              // El handle es de la familia: lo que reserva Nona queda
+              // reservado también dentro de CINCO.
+              reservedHandles: nonaConfig.reservedHandles,
+            );
+          }
+        }
+
+        return child;
+      },
     );
   }
 }

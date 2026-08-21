@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import '../game/daily_controller.dart';
 import '../game/practice_controller.dart';
 import '../l10n/app_localizations.dart';
+
 import 'package:juegos_senda/juegos_senda.dart';
 
+import '../nona_config.dart';
 import 'settings_tab.dart';
 import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
@@ -93,12 +95,25 @@ class _HomeScreenState extends State<HomeScreen> {
           },
 
           // Lo social es lo único que necesita cuenta: sin ella no hay con
-          // quién compararse. La clasificación de verdad llega en la fase B
-          // —está atada a Firebase y a los guardarraíles—, así que hoy esta
-          // pestaña enseña siempre la invitación a entrar. Cuando exista
-          // LeaderboardService, aquí va SendaLeaderboardScreen para quien haya
-          // iniciado sesión.
-          SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
+          // quién compararse.
+          //
+          // Con sesión, la pestaña lleva a Amigos. La CLASIFICACIÓN todavía no
+          // —necesita `LeaderboardService`, que es de la fase B—, pero enseñar
+          // la invitación a entrar a alguien que YA entró sería pedirle que
+          // haga algo que acaba de hacer.
+          //
+          // `onInvite` va nulo a propósito hasta el guardarraíl #3: con un solo
+          // `fcmToken` por persona, una invitación desde Nona llega a la app
+          // que registró el token la última vez — una moneda al aire.
+          ListenableBuilder(
+            listenable: widget.auth,
+            builder: (context, _) => widget.auth.signedIn
+                ? SendaFriendsScreen(
+                    friends: widget.friends,
+                    gameId: nonaGameId,
+                  )
+                : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
+          ),
 
           SettingsTab(
             auth: widget.auth,
