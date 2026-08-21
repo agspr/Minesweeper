@@ -1,5 +1,20 @@
 /// El tablero 9×9.
 ///
+/// **Sin líneas.** Cada casilla es una superelipse —la curva de esquina que
+/// entra en el lado recto de forma continua, no un arco pegado— y las cajas de
+/// 3×3 se leen por el RITMO de los huecos: casi juntas dentro de una caja,
+/// separadas entre cajas. Lo que antes decía un trazo grueso cada tres
+/// columnas ahora lo dice el espacio.
+///
+/// El precio de ese cambio es que la estructura pasa de estar dibujada a estar
+/// calculada, así que la aritmética vive en [BoardMetrics] y se comprueba en
+/// `test/board_metrics_test.dart`. Una línea mal puesta se ve; un ritmo mal
+/// repartido no revienta nada, solo deja un tablero ilegible.
+///
+/// Los COLORES no cambiaron con la forma, y a propósito: cada tono del tablero
+/// está razonado contra los demás en `theme.dart` y medido en
+/// `board_colour_test.dart`. Esto es un cambio de silueta, no de paleta.
+///
 /// Dos decisiones de disposición que evitan fallos concretos:
 ///
 /// 1. **Siempre cuadrado y del tamaño que quepa.** El lado sale de la
@@ -15,6 +30,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../game/board_metrics.dart';
 import '../game/grid.dart';
 import '../game/sudoku_board.dart';
 import '../theme.dart';
@@ -39,26 +55,24 @@ class SudokuBoardView extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final side = constraints.biggest.shortestSide;
-        final cell = side / boardSize;
+        final m = BoardMetrics(side);
         final selDigit = selected >= 0 ? board.valueAt(selected) : 0;
 
         return MediaQuery(
           // Ver la nota 2 de la cabecera.
-          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.noScaling),
           child: SizedBox.square(
             dimension: side,
             child: Stack(
               children: [
                 for (var index = 0; index < cellCount; index++)
-                  Positioned(
-                    left: colOf(index) * cell,
-                    top: rowOf(index) * cell,
-                    width: cell,
-                    height: cell,
+                  Positioned.fromRect(
+                    rect: m.rectOf(index),
                     child: _Cell(
                       board: board,
                       index: index,
-                      size: cell,
+                      metrics: m,
                       isSelected: index == selected,
                       isPeer: selected >= 0 && peers[selected].contains(index),
                       isSameDigit:
@@ -68,18 +82,6 @@ class SudokuBoardView extends StatelessWidget {
                       onTap: () => onTapCell(index),
                     ),
                   ),
-                // Las líneas van ENCIMA para que ningún fondo de casilla las
-                // tape, y sin capturar toques.
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: CustomPaint(
-                      painter: _GridPainter(
-                        thinColour: NonaColors.gridThin,
-                        thickColour: NonaColors.gridThick,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -93,7 +95,7 @@ class _Cell extends StatelessWidget {
   const _Cell({
     required this.board,
     required this.index,
-    required this.size,
+    required this.metrics,
     required this.isSelected,
     required this.isPeer,
     required this.isSameDigit,
@@ -102,7 +104,7 @@ class _Cell extends StatelessWidget {
 
   final SudokuBoard board;
   final int index;
-  final double size;
+  final BoardMetrics metrics;
   final bool isSelected;
   final bool isPeer;
   final bool isSameDigit;
@@ -110,6 +112,7 @@ class _Cell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = metrics.cell;
     final value = board.valueAt(index);
     final given = board.isGiven(index);
     final wrong = board.isWrong(index);
@@ -130,15 +133,23 @@ class _Cell extends StatelessWidget {
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: bg,
-          // Borde solo en la seleccionada. La separa de la equivocada por
-          // PRESENCIA y no por tono, que es lo que hace falta con Coral: su
-          // chip y el rojo de error quedan a 22,7 de distancia, el par más
-          // justo del tablero. Con borde, da igual el tema.
-          border: isSelected && !wrong
-              ? Border.all(color: NonaColors.cellSelectedBorder, width: 2)
-              : null,
+          shape: RoundedSuperellipseBorder(
+            // La seleccionada se redondea MÁS que las demás: así seleccionar
+            // cambia la forma y no solo el color, que es un canal que no
+            // depende del tema ni de la vista de nadie.
+            borderRadius: BorderRadius.circular(
+              isSelected ? metrics.selectedRadius : metrics.radius,
+            ),
+            // Borde solo en la seleccionada. La separa de la equivocada por
+            // PRESENCIA y no por tono, que es lo que hace falta con Coral: su
+            // chip y el rojo de error quedan a 22,7 de distancia, el par más
+            // justo del tablero. Con borde, da igual el tema.
+            side: isSelected && !wrong
+                ? BorderSide(color: NonaColors.cellSelectedBorder, width: 2)
+                : BorderSide.none,
+          ),
         ),
         child: value != 0
             ? Text(
@@ -213,41 +224,4 @@ class _Notes extends StatelessWidget {
       ),
     );
   }
-}
-
-class _GridPainter extends CustomPainter {
-  _GridPainter({required this.thinColour, required this.thickColour});
-
-  // Los colores ENTRAN por el constructor en vez de leerse de NonaColors
-  // dentro de `paint`. Es lo que permite que `shouldRepaint` los compare: si
-  // los leyera dentro, el pintor no tendría forma de saber que cambiaron y las
-  // líneas se quedarían del tema anterior hasta que algo forzara un repintado.
-  final Color thinColour;
-  final Color thickColour;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cell = size.width / boardSize;
-    final thin = Paint()
-      ..color = thinColour
-      ..strokeWidth = 1;
-    final thick = Paint()
-      ..color = thickColour
-      ..strokeWidth = 2.5;
-
-    for (var i = 0; i <= boardSize; i++) {
-      // Cada 3 líneas, gruesa: es lo que hace legibles las cajas de un golpe.
-      final paint = i % boxSize == 0 ? thick : thin;
-      final d = i * cell;
-      canvas.drawLine(Offset(d, 0), Offset(d, size.height), paint);
-      canvas.drawLine(Offset(0, d), Offset(size.width, d), paint);
-    }
-  }
-
-  // Antes devolvía `false` siempre, que era correcto mientras las líneas eran
-  // dos constantes. Con el tablero teñido dejó de serlo: cambiar de tema o
-  // apagar el color no repintaba la rejilla.
-  @override
-  bool shouldRepaint(covariant _GridPainter old) =>
-      old.thinColour != thinColour || old.thickColour != thickColour;
 }
