@@ -181,15 +181,15 @@ class _Cell extends StatelessWidget {
                 style: TextStyle(
                   fontSize: size * 0.56,
                   height: 1,
-                  // Las pistas van en negrita y en blanco; lo escrito, más
-                  // ligero y en el acento. Se distinguen por peso además de por
-                  // color, no solo por color.
+                  // Las pistas van en negrita y en el acento entero; lo
+                  // escrito, más ligero y en el acento aclarado. Se distinguen
+                  // por peso además de por brillo, no solo por uno de los dos.
                   //
                   // Lo EQUIVOCADO también va en negrita, y no por énfasis: con
                   // el tema Coral el acento es #FF8A93 y el rojo de error
-                  // #FF7A8A — el mismo color a ojo. Separados solo por tono, un
-                  // dígito correcto y uno equivocado se verían idénticos en ese
-                  // tema. Con el peso, no.
+                  // #FF7A8A — el mismo color a ojo. Lo que separa un dígito
+                  // equivocado de una pista en ese tema es el fondo rojo de su
+                  // casilla; de uno escrito, además, el peso.
                   fontWeight: given || wrong
                       ? FontWeight.w800
                       : FontWeight.w500,

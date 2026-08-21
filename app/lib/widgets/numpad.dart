@@ -144,11 +144,9 @@ class _DigitKey extends StatelessWidget {
                   fontSize: 22,
                   height: 1,
                   fontWeight: FontWeight.w700,
-                  color: done
-                      ? NonaColors.keyDoneFg
-                      : notesMode
-                      ? NonaColors.accent
-                      : NonaColors.keyFg,
+                  // El modo notas lo dice el borde de arriba, no el color del
+                  // dígito: las teclas van siempre en el acento.
+                  color: done ? NonaColors.keyDoneFg : NonaColors.keyDigitFg,
                 ),
               ),
               const SizedBox(height: 3),

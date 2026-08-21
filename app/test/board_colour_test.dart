@@ -72,9 +72,11 @@ void main() {
   /// disfrazado.
   const exentas = <String, String>{
     // Con Coral el acento (#FF8A93) y el rojo de error (#FF7A8A) son el mismo
-    // color a ojo. Se separan por PESO: lo equivocado va en w800, lo escrito
-    // en w500. Ver sudoku_board_view.dart.
-    'escrito|equivocado': 'peso de la tipografía',
+    // color a ojo, y la pista lleva el acento en negrita, igual que lo
+    // equivocado. Lo que las separa es dónde están: un dígito equivocado solo
+    // existe sobre `cellWrong`, y ese fondo se mide contra todos los demás en
+    // `fondosPorTono`. Ver sudoku_board_view.dart.
+    'pista|equivocado': 'fondo rojo de la casilla equivocada',
   };
 
   bool exenta(String a, String b) =>
@@ -154,12 +156,36 @@ void main() {
     }
   });
 
-  test('apagar el color NO toca el dígito escrito', () {
-    // El límite del interruptor: apaga la decoración, no el acento de lo que
-    // ha escrito quien juega. Eso distingue lo suyo de las pistas.
+  test('apagar el color NO toca los dígitos', () {
+    // El límite del interruptor: apaga la decoración, no el color de los
+    // números. Pistas, escritos y teclado siguen al tema con el color apagado.
     NonaColors.current = SendaPalettes.cobalto;
     NonaColors.tinted = false;
-    expect(NonaColors.entered, SendaPalettes.cobalto.brand.accent);
+    expect(NonaColors.given, SendaPalettes.cobalto.brand.accent);
+    expect(NonaColors.keyDigitFg, SendaPalettes.cobalto.brand.accent);
+    expect(
+      NonaColors.entered,
+      Color.lerp(SendaPalettes.cobalto.brand.accent, Colors.white, 0.55),
+    );
+  });
+
+  test('lo escrito es el acento aclarado, no otro color', () {
+    // Lo escrito tiene que seguir pareciendo "del tema": más claro que la
+    // pista, pero de la misma familia. Y distinto de la pista por brillo, que
+    // es el canal que acompaña al peso.
+    for (final p in SendaPalettes.all) {
+      NonaColors.current = p;
+      expect(
+        dist(NonaColors.entered, NonaColors.given),
+        greaterThan(minima),
+        reason: '${p.name}: lo escrito se confunde con la pista',
+      );
+      expect(
+        NonaColors.entered.computeLuminance(),
+        greaterThan(NonaColors.given.computeLuminance()),
+        reason: '${p.name}: lo escrito tiene que ser MÁS claro que la pista',
+      );
+    }
   });
 
   test('cada excepción declara su segundo canal', () {

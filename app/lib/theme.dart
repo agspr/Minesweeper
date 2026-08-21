@@ -150,11 +150,30 @@ abstract final class NonaColors {
   /// (§1), así que esto se ve en el acto.
   static const cellWrong = Color(0xFF3A1218);
 
-  /// Pista: la más brillante y en negrita. No se puede tocar, y se nota.
-  static const given = Color(0xFFF2F0F7);
+  // ── Dígitos ────────────────────────────────────────────
+  //
+  // Los números van en el color del tema, en el tablero y en el teclado: es lo
+  // que hace que elegir Cobalto se sienta como un tablero AZUL y no como un
+  // tablero gris con detalles azules. Las pistas llevan el acento entero y en
+  // negrita; lo escrito, el mismo acento aclarado y más ligero. Dos canales
+  // —brillo y peso— entre lo que no se puede tocar y lo que sí.
+  //
+  // Ninguno de los dos sigue al interruptor de color: apaga la decoración del
+  // tablero, no la diferencia entre lo suyo y las pistas.
+  //
+  // Coral obliga a mirar una pareja más: su acento (#FF8A93) queda a 18,4 del
+  // rojo de error (#FF7A8A), y ahora la pista lleva el acento EN NEGRITA, igual
+  // que lo equivocado. Lo que las separa es el FONDO: un dígito equivocado solo
+  // existe sobre [cellWrong], que está a más de 20 de cualquier otro fondo.
+  // `board_colour_test.dart` declara esa exención con su canal.
 
-  /// Dígito escrito por el jugador: en el acento, más ligero que una pista.
-  static Color get entered => accent;
+  /// Pista: el acento entero, en negrita. No se puede tocar, y se nota.
+  static Color get given => accent;
+
+  /// Dígito escrito por el jugador: el acento aclarado hacia el blanco, más
+  /// ligero que una pista. Sigue siendo "del tema", pero se ve de un vistazo
+  /// que es de quien juega.
+  static Color get entered => Color.lerp(accent, Colors.white, 0.55)!;
 
   /// Dígito equivocado.
   static const wrong = Color(0xFFFF7A8A);
@@ -171,7 +190,16 @@ abstract final class NonaColors {
 
   // ── Numpad ─────────────────────────────────────────────
   static const keyBg = Color(0xFF23232B);
+
+  /// Texto e icono de las teclas de acción (deshacer, borrar, notas) y de las
+  /// barras del modo práctica. Neutro: son botones, no números.
   static const keyFg = Color(0xFFECEAF2);
+
+  /// El dígito de cada tecla numérica, en el acento como las pistas: el
+  /// teclado y el tablero hablan el mismo color. Solo los NÚMEROS; las teclas
+  /// de acción siguen en [keyFg] para que "notas" activo conserve su cambio
+  /// de color.
+  static Color get keyDigitFg => accent;
   static const keyDone = Color(0xFF1A1A20);
   static const keyDoneFg = Color(0xFF44444E);
 }
