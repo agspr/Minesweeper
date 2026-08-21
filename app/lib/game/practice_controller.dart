@@ -16,6 +16,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/haptics.dart';
+
 import 'difficulty.dart';
 import 'generator.dart';
 import 'grid.dart';
@@ -37,7 +39,8 @@ Map<String, dynamic>? _generateInIsolate((int, int) args) {
 class PracticeController extends ChangeNotifier {
   PracticeController(this._prefs, {int Function()? seedSource})
     : _seedSource =
-          seedSource ?? (() => DateTime.now().microsecondsSinceEpoch & 0x7FFFFFFF);
+          seedSource ??
+          (() => DateTime.now().microsecondsSinceEpoch & 0x7FFFFFFF);
 
   static const _kState = 'game.nona.practice';
   static const _kDifficulty = 'game.nona.practice.difficulty';
@@ -107,10 +110,10 @@ class PracticeController extends ChangeNotifier {
     // Se reintenta con semillas distintas: `generate` puede no converger al
     // grado pedido, y en ese caso devuelve null en vez de entregar otra cosa.
     for (var attempt = 0; attempt < 5 && json == null; attempt++) {
-      json = await compute(
-        _generateInIsolate,
-        (_seedSource() + attempt, _difficulty.index),
-      );
+      json = await compute(_generateInIsolate, (
+        _seedSource() + attempt,
+        _difficulty.index,
+      ));
     }
 
     if (json != null) {
@@ -140,7 +143,8 @@ class PracticeController extends ChangeNotifier {
     if (_notesMode) {
       b.toggleNote(_selected, digit);
     } else {
-      b.place(_selected, digit);
+      // Un fallo se siente, no solo se ve: ver NonaHaptics.mistake.
+      if (b.place(_selected, digit)) NonaHaptics.mistake();
     }
     _save();
     notifyListeners();

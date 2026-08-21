@@ -17,6 +17,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/haptics.dart';
+
 import 'daily_bank.dart';
 import 'day_key.dart';
 import 'difficulty.dart';
@@ -49,10 +51,8 @@ class DailyOutcome {
 }
 
 class DailyController extends ChangeNotifier {
-  DailyController(
-    this._prefs, {
-    DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+  DailyController(this._prefs, {DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now;
 
   // Prefijo 'game.' a propósito: es lo que SessionSync borra al cambiar de
   // cuenta en el aparato, para que la partida de una persona no se le atribuya
@@ -178,7 +178,8 @@ class DailyController extends ChangeNotifier {
     if (_notesMode) {
       b.toggleNote(_selected, digit);
     } else {
-      b.place(_selected, digit);
+      // Un fallo se siente, no solo se ve: ver NonaHaptics.mistake.
+      if (b.place(_selected, digit)) NonaHaptics.mistake();
       // Terminar para el reloj: la partida ya está cerrada.
       if (b.isComplete) pauseTimer();
     }
