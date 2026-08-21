@@ -4,21 +4,29 @@
 /// fondo, así que mide tiempo de juego y no de calendario. Al volver se
 /// comprueba si ya es otro día: un proceso móvil sobrevive a medianoche sin
 /// problema, y sin esa comprobación seguiría mostrando el puzle de ayer.
+///
+/// **El reloj ya no se ENSEÑA mientras se juega**, solo al final, en el
+/// resultado. No puntúa (§1) y no se compite con él contra nadie: en la
+/// cabecera solo servía para meter prisa. Sigue corriendo porque el resultado y
+/// el registro del día lo piden.
+///
+/// **La X de la cabecera es la única salida.** La barra inferior desaparece
+/// mientras se juega, así que no hay pestañas debajo a las que volver: por eso
+/// la cabecera se dibuja también mientras carga y cuando el día no está en el
+/// banco, donde antes no había nada. Sin ella, esos dos estados encerraban a
+/// quien los viera.
 library;
-
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 
 import '../game/daily_controller.dart';
 import '../game/scoring.dart';
 import '../l10n/app_localizations.dart';
-import 'package:juegos_senda/juegos_senda.dart';
-
 import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
 import '../services/share_service.dart';
 import '../theme.dart';
+import '../widgets/game_header.dart';
 import '../widgets/numpad.dart';
 import '../widgets/puzzle_layout.dart';
 import '../widgets/result_overlay.dart';
@@ -30,18 +38,22 @@ class GameScreen extends StatefulWidget {
     required this.controller,
     required this.progress,
     required this.theme,
+    required this.onExit,
   });
 
   final DailyController controller;
   final ProgressController progress;
   final ThemeController theme;
 
+  /// Volver al menú. No es `Navigator.pop`: la pantalla no es una ruta, vive
+  /// dentro de la pestaña Jugar (ver `home_screen.dart`).
+  final VoidCallback onExit;
+
   @override
   State<GameScreen> createState() => _GameScreenState();
 }
 
 class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
-  Timer? _ticker;
   bool _resultDismissed = false;
   bool _wasComplete = false;
 
@@ -50,17 +62,14 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     widget.controller.startTimer();
-    // Un tic por segundo solo para repintar el reloj. El tiempo real lo lleva
-    // el controlador con su propio reloj, así que perder un tic no descuadra
-    // nada.
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted && !widget.controller.isComplete) setState(() {});
-    });
+    // Aquí vivía un tic por segundo cuyo único trabajo era repintar el reloj de
+    // la cabecera. Sin reloj a la vista, repintar la pantalla entera una vez
+    // por segundo no dibujaba nada nuevo. El tiempo lo sigue llevando el
+    // controlador con su propio reloj, y se lee cuando hace falta.
   }
 
   @override
   void dispose() {
-    _ticker?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     widget.controller.pauseTimer();
     super.dispose();
@@ -98,15 +107,57 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // `bottom: false` porque debajo manda el armazón: mientras se juega, la
+      // barra inferior deja sitio a una franja del alto del gesto (ver
+      // `home_screen.dart`), y volver a descontar el hueco aquí lo contaría dos
+      // veces.
       body: SafeArea(
+        bottom: false,
         child: ListenableBuilder(
           listenable: widget.controller,
           builder: (context, _) {
             final c = widget.controller;
+            final l = L.of(context);
 
-            if (c.loadError != null) return const _BankGap();
+            // La MISMA cabecera en los tres estados —error, carga y partida—,
+            // porque la X es la única forma de salir y no puede faltar en
+            // ninguno. Lo que cambia es cuánto sabe: sin puzle cargado no hay
+            // dificultad que poner de subtítulo ni fallos que contar.
+            final header = GameHeader(
+              title: l.appTagline,
+              subtitle: c.difficulty == null
+                  ? null
+                  : difficultyLabel(context, c.difficulty!),
+              onClose: widget.onExit,
+              trailing: c.board == null
+                  ? null
+                  // Los fallos se ven SIEMPRE, también en cero: es lo que se
+                  // está puntuando, y esconderlo hasta el primer fallo haría
+                  // que la primera resta pareciera salir de la nada.
+                  : HeaderChip(
+                      label: c.board!.mistakes == 0
+                          ? l.noMistakes
+                          : l.mistakeCount(c.board!.mistakes) +
+                                (c.board!.mistakes >= 5
+                                    ? l.mistakeCapSuffix
+                                    : ''),
+                      highlight: c.board!.mistakes > 0,
+                    ),
+            );
+
+            if (c.loadError != null) {
+              return PuzzleLayout(
+                header: header,
+                board: const _BankGap(),
+                numpad: const SizedBox.shrink(),
+              );
+            }
             if (!c.ready || c.board == null) {
-              return const Center(child: CircularProgressIndicator(strokeWidth: 2.5));
+              return PuzzleLayout(
+                header: header,
+                board: const CircularProgressIndicator(strokeWidth: 2.5),
+                numpad: const SizedBox.shrink(),
+              );
             }
 
             // Al completarse, el reloj se para, se registra el día y sale el
@@ -126,12 +177,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             return Stack(
               children: [
                 PuzzleLayout(
-                  header: _Header(
-                    difficulty: difficultyLabel(context, c.difficulty!),
-                    mistakes: board.mistakes,
-                    elapsed: c.elapsed,
-                    theme: widget.theme,
-                  ),
+                  header: header,
                   board: SudokuBoardView(
                     board: board,
                     selected: c.selected,
@@ -145,6 +191,8 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                     onErase: c.erase,
                     onToggleNotes: c.toggleNotesMode,
                     onUndo: c.undo,
+                    boardColourOn: widget.theme.boardColour,
+                    onToggleBoardColour: widget.theme.toggleBoardColour,
                   ),
                 ),
                 if (c.isComplete && !_resultDismissed)
@@ -159,139 +207,6 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               ],
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.theme,
-    required this.difficulty,
-    required this.mistakes,
-    required this.elapsed,
-  });
-
-  final ThemeController theme;
-  final String difficulty;
-  final int mistakes;
-  final Duration elapsed;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = L.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      // Flexible + FittedBox porque esta fila desbordaba en TODOS los móviles
-      // (43 px en un iPhone SE) y en un iPad no se veía: lo cazó
-      // `layout_test.dart`. Ahora el título se recorta con puntos suspensivos y
-      // el grupo de chips se encoge en bloque antes que salirse, así que
-      // aguanta también el texto del sistema ampliado al máximo.
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Text(
-              difficulty,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                color: NonaColors.text,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Los fallos se ven SIEMPRE, también en cero: es lo que se
-                  // está puntuando, y esconderlo hasta el primer fallo haría
-                  // que la primera resta pareciera salir de la nada.
-                  _Chip(
-                    label: mistakes == 0
-                        ? l.noMistakes
-                        : l.mistakeCount(mistakes) +
-                              (mistakes >= 5 ? l.mistakeCapSuffix : ''),
-                    highlight: mistakes > 0,
-                  ),
-                  const SizedBox(width: 8),
-                  _Chip(label: _clock(elapsed)),
-                ],
-              ),
-            ),
-          ),
-          // Fuera del FittedBox a propósito: ahí dentro se encogería con los
-          // chips y un área de toque encogida deja de poder tocarse. Aquí
-          // conserva sus 40x40 pase lo que pase con el resto de la fila.
-          _BoardColourButton(theme: theme),
-        ],
-      ),
-    );
-  }
-}
-
-/// Apagar o encender el color del tablero, sin salir del tablero.
-///
-/// Va aquí y no en ajustes porque es una decisión que se toma MIRÁNDOLO: quien
-/// lo encuentre chillón lo piensa jugando, y mandarle a otra pantalla para
-/// volver a comprobar el efecto sería pedirle que recuerde dos estados a la
-/// vez. Es el mismo criterio por el que el selector de color SÍ vive en Más:
-/// allí se elige identidad, aquí se ajusta lo que se está mirando.
-class _BoardColourButton extends StatelessWidget {
-  const _BoardColourButton({required this.theme});
-
-  final ThemeController theme;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = L.of(context);
-    final on = theme.boardColour;
-    return IconButton(
-      onPressed: () {
-        Haptics.selection();
-        theme.toggleBoardColour();
-      },
-      visualDensity: VisualDensity.compact,
-      // El icono dice en qué ESTADO está, no qué pasará al pulsarlo: un icono
-      // que anuncia la acción obliga a deducir el estado actual por descarte.
-      icon: Icon(
-        on ? Icons.palette_rounded : Icons.palette_outlined,
-        size: 20,
-        color: on ? NonaColors.accent : NonaColors.muted,
-      ),
-      tooltip: on ? l.boardColourOn : l.boardColourOff,
-      // Lo que leen los lectores de pantalla: el estado, no el icono.
-    );
-  }
-}
-
-class _Chip extends StatelessWidget {
-  const _Chip({required this.label, this.highlight = false});
-
-  final String label;
-  final bool highlight;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: highlight ? NonaColors.cellWrong : NonaColors.surface,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: highlight ? NonaColors.wrong : NonaColors.muted,
         ),
       ),
     );
@@ -320,10 +235,4 @@ class _BankGap extends StatelessWidget {
       ),
     );
   }
-}
-
-String _clock(Duration d) {
-  final m = d.inMinutes.toString().padLeft(2, '0');
-  final s = (d.inSeconds % 60).toString().padLeft(2, '0');
-  return '$m:$s';
 }

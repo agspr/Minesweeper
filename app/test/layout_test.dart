@@ -4,8 +4,9 @@ import 'package:nona/game/daily_bank.dart';
 import 'package:nona/game/daily_controller.dart';
 import 'package:nona/game/difficulty.dart';
 import 'package:nona/game/generator.dart';
-import 'package:juegos_senda/juegos_senda.dart';
+import 'package:nona/game/practice_controller.dart';
 import 'package:nona/screens/game_screen.dart';
+import 'package:nona/screens/practice_screen.dart';
 import 'package:nona/services/progress_controller.dart';
 import 'package:nona/services/theme_controller.dart';
 
@@ -84,17 +85,26 @@ void main() {
         );
         await c.load();
 
-        // Con la barra inferior DEBAJO, no la pantalla suelta.
+        // Se monta lo que monta la app DE VERDAD, y eso cambió: mientras se
+        // juega, la barra inferior ya no está —se la lleva `home_screen.dart`
+        // para que el tablero crezca— y en su sitio quedan el banner y la
+        // franja del gesto. Una prueba de desbordes que monta otra cosa no
+        // prueba nada: es el mismo agujero que tenía este fichero cuando
+        // probaba `GameScreen` a pelo, sin barra.
         //
-        // La barra le quita 68 puntos de alto al tablero, y este fichero existe
-        // justo para eso: la primera versión probaba `GameScreen` a pelo, así
-        // que cuando se añadió la barra las seis medidas siguieron en verde sin
-        // haber medido nunca el caso real. Una prueba de desbordes que no monta
-        // lo que se monta en la app no prueba nada.
+        // El banner se sustituye por una caja de su alto MÁXIMO documentado
+        // (15 % del alto de pantalla): el de verdad pregunta su tamaño por un
+        // canal de plataforma que aquí no existe, y reservar de más es el lado
+        // seguro para una prueba de desbordes.
+        final insets = _insetsFor(entry.value);
         await tester.pumpWidget(
           testApp(
             MediaQuery(
-              data: MediaQueryData(textScaler: TextScaler.linear(escala.value)),
+              data: MediaQueryData.fromView(tester.view).copyWith(
+                textScaler: TextScaler.linear(escala.value),
+                padding: insets,
+                viewPadding: insets,
+              ),
               child: Scaffold(
                 body: GameScreen(
                   controller: c,
@@ -102,10 +112,17 @@ void main() {
                     await SharedPreferences.getInstance(),
                   ),
                   theme: ThemeController(await SharedPreferences.getInstance()),
+                  onExit: () {},
                 ),
-                bottomNavigationBar: SendaBottomNav(
-                  current: SendaTab.play,
-                  onSelect: (_) {},
+                bottomNavigationBar: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (entry.value.height >= 700)
+                      SizedBox(
+                        height: (entry.value.height * 0.15).floorToDouble(),
+                      ),
+                    Container(height: insets.bottom),
+                  ],
                 ),
               ),
             ),
@@ -122,6 +139,78 @@ void main() {
         // recortado a cero.
         expect(find.byType(GameScreen), findsOneWidget);
       });
+
+      testWidgets('sin desbordes en práctica · ${entry.key} · ${escala.key}', (
+        tester,
+      ) async {
+        // El modo práctica también entra en la matriz: su cabecera CRECIÓ —X y
+        // título encima de las pastillas de dificultad— y es la pantalla con
+        // más cosas apiladas de la app.
+        tester.view.physicalSize = entry.value;
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final prefs = await SharedPreferences.getInstance();
+        late PracticeController c;
+        await tester.runAsync(() async {
+          c = PracticeController(prefs);
+          await c.load();
+        });
+
+        final insets = _insetsFor(entry.value);
+        await tester.pumpWidget(
+          testApp(
+            MediaQuery(
+              data: MediaQueryData.fromView(tester.view).copyWith(
+                textScaler: TextScaler.linear(escala.value),
+                padding: insets,
+                viewPadding: insets,
+              ),
+              child: Scaffold(
+                body: PracticeScreen(
+                  controller: c,
+                  theme: ThemeController(prefs),
+                  onExit: () {},
+                ),
+                bottomNavigationBar: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (entry.value.height >= 700)
+                      SizedBox(
+                        height: (entry.value.height * 0.15).floorToDouble(),
+                      ),
+                    Container(height: insets.bottom),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'práctica desborda en ${entry.key} con ${escala.key}',
+        );
+      });
     }
   }
+}
+
+/// Zonas seguras aproximadas por clase de aparato.
+///
+/// Antes este fichero montaba un `MediaQueryData()` a secas, cuyo tamaño es
+/// CERO: con eso, la rama de tablet apaisada de `PuzzleLayout` no la montaba
+/// nunca nadie y los insets no existían. Sin ellos, la franja del gesto —que es
+/// justo lo que ahora sostiene el numpad— medía siempre 0.
+EdgeInsets _insetsFor(Size size) {
+  if (size.shortestSide >= 600) {
+    return const EdgeInsets.only(top: 24, bottom: 20); // iPad
+  }
+  if (size.height <= 568) {
+    return const EdgeInsets.only(top: 20); // SE: botón físico, sin raya
+  }
+  return const EdgeInsets.only(top: 59, bottom: 34); // móvil con muesca
 }

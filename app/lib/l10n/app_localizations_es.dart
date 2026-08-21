@@ -84,6 +84,9 @@ class LEs extends L {
   String get notes => 'Notas';
 
   @override
+  String get closeGame => 'Menú principal';
+
+  @override
   String get hint => 'Pista';
 
   @override

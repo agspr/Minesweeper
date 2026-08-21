@@ -32,6 +32,7 @@ class HomeScreen extends StatefulWidget {
     required this.auth,
     required this.friends,
     required this.purchases,
+    this.banner,
   });
 
   final DailyController daily;
@@ -42,6 +43,14 @@ class HomeScreen extends StatefulWidget {
   final AuthController auth;
   final FriendsService friends;
   final PurchaseService purchases;
+
+  /// El banner de anuncios, ya construido.
+  ///
+  /// Se INYECTA en vez de montarse aquí por las pruebas: `AdBanner` pregunta su
+  /// tamaño por un canal de plataforma que en una prueba de widgets no existe,
+  /// y montarlo dentro reventaría cualquier prueba que monte el menú. Quien lo
+  /// construye es `main.dart`, una sola vez; las pruebas pasan `null`.
+  final Widget? banner;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -58,6 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _play = v;
     _tab = SendaTab.play;
   });
+
+  /// Se está jugando: ni menú ni otras pestañas.
+  bool get _inGame => _tab == SendaTab.play && _play != _Play.menu;
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +99,11 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: widget.daily,
               progress: widget.progress,
               theme: widget.theme,
+              onExit: () => _goPlay(_Play.menu),
             ),
             _Play.practice => PracticeScreen(
               controller: widget.practice,
+              theme: widget.theme,
               onExit: () => _goPlay(_Play.menu),
             ),
           },
@@ -125,9 +139,33 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: SendaBottomNav(
-        current: _tab,
-        onSelect: (t) => setState(() => _tab = t),
+      // Abajo: el banner y, debajo, la barra de pestañas O el hueco del gesto.
+      //
+      // Mientras se juega la barra **se va del árbol**, no se atenúa: es el
+      // alto que le hace falta al tablero, y con `hidden` seguiría ocupándolo.
+      // Que dependa de la vista y no de un gesto es lo que hace que sea seguro:
+      // la vista solo cambia al navegar, así que nada se mueve bajo los dedos a
+      // mitad de una partida.
+      //
+      // Al quitarla hay que devolver a mano el hueco de la barra de gestos, que
+      // hasta ahora cubría ella; si no, el numpad queda debajo de la raya.
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // En pantallas muy bajas el banner se sacrifica: el tablero manda.
+          if (widget.banner != null && MediaQuery.sizeOf(context).height >= 700)
+            widget.banner!,
+          if (_inGame)
+            Container(
+              height: MediaQuery.paddingOf(context).bottom,
+              color: NonaColors.appBg,
+            )
+          else
+            SendaBottomNav(
+              current: _tab,
+              onSelect: (t) => setState(() => _tab = t),
+            ),
+        ],
       ),
     );
   }

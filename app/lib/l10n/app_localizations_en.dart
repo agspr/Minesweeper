@@ -84,6 +84,9 @@ class LEn extends L {
   String get notes => 'Notes';
 
   @override
+  String get closeGame => 'Main menu';
+
+  @override
   String get hint => 'Hint';
 
   @override

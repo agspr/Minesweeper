@@ -205,6 +205,12 @@ abstract class L {
   /// **'Notas'**
   String get notes;
 
+  /// No description provided for @closeGame.
+  ///
+  /// In es, this message translates to:
+  /// **'Menú principal'**
+  String get closeGame;
+
   /// No description provided for @hint.
   ///
   /// In es, this message translates to:
