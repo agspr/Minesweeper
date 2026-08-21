@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Cómo se exporta el archivo para App Store Connect.
+	     Existe porque las opciones que genera Flutter por su cuenta NO dicen
+	     qué perfil usar, y el exportador entonces elige uno cualquiera del
+	     equipo: la exportación fallaba con "requires a provisioning profile
+	     with the Sign In with Apple feature" aunque el perfil correcto —"Nona
+	     App Store"— estuviera instalado y sí llevara esa capacidad. Mapear el
+	     bundle id a su perfil a mano es lo que lo arregla. Mismo fichero y
+	     misma forma que en CINCO. -->
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>teamID</key>
+	<string>J89RR3WSZY</string>
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.nonaapp.nona</key>
+		<string>Nona App Store</string>
+	</dict>
+</dict>
+</plist>
