@@ -62,6 +62,10 @@ Future<void> main() async {
       auth: AuthController(firebaseReady: firebaseReady, prefs: prefs),
       friends: FriendsService(firebaseReady: firebaseReady),
       purchases: PurchaseService(prefs, nonaConfig.iap)..init(),
+      // El consentimiento (RGPD + ATT) se pide una vez por sesión y lo comparte
+      // todo lo que muestre anuncios, así que vive aquí arriba y no dentro del
+      // banner.
+      consent: ConsentManager(),
     ),
   );
 }
@@ -77,6 +81,7 @@ class NonaApp extends StatelessWidget {
     required this.auth,
     required this.friends,
     required this.purchases,
+    required this.consent,
   });
 
   final DailyController daily;
@@ -87,6 +92,7 @@ class NonaApp extends StatelessWidget {
   final AuthController auth;
   final FriendsService friends;
   final PurchaseService purchases;
+  final ConsentManager consent;
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +137,18 @@ class NonaApp extends StatelessWidget {
                 auth: auth,
                 friends: friends,
                 purchases: purchases,
+                // Se construye AQUÍ, una sola vez y arriba del todo: el banner
+                // reserva su alto desde el primer fotograma, y rehacerlo en
+                // cada reconstrucción del armazón lo haría recargar. Las
+                // pruebas montan `HomeScreen` sin él.
+                banner: AdBanner(
+                  consent: consent,
+                  purchases: purchases,
+                  ads: nonaConfig.ads,
+                  // El hueco reservado tiene que fundirse con el fondo de la
+                  // app, no con uno del paquete.
+                  backgroundColor: NonaColors.appBg,
+                ),
               ),
             ),
           ),
