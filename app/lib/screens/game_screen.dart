@@ -133,15 +133,20 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                   ? null
                   // Los fallos se ven SIEMPRE, también en cero: es lo que se
                   // está puntuando, y esconderlo hasta el primer fallo haría
-                  // que la primera resta pareciera salir de la nada.
+                  // que la primera resta pareciera salir de la nada. Lo que
+                  // cambió es CÓMO: una equis y el número, sin la frase. Las
+                  // palabras siguen ahí para quien use un lector de pantalla.
                   : HeaderChip(
-                      label: c.board!.mistakes == 0
+                      icon: Icons.close_rounded,
+                      count: c.board!.mistakes,
+                      highlight: c.board!.mistakes > 0,
+                      capped: c.board!.mistakes >= maxCountedMistakes,
+                      semanticsLabel: c.board!.mistakes == 0
                           ? l.noMistakes
                           : l.mistakeCount(c.board!.mistakes) +
-                                (c.board!.mistakes >= 5
+                                (c.board!.mistakes >= maxCountedMistakes
                                     ? l.mistakeCapSuffix
                                     : ''),
-                      highlight: c.board!.mistakes > 0,
                     ),
             );
 

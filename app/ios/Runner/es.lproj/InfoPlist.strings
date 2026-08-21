@@ -1,0 +1,4 @@
+/* El texto del prompt de seguimiento de iOS (ATT).
+   Vive aquí y no en Info.plist porque Nona es bilingüe: en el plist solo cabe
+   una versión, y quien juegue en inglés vería el permiso en español. */
+"NSUserTrackingUsageDescription" = "Nona usa el identificador de anuncios de tu dispositivo para mostrarte anuncios más relevantes. Puedes rechazarlo y seguir usando todas las funciones.";

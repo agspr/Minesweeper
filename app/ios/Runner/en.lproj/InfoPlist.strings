@@ -1,0 +1,3 @@
+/* iOS tracking prompt (ATT). Lives here rather than in Info.plist because Nona
+   ships in two languages and the plist only holds one. */
+"NSUserTrackingUsageDescription" = "Nona uses your device's advertising identifier to show you more relevant ads. You can decline and keep using every feature.";

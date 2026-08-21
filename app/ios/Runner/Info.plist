@@ -10,9 +10,14 @@
 	<string>ca-app-pub-5030233210775781~5728912318</string>
 	<!-- ATT: el prompt de seguimiento de iOS. Sin esta clave el sistema NO lo
 	     enseña nunca, lo da por denegado, y App Review rechaza la app por pedir
-	     seguimiento sin explicarlo. -->
+	     seguimiento sin explicarlo.
+	
+	     Lo que se lee aquí es el RESPALDO, en el idioma de desarrollo: el texto
+	     que de verdad sale lo ponen en/es.lproj/InfoPlist.strings según el
+	     idioma del teléfono. La clave tiene que seguir estando en el plist
+	     aunque esté traducida fuera; los .strings solo la sustituyen. -->
 	<key>NSUserTrackingUsageDescription</key>
-	<string>Nona usa el identificador de anuncios de tu dispositivo para mostrarte anuncios más relevantes. Puedes rechazarlo y seguir usando todas las funciones.</string>
+	<string>Nona uses your device's advertising identifier to show you more relevant ads. You can decline and keep using every feature.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

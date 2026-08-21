@@ -128,7 +128,11 @@ class _Header extends StatelessWidget {
           // chip existe igual, así que el título no se mueve al pedir la
           // primera.
           trailing: hintsUsed > 0
-              ? HeaderChip(label: l.hintCount(hintsUsed))
+              ? HeaderChip(
+                  icon: Icons.lightbulb_outline_rounded,
+                  count: hintsUsed,
+                  semanticsLabel: l.hintCount(hintsUsed),
+                )
               : null,
         ),
         const SizedBox(height: 8),
