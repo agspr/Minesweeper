@@ -1,15 +1,23 @@
 /// El tablero 9×9.
 ///
-/// **Sin líneas.** Cada casilla es una superelipse —la curva de esquina que
-/// entra en el lado recto de forma continua, no un arco pegado— y las cajas de
-/// 3×3 se leen por el RITMO de los huecos: casi juntas dentro de una caja,
-/// separadas entre cajas. Lo que antes decía un trazo grueso cada tres
-/// columnas ahora lo dice el espacio.
+/// Casillas que son superelipses —la curva de esquina que entra en el lado
+/// recto de forma continua, no un arco pegado— sentadas sobre una rejilla
+/// clásica: línea fina entre casillas, gruesa entre cajas de 3×3 y un marco
+/// alrededor. Las líneas corren por el CENTRO de los huecos que separan las
+/// casillas, así que la estructura se dice dos veces y las dos coinciden: el
+/// ritmo de los huecos —casi juntas dentro de una caja, separadas entre cajas—
+/// y el trazo que pasa por ellos.
 ///
-/// El precio de ese cambio es que la estructura pasa de estar dibujada a estar
-/// calculada, así que la aritmética vive en [BoardMetrics] y se comprueba en
-/// `test/board_metrics_test.dart`. Una línea mal puesta se ve; un ritmo mal
-/// repartido no revienta nada, solo deja un tablero ilegible.
+/// Que se diga dos veces no es adorno. Quien ha hecho sudokus en papel toda la
+/// vida reconoce un tablero por su rejilla, y un tablero de baldosas sueltas,
+/// por bien repartido que esté, le pide aprender a leerlo. La rejilla es lo que
+/// hace que esto parezca un sudoku antes de mirarlo dos veces; las
+/// superelipses son lo que hace que no parezca una hoja de cuadrícula.
+///
+/// El precio de calcular la estructura en vez de solo dibujarla es que la
+/// aritmética vive en [BoardMetrics] y se comprueba en
+/// `test/board_metrics_test.dart`: una línea desviada medio hueco pisa la
+/// curva de una casilla sin que nada reviente.
 ///
 /// Los COLORES no cambiaron con la forma, y a propósito: cada tono del tablero
 /// está razonado contra los demás en `theme.dart` y medido en
@@ -27,6 +35,8 @@
 ///    puré. Se envuelve en un MediaQuery con `TextScaler.noScaling` y cada
 ///    tamaño se calcula en proporción a la celda.
 library;
+
+import 'dart:math' show max;
 
 import 'package:flutter/material.dart';
 
@@ -66,6 +76,20 @@ class SudokuBoardView extends StatelessWidget {
             dimension: side,
             child: Stack(
               children: [
+                // La rejilla va DEBAJO de las casillas: las líneas corren por
+                // los huecos y nunca deberían tocar una casilla, pero si la
+                // aritmética fallara, mejor una línea tapada que una casilla
+                // tachada.
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _GridPainter(
+                      metrics: m,
+                      thin: NonaColors.gridThin,
+                      thick: NonaColors.gridThick,
+                      pixelRatio: MediaQuery.devicePixelRatioOf(context),
+                    ),
+                  ),
+                ),
                 for (var index = 0; index < cellCount; index++)
                   Positioned.fromRect(
                     rect: m.rectOf(index),
@@ -224,4 +248,66 @@ class _Notes extends StatelessWidget {
       ),
     );
   }
+}
+
+/// La rejilla clásica: fina entre casillas, gruesa entre cajas, marco fuera.
+///
+/// Cada línea se ajusta a píxeles FÍSICOS antes de pintarse. Una línea de un
+/// píxel lógico centrada en una coordenada fraccionaria se reparte entre dos
+/// filas de píxeles y sale gris y borrosa; la misma línea ajustada a la rejilla
+/// física sale nítida. El marco no se ajusta: es grueso y curvo, y ahí el
+/// suavizado ayuda en vez de estorbar.
+class _GridPainter extends CustomPainter {
+  const _GridPainter({
+    required this.metrics,
+    required this.thin,
+    required this.thick,
+    required this.pixelRatio,
+  });
+
+  final BoardMetrics metrics;
+  final Color thin;
+  final Color thick;
+  final double pixelRatio;
+
+  double _snap(double v) => (v * pixelRatio).roundToDouble() / pixelRatio;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final m = metrics;
+    final side = m.side;
+
+    // Primero las finas y luego las gruesas: donde se cruzan, manda la gruesa.
+    for (final boxLines in [false, true]) {
+      final paint = Paint()..color = boxLines ? thick : thin;
+      for (var i = 0; i < boardSize - 1; i++) {
+        if (m.isBoxLine(i) != boxLines) continue;
+        final w = m.lineWidthAfter(i);
+        final a = _snap(m.lineAt(i) - w / 2);
+        // Nunca por debajo de un píxel físico, aunque el ajuste redondee a 0.
+        final b = max(_snap(m.lineAt(i) + w / 2), a + 1 / pixelRatio);
+        canvas.drawRect(Rect.fromLTRB(a, 0, b, side), paint); // vertical
+        canvas.drawRect(Rect.fromLTRB(0, a, side, b), paint); // horizontal
+      }
+    }
+
+    final frame = Paint()
+      ..color = thick
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = m.thick;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, side, side).deflate(m.thick / 2),
+        Radius.circular(m.frameRadius),
+      ),
+      frame,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_GridPainter old) =>
+      old.metrics.side != metrics.side ||
+      old.thin != thin ||
+      old.thick != thick ||
+      old.pixelRatio != pixelRatio;
 }

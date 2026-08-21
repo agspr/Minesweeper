@@ -162,10 +162,12 @@ abstract final class NonaColors {
   /// Anotaciones a lápiz.
   static const note = Color(0xFF7B7B8C);
 
-  // Aquí vivían `gridThin` y `gridThick`. El tablero ya no tiene líneas: las
-  // casillas son superelipses y las cajas de 3×3 se leen por el ritmo de los
-  // huecos. Lo que separa las cajas es ahora geometría, no color, y por eso la
-  // estructura del tablero dejó de tener paleta que apagar.
+  /// Líneas finas entre casillas y gruesas entre cajas de 3×3 (y el marco).
+  /// Corren por el centro de los huecos que separan las superelipses, sobre
+  /// [appBg]. Se tiñen: son pura geometría, no significan ningún estado, así
+  /// que el acento puede mandar sin pisar nada.
+  static Color get gridThin => _tint(const Color(0xFF26262E), 0.15);
+  static Color get gridThick => _tint(const Color(0xFF4A4A58), 0.28);
 
   // ── Numpad ─────────────────────────────────────────────
   static const keyBg = Color(0xFF23232B);

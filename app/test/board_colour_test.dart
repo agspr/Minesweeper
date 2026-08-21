@@ -144,9 +144,8 @@ void main() {
       NonaColors.tinted = false;
       expect(NonaColors.cellPeer, const Color(0xFF24242E));
       expect(NonaColors.cellSameDigit, const Color(0xFF33333F));
-      // Las líneas ya no están: la estructura del tablero es geometría y no
-      // color, así que no hay nada suyo que apagar. Lo que sigue debajo son
-      // los estados, que sí.
+      expect(NonaColors.gridThin, const Color(0xFF26262E));
+      expect(NonaColors.gridThick, const Color(0xFF4A4A58));
       expect(
         NonaColors.cellSelected,
         const Color(0xFF2C2C36),
