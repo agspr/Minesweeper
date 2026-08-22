@@ -4,7 +4,7 @@
   "appName": "Nona",
   "appTagline": "Daily Sudoku",
 
-  "menuDaily": "Today's puzzle",
+  "menuDaily": "Daily sudoku",
   "menuDailyToday": "{difficulty} · today",
   "menuDailyDone": "Done · {difficulty}",
   "menuLoading": "Loading…",

@@ -4,7 +4,7 @@
   "appName": "Nona",
   "appTagline": "Sudoku del día",
 
-  "menuDaily": "Reto del día",
+  "menuDaily": "Sudoku del día",
   "menuDailyToday": "{difficulty} · hoy",
   "@menuDailyToday": {
     "placeholders": { "difficulty": { "type": "String" } }

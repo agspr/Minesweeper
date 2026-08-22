@@ -98,11 +98,7 @@ class PuzzleLayout extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 380, minWidth: 260),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              header,
-              const SizedBox(height: 28),
-              numpad,
-            ],
+            children: [header, const SizedBox(height: 28), numpad],
           ),
         ),
       ],

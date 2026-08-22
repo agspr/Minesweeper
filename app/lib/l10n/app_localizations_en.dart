@@ -16,7 +16,7 @@ class LEn extends L {
   String get appTagline => 'Daily Sudoku';
 
   @override
-  String get menuDaily => 'Today\'s puzzle';
+  String get menuDaily => 'Daily sudoku';
 
   @override
   String menuDailyToday(String difficulty) {

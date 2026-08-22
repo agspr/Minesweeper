@@ -5,7 +5,10 @@ import 'package:nona/game/daily_controller.dart';
 import 'package:nona/game/difficulty.dart';
 import 'package:nona/game/generator.dart';
 import 'package:nona/game/practice_controller.dart';
+import 'package:juegos_senda/juegos_senda.dart';
+import 'package:nona/nona_config.dart';
 import 'package:nona/screens/game_screen.dart';
+import 'package:nona/screens/home_screen.dart';
 import 'package:nona/screens/practice_screen.dart';
 import 'package:nona/widgets/numpad.dart';
 import 'package:nona/services/progress_controller.dart';
@@ -217,6 +220,84 @@ void main() {
           reason: 'práctica desborda en ${entry.key} con ${escala.key}',
         );
         expect(find.byType(Numpad), findsOneWidget);
+      });
+
+      testWidgets('sin desbordes en el menú · ${entry.key} · ${escala.key}', (
+        tester,
+      ) async {
+        // El menú entró aquí tarde, y por un motivo concreto: sus tipografías
+        // se subieron para que se vea del tamaño que se ve CINCO. CINCO puede
+        // permitírselo porque TOPA la escala del texto entre 1,32 y 1,55;
+        // Nona no la topa, así que aquí una letra de 23,5 con el texto al
+        // máximo son 37,6 pt de verdad, y en un SE eso es donde se rompe.
+        // Subir tamaños sin esta prueba era fiarlo a mirar una captura de un
+        // solo teléfono.
+        tester.view.physicalSize = entry.value;
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final prefs = await SharedPreferences.getInstance();
+        final c = DailyController(
+          prefs,
+          clock: () => DateTime(2026, 8, 17, 10),
+        );
+        await c.load();
+        // Con racha: la pastilla solo se pinta si hay, y es una de las piezas
+        // que se agrandaron.
+        final progress = ProgressController(prefs);
+
+        final insets = _insetsFor(entry.value);
+        await tester.pumpWidget(
+          testApp(
+            MediaQuery(
+              data: MediaQueryData.fromView(tester.view).copyWith(
+                textScaler: TextScaler.linear(escala.value),
+                padding: insets,
+                viewPadding: insets,
+              ),
+              child: HomeScreen(
+                daily: c,
+                practice: PracticeController(prefs),
+                locale: LocaleController(prefs),
+                theme: ThemeController(prefs),
+                progress: progress,
+                auth: AuthController(firebaseReady: false, prefs: prefs),
+                friends: FriendsService(firebaseReady: false),
+                purchases: PurchaseService(
+                  prefs,
+                  const IapConfig(removeAdsId: 'x'),
+                ),
+                notifications: NotificationsService(
+                  firebaseReady: false,
+                  gameId: nonaGameId,
+                ),
+                leaderboard: null,
+              ),
+            ),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 200));
+
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'el menú desborda en ${entry.key} con ${escala.key}',
+        );
+
+        // Lo que esta prueba NO puede comprobar, y conviene que quede escrito
+        // para que nadie lo vuelva a intentar: si el título CABE en una línea.
+        //
+        // En una prueba de widget la fuente es la de prueba, donde cada glifo
+        // es un cuadrado de un em: "Sudoku del día" a 18 pt "mide" 252 pt de
+        // ancho, cuando en el teléfono de verdad ocupa unos 112. Medir ahí el
+        // ajuste del texto da números que no existen — lo intenté, y decía que
+        // el título se parte en dos líneas en TODOS los teléfonos, incluido el
+        // tamaño que lleva la app publicada y que en la captura del dueño se ve
+        // en una sola línea.
+        //
+        // Es el mismo motivo por el que este proyecto abandonó las capturas de
+        // referencia. El ajuste tipográfico se comprueba mirando el aparato.
       });
     }
   }

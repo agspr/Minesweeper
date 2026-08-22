@@ -21,7 +21,8 @@ const int allDigitsMask = 0x1FF;
 
 int rowOf(int cell) => cell ~/ boardSize;
 int colOf(int cell) => cell % boardSize;
-int boxOf(int cell) => (rowOf(cell) ~/ boxSize) * boxSize + colOf(cell) ~/ boxSize;
+int boxOf(int cell) =>
+    (rowOf(cell) ~/ boxSize) * boxSize + colOf(cell) ~/ boxSize;
 
 /// Bit del dígito [d] (1–9).
 int bitOf(int d) => 1 << (d - 1);
@@ -139,9 +140,6 @@ List<int> decodeGrid(String s) {
   }
   return [
     for (final ch in s.split(''))
-      if (ch == '.' || ch == '0')
-        0
-      else
-        int.parse(ch),
+      if (ch == '.' || ch == '0') 0 else int.parse(ch),
   ];
 }

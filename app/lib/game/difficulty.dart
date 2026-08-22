@@ -68,10 +68,7 @@ Difficulty? gradeFor(SolveReport report, int clueCount) {
 /// grado por arriba y el suelo de pistas impide pasarse por abajo.
 ({Technique maxTechnique, int minClues}) digTargetFor(Difficulty d) =>
     switch (d) {
-      Difficulty.easy => (
-        maxTechnique: Technique.hiddenSingle,
-        minClues: 32,
-      ),
+      Difficulty.easy => (maxTechnique: Technique.hiddenSingle, minClues: 32),
       Difficulty.medium => (
         maxTechnique: Technique.lockedCandidates,
         minClues: 28,

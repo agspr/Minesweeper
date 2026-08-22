@@ -271,7 +271,7 @@ class _Menu extends StatelessWidget {
                             // acordarse de las mayúsculas.
                             l.appTagline.toUpperCase(),
                             style: const TextStyle(
-                              fontSize: 13,
+                              fontSize: 17,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 4,
                               color: NonaColors.muted,
@@ -291,7 +291,7 @@ class _Menu extends StatelessWidget {
                               child: Text(
                                 l.menuStreak(streak),
                                 style: TextStyle(
-                                  fontSize: 14.5,
+                                  fontSize: 19,
                                   fontWeight: FontWeight.w700,
                                   color: NonaColors.accent,
                                 ),
@@ -419,7 +419,7 @@ class _ModeCard extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 23.5,
                         fontWeight: FontWeight.w800,
                         color: NonaColors.text,
                       ),
@@ -428,7 +428,7 @@ class _ModeCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        fontSize: 13.5,
+                        fontSize: 17.5,
                         color: NonaColors.muted,
                       ),
                     ),

@@ -112,7 +112,7 @@ abstract class L {
   /// No description provided for @menuDaily.
   ///
   /// In es, this message translates to:
-  /// **'Reto del día'**
+  /// **'Sudoku del día'**
   String get menuDaily;
 
   /// No description provided for @menuDailyToday.

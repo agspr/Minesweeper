@@ -92,7 +92,7 @@ void main() {
     await montar(tester);
     expect(find.byType(SendaBottomNav), findsOneWidget);
 
-    await tester.tap(find.text('Reto del día'));
+    await tester.tap(find.text('Sudoku del día'));
     await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.byType(GameScreen), findsOneWidget);
@@ -105,7 +105,7 @@ void main() {
 
   testWidgets('la X devuelve al menú, con su barra', (tester) async {
     await montar(tester);
-    await tester.tap(find.text('Reto del día'));
+    await tester.tap(find.text('Sudoku del día'));
     await tester.pump(const Duration(milliseconds: 200));
 
     await tester.tap(find.byTooltip('Menú principal'));
@@ -122,7 +122,7 @@ void main() {
     // alguien sustituye la franja por `bottomNavigationBar: null`, el hueco
     // vuelve al cuerpo y esta medida se va a cero.
     await montar(tester);
-    await tester.tap(find.text('Reto del día'));
+    await tester.tap(find.text('Sudoku del día'));
     await tester.pump(const Duration(milliseconds: 200));
 
     final franja = tester.widgetList<Container>(find.byType(Container)).where((

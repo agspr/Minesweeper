@@ -53,10 +53,7 @@ class SudokuBoard {
   factory SudokuBoard.fromStrings({
     required String givens,
     required String solution,
-  }) => SudokuBoard(
-    givens: decodeGrid(givens),
-    solution: decodeGrid(solution),
-  );
+  }) => SudokuBoard(givens: decodeGrid(givens), solution: decodeGrid(solution));
 
   /// Pistas del puzle: inmutables, no se pueden borrar ni sobrescribir.
   final List<int> givens;
@@ -130,7 +127,10 @@ class SudokuBoard {
     if (digit < 1 || digit > boardSize) return false;
     if (entries[cell] == digit) return false;
 
-    final move = _Move(entries: {cell: entries[cell]}, notes: {cell: notes[cell]});
+    final move = _Move(
+      entries: {cell: entries[cell]},
+      notes: {cell: notes[cell]},
+    );
 
     entries[cell] = digit;
     // Escribir borra las anotaciones de la propia casilla: ya está decidida.
@@ -160,7 +160,9 @@ class SudokuBoard {
   void erase(int cell) {
     if (isGiven(cell)) return;
     if (entries[cell] == 0 && notes[cell] == 0) return;
-    _undo.add(_Move(entries: {cell: entries[cell]}, notes: {cell: notes[cell]}));
+    _undo.add(
+      _Move(entries: {cell: entries[cell]}, notes: {cell: notes[cell]}),
+    );
     entries[cell] = 0;
     notes[cell] = 0;
   }

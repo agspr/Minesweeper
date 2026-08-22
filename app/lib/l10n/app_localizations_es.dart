@@ -16,7 +16,7 @@ class LEs extends L {
   String get appTagline => 'Sudoku del día';
 
   @override
-  String get menuDaily => 'Reto del día';
+  String get menuDaily => 'Sudoku del día';
 
   @override
   String menuDailyToday(String difficulty) {
