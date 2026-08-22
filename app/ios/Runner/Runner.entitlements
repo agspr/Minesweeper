@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Notificaciones push. Nona arrastra firebase_messaging a traves de
+	     notifications_service.dart del paquete, asi que SIN esta clave la app
+	     compila, instala y arranca igual — pero nunca consigue token de APNs y
+	     los avisos no llegan nunca, sin un solo error a la vista. El perfil
+	     "Nona App Store" ya la permite, asi que no hay nada que tocar en el
+	     portal de Apple. `production` tambien vale para TestFlight; el entorno
+	     de desarrollo solo hace falta para builds de depuracion en aparato. -->
+	<key>aps-environment</key>
+	<string>production</string>
 	<key>com.apple.developer.applesignin</key>
 	<array>
 		<string>Default</string>
