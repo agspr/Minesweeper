@@ -7,6 +7,7 @@ import 'package:nona/game/generator.dart';
 import 'package:nona/game/practice_controller.dart';
 import 'package:nona/screens/game_screen.dart';
 import 'package:nona/screens/practice_screen.dart';
+import 'package:nona/widgets/numpad.dart';
 import 'package:nona/services/progress_controller.dart';
 import 'package:nona/services/theme_controller.dart';
 
@@ -189,11 +190,33 @@ void main() {
         );
         await tester.pump(const Duration(milliseconds: 100));
 
+        // La pantalla de NIVEL, que es lo primero que se ve.
+        expect(
+          tester.takeException(),
+          isNull,
+          reason:
+              'la pantalla de nivel desborda en ${entry.key} con ${escala.key}',
+        );
+
+        // Y después el TABLERO. Sin este paso la matriz se quedaría midiendo
+        // solo el selector: el modo libre abre ahí, así que una prueba que
+        // monta y mira sin tocar nada ya no ve el tablero de práctica.
+        // `ensureVisible` y no un tap a pelo: en un SE con el texto al máximo
+        // las tarjetas de nivel quedan por debajo del pliegue y hay que
+        // desplazarse, que es lo que haría una persona. Sin esto el tap cae
+        // fuera de la pantalla, no pasa nada, y la prueba mide el selector
+        // creyendo que mide el tablero.
+        await tester.ensureVisible(find.text('Fácil'));
+        await tester.pump();
+        await tester.tap(find.text('Fácil'));
+        await tester.pump(const Duration(milliseconds: 100));
+
         expect(
           tester.takeException(),
           isNull,
           reason: 'práctica desborda en ${entry.key} con ${escala.key}',
         );
+        expect(find.byType(Numpad), findsOneWidget);
       });
     }
   }

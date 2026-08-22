@@ -84,6 +84,27 @@ class LEs extends L {
   String get notes => 'Notas';
 
   @override
+  String get practiceDifficultyTitle => 'Selecciona el nivel\nde dificultad';
+
+  @override
+  String get practiceDifficultySubtitle =>
+      'Cambia cuántas pistas trae y qué técnicas pide. Todos tienen una sola solución.';
+
+  @override
+  String get difficultyEasyDesc =>
+      'Muchas pistas y siempre una jugada a la vista';
+
+  @override
+  String get difficultyMediumDesc =>
+      'Menos pistas: hay que rastrear el tablero';
+
+  @override
+  String get difficultyHardDesc => 'Pide técnicas como pares y tríos';
+
+  @override
+  String get keepPlaying => 'Seguir jugando';
+
+  @override
   String get closeGame => 'Menú principal';
 
   @override

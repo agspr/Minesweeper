@@ -84,6 +84,27 @@ class LEn extends L {
   String get notes => 'Notes';
 
   @override
+  String get practiceDifficultyTitle => 'Choose a\ndifficulty level';
+
+  @override
+  String get practiceDifficultySubtitle =>
+      'Changes how many givens you get and which techniques you need. Every puzzle has one solution.';
+
+  @override
+  String get difficultyEasyDesc =>
+      'Plenty of givens, and always a move in plain sight';
+
+  @override
+  String get difficultyMediumDesc =>
+      'Fewer givens — you have to sweep the board';
+
+  @override
+  String get difficultyHardDesc => 'Needs techniques like pairs and triples';
+
+  @override
+  String get keepPlaying => 'Keep playing';
+
+  @override
   String get closeGame => 'Main menu';
 
   @override

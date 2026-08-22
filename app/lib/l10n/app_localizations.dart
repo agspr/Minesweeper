@@ -205,6 +205,42 @@ abstract class L {
   /// **'Notas'**
   String get notes;
 
+  /// No description provided for @practiceDifficultyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Selecciona el nivel\nde dificultad'**
+  String get practiceDifficultyTitle;
+
+  /// No description provided for @practiceDifficultySubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambia cuántas pistas trae y qué técnicas pide. Todos tienen una sola solución.'**
+  String get practiceDifficultySubtitle;
+
+  /// No description provided for @difficultyEasyDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Muchas pistas y siempre una jugada a la vista'**
+  String get difficultyEasyDesc;
+
+  /// No description provided for @difficultyMediumDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Menos pistas: hay que rastrear el tablero'**
+  String get difficultyMediumDesc;
+
+  /// No description provided for @difficultyHardDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Pide técnicas como pares y tríos'**
+  String get difficultyHardDesc;
+
+  /// No description provided for @keepPlaying.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir jugando'**
+  String get keepPlaying;
+
   /// No description provided for @closeGame.
   ///
   /// In es, this message translates to:
