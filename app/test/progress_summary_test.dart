@@ -140,6 +140,42 @@ void main() {
       expect(s.totalPoints, 500, reason: 'el total no caduca');
     });
 
+    test('un documento que NO existe no toca nada', () {
+      // La primera vez que alguien juega a Nona no hay resumen que leer, y
+      // Firestore devuelve eso como un mapa vacío, no como un error. "No hay
+      // nada" NO es "hay cero": si se tratara igual, entrar por primera vez
+      // con progreso de invitado en el teléfono lo borraría.
+      //
+      // Lo levantó el agente de CINCO preguntando por este caso exacto.
+      jugar(DateTime(2026, 8, 18));
+      final antes = progress.totalPoints;
+      final racha = progress.streakAsOf(DateTime(2026, 8, 18, 10));
+
+      expect(progress.adoptCloud(const ProgressSummary()), isFalse);
+      expect(progress.totalPoints, antes);
+      expect(progress.streakAsOf(DateTime(2026, 8, 18, 10)), racha);
+      expect(progress.lastCompletedDay, '2026-08-18');
+    });
+
+    test('en empate manda el TELÉFONO, no la nube', () {
+      // El empate se construye a mano porque jugando no se alcanza —los puntos
+      // y la racha se mueven juntos—, y aun así la regla hay que dejarla
+      // clavada: se adopta solo si la nube va POR DELANTE, nunca si va igual.
+      // Con "igual o más" bastaría un resumen empatado y sin racha para borrar
+      // la del teléfono, y ese resumen es justo lo que devuelve un documento
+      // que no existe.
+      jugar(DateTime(2026, 8, 18));
+      final empate = progress.totalPoints;
+
+      final adoptado = progress.adoptCloud(
+        ProgressSummary(totalPoints: empate),
+      );
+
+      expect(adoptado, isFalse);
+      expect(progress.streakAsOf(DateTime(2026, 8, 18, 10)), 1);
+      expect(progress.lastCompletedDay, '2026-08-18');
+    });
+
     test('el suelo no se SUMA a lo jugado aquí: se toma el mayor', () {
       // Sumar contaría dos veces un día que estuviera en los dos lados, y en el
       // marcador de amigos eso es mentir hacia arriba.
