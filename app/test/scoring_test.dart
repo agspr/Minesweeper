@@ -36,7 +36,8 @@ void main() {
 
     test('una semana limpia son 650 puntos', () {
       // 3 fáciles + 2 medios + 2 difíciles.
-      final week = 3 * baseFor(Difficulty.easy) +
+      final week =
+          3 * baseFor(Difficulty.easy) +
           2 * baseFor(Difficulty.medium) +
           2 * baseFor(Difficulty.hard);
       expect(week, 650);
@@ -58,12 +59,21 @@ void main() {
       var mistakes = 0;
       for (final row in ladder.entries) {
         final (easy, medium, hard) = row.value;
-        expect(scoreDaily(finished(Difficulty.easy, mistakes)).points, easy,
-            reason: '${row.key} en fácil');
-        expect(scoreDaily(finished(Difficulty.medium, mistakes)).points, medium,
-            reason: '${row.key} en medio');
-        expect(scoreDaily(finished(Difficulty.hard, mistakes)).points, hard,
-            reason: '${row.key} en difícil');
+        expect(
+          scoreDaily(finished(Difficulty.easy, mistakes)).points,
+          easy,
+          reason: '${row.key} en fácil',
+        );
+        expect(
+          scoreDaily(finished(Difficulty.medium, mistakes)).points,
+          medium,
+          reason: '${row.key} en medio',
+        );
+        expect(
+          scoreDaily(finished(Difficulty.hard, mistakes)).points,
+          hard,
+          reason: '${row.key} en difícil',
+        );
         mistakes++;
       }
     });
@@ -77,12 +87,21 @@ void main() {
       };
       for (final row in rows.entries) {
         final (pct, (easy, medium, hard)) = row.value;
-        expect(scoreDaily(partial(Difficulty.easy, pct)).points, easy,
-            reason: '${row.key} en fácil');
-        expect(scoreDaily(partial(Difficulty.medium, pct)).points, medium,
-            reason: '${row.key} en medio');
-        expect(scoreDaily(partial(Difficulty.hard, pct)).points, hard,
-            reason: '${row.key} en difícil');
+        expect(
+          scoreDaily(partial(Difficulty.easy, pct)).points,
+          easy,
+          reason: '${row.key} en fácil',
+        );
+        expect(
+          scoreDaily(partial(Difficulty.medium, pct)).points,
+          medium,
+          reason: '${row.key} en medio',
+        );
+        expect(
+          scoreDaily(partial(Difficulty.hard, pct)).points,
+          hard,
+          reason: '${row.key} en difícil',
+        );
       }
     });
 
@@ -98,8 +117,11 @@ void main() {
       for (final d in Difficulty.values) {
         final floor = scoreDaily(finished(d, 5)).points;
         for (final n in [6, 7, 12, 81, 999]) {
-          expect(scoreDaily(finished(d, n)).points, floor,
-              reason: '$n fallos en $d deberían quedarse en el suelo');
+          expect(
+            scoreDaily(finished(d, n)).points,
+            floor,
+            reason: '$n fallos en $d deberían quedarse en el suelo',
+          );
         }
       }
     });
@@ -147,8 +169,11 @@ void main() {
         var previous = 0;
         for (var pct = 0; pct <= 99; pct++) {
           final points = scoreDaily(partial(d, pct)).points;
-          expect(points, greaterThanOrEqualTo(previous),
-              reason: 'en $d, $pct% dio menos que ${pct - 1}%');
+          expect(
+            points,
+            greaterThanOrEqualTo(previous),
+            reason: 'en $d, $pct% dio menos que ${pct - 1}%',
+          );
           previous = points;
         }
       }
@@ -160,8 +185,11 @@ void main() {
       for (final d in Difficulty.values) {
         final peorFinal = scoreDaily(finished(d, 99)).points;
         final mejorParcial = scoreDaily(partial(d, 99)).points;
-        expect(peorFinal, greaterThan(mejorParcial),
-            reason: 'en $d terminar con 99 fallos debe superar un 99% a medias');
+        expect(
+          peorFinal,
+          greaterThan(mejorParcial),
+          reason: 'en $d terminar con 99 fallos debe superar un 99% a medias',
+        );
       }
     });
 
@@ -192,7 +220,11 @@ void main() {
       expect(s.countedMistakes, 3);
       expect(s.mistakePenalty, 30);
       expect(s.points, 70);
-      expect(s.base - s.mistakePenalty, s.points, reason: 'el desglose debe cuadrar');
+      expect(
+        s.base - s.mistakePenalty,
+        s.points,
+        reason: 'el desglose debe cuadrar',
+      );
       expect(s.partialFraction, isNull);
     });
 

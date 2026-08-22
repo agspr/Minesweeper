@@ -86,7 +86,11 @@ void main() {
       c.select(cell);
       c.tapDigit(c.board!.solution[cell]);
       c.hint();
-      expect(c.board!.correctCount, 2, reason: 'no debe malgastarse en una ya hecha');
+      expect(
+        c.board!.correctCount,
+        2,
+        reason: 'no debe malgastarse en una ya hecha',
+      );
     });
 
     test('a base de pistas se termina el puzle', () async {
@@ -128,7 +132,9 @@ void main() {
   });
 
   test('un guardado corrupto no deja al jugador sin puzle', () async {
-    SharedPreferences.setMockInitialValues({'game.nona.practice': 'no es json'});
+    SharedPreferences.setMockInitialValues({
+      'game.nona.practice': 'no es json',
+    });
     final c = PracticeController(await SharedPreferences.getInstance());
     await c.load();
     expect(c.board, isNotNull, reason: 'debe generar uno limpio');

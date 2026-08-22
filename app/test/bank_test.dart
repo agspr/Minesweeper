@@ -93,7 +93,11 @@ void main() {
     for (final entry in bank.entries) {
       final givens = decodeGrid(entry.value['givens'] as String);
       final solution = decodeGrid(entry.value['solution'] as String);
-      expect(isSolved(solution), isTrue, reason: '${entry.key}: solución inválida');
+      expect(
+        isSolved(solution),
+        isTrue,
+        reason: '${entry.key}: solución inválida',
+      );
       for (var i = 0; i < cellCount; i++) {
         if (givens[i] != 0) {
           expect(
@@ -166,9 +170,9 @@ void main() {
   test('el manifest cuadra con los ficheros (detecta ediciones a mano)', () {
     // El banco es un dato publicado: si alguien edita un día a mano, la suma
     // deja de cuadrar y esta prueba lo caza antes de que llegue a una tienda.
-    final manifest =
-        (jsonDecode(File('$bankDir/manifest.json').readAsStringSync()) as Map)
-            .cast<String, dynamic>();
+    final manifest = (jsonDecode(
+      File('$bankDir/manifest.json').readAsStringSync(),
+    ) as Map).cast<String, dynamic>();
     final byYear = (manifest['years'] as Map).cast<String, dynamic>();
     for (final y in years) {
       final meta = (byYear['$y'] as Map).cast<String, dynamic>();

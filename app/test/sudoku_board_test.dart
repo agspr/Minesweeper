@@ -8,10 +8,8 @@ void main() {
   // Un puzle real del generador, no uno inventado: así las pruebas se apoyan en
   // un tablero con solución única de verdad.
   final puzzle = generate(seed: 2026, target: Difficulty.easy)!;
-  SudokuBoard fresh() => SudokuBoard.fromStrings(
-    givens: puzzle.givens,
-    solution: puzzle.solution,
-  );
+  SudokuBoard fresh() =>
+      SudokuBoard.fromStrings(givens: puzzle.givens, solution: puzzle.solution);
 
   /// Primera casilla vacía, y el dígito que le toca.
   (int, int) firstEmpty(SudokuBoard b) {
@@ -52,7 +50,17 @@ void main() {
       // de 5 fallos.
       final b = fresh();
       final (cell, right) = firstEmpty(b);
-      final wrongs = [1, 2, 3, 4, 5, 6, 7, 8, 9].where((d) => d != right).toList();
+      final wrongs = [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+      ].where((d) => d != right).toList();
       b.place(cell, wrongs[0]);
       b.place(cell, wrongs[1]);
       expect(b.mistakes, 2);
@@ -226,7 +234,10 @@ void main() {
       expect(b.remainingOf(1), 9 - placed);
       final (cell, right) = firstEmpty(b);
       b.place(cell, right);
-      expect(b.remainingOf(right), 9 - b.givens.where((v) => v == right).length - 1);
+      expect(
+        b.remainingOf(right),
+        9 - b.givens.where((v) => v == right).length - 1,
+      );
     });
   });
 

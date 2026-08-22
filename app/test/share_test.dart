@@ -53,9 +53,15 @@ void main() {
 
   test('la fila de fallos refleja lo conservado', () {
     expect(build(es, finished(Difficulty.easy)).contains('🟩🟩🟩🟩🟩'), isTrue);
-    expect(build(es, finished(Difficulty.easy, mistakes: 2)).contains('🟩🟩🟩⬛⬛'), isTrue);
+    expect(
+      build(es, finished(Difficulty.easy, mistakes: 2)).contains('🟩🟩🟩⬛⬛'),
+      isTrue,
+    );
     // A partir de 5 la penalización se acaba, y la fila también.
-    expect(build(es, finished(Difficulty.easy, mistakes: 9)).contains('⬛⬛⬛⬛⬛'), isTrue);
+    expect(
+      build(es, finished(Difficulty.easy, mistakes: 9)).contains('⬛⬛⬛⬛⬛'),
+      isTrue,
+    );
   });
 
   test('NO menciona el tiempo: el reloj no puntúa (§1)', () {
@@ -67,8 +73,14 @@ void main() {
   });
 
   test('la racha solo sale si hay más de un día', () {
-    expect(build(es, finished(Difficulty.easy), streak: 1).contains('🔥'), isFalse);
-    expect(build(es, finished(Difficulty.easy), streak: 4).contains('🔥'), isTrue);
+    expect(
+      build(es, finished(Difficulty.easy), streak: 1).contains('🔥'),
+      isFalse,
+    );
+    expect(
+      build(es, finished(Difficulty.easy), streak: 4).contains('🔥'),
+      isTrue,
+    );
   });
 
   test('sin terminar dice el avance, sin disimular', () {
@@ -84,7 +96,11 @@ void main() {
     );
     final text = build(es, partial);
     expect(text.contains('62'), isTrue);
-    expect(text.contains('🟩'), isFalse, reason: 'la fila de fallos es de los terminados');
+    expect(
+      text.contains('🟩'),
+      isFalse,
+      reason: 'la fila de fallos es de los terminados',
+    );
   });
 
   test('sale traducido en los dos idiomas', () {

@@ -28,9 +28,7 @@ void main() {
     test('semillas contiguas y pequeñas no producen secuencias parecidas', () {
       // Es lo que motiva el sembrado con SplitMix32: sin él, Prng(0), Prng(1),
       // Prng(2)… arrancan con estados casi idénticos.
-      final first = [
-        for (var s = 0; s < 8; s++) Prng(s).next(),
-      ];
+      final first = [for (var s = 0; s < 8; s++) Prng(s).next()];
       expect(first.toSet().length, 8);
     });
 
@@ -174,12 +172,18 @@ void main() {
       // hace que el grado signifique algo: un "fácil" de 26 pistas no sería
       // fácil por mucho que se resuelva con únicos.
       for (var seed = 300; seed < 312; seed++) {
-        expect(generate(seed: seed, target: Difficulty.easy)!.clueCount,
-            greaterThanOrEqualTo(32));
-        expect(generate(seed: seed, target: Difficulty.medium)!.clueCount,
-            inInclusiveRange(28, 33));
-        expect(generate(seed: seed, target: Difficulty.hard)!.clueCount,
-            greaterThanOrEqualTo(17));
+        expect(
+          generate(seed: seed, target: Difficulty.easy)!.clueCount,
+          greaterThanOrEqualTo(32),
+        );
+        expect(
+          generate(seed: seed, target: Difficulty.medium)!.clueCount,
+          inInclusiveRange(28, 33),
+        );
+        expect(
+          generate(seed: seed, target: Difficulty.hard)!.clueCount,
+          greaterThanOrEqualTo(17),
+        );
       }
     });
 
@@ -215,8 +219,11 @@ void main() {
         final target = Difficulty.values[seed % 3];
         final p = generate(seed: seed, target: target);
         expect(p, isNotNull, reason: 'semilla $seed no convergió');
-        expect(countSolutions(decodeGrid(p!.givens), limit: 2), 1,
-            reason: 'semilla $seed no es única');
+        expect(
+          countSolutions(decodeGrid(p!.givens), limit: 2),
+          1,
+          reason: 'semilla $seed no es única',
+        );
         expect(p.difficulty, target);
         generated++;
       }
@@ -267,9 +274,7 @@ void main() {
     });
 
     test('la semana entera cuadra con el reparto locked', () {
-      final week = [
-        for (var d = 1; d <= 7; d++) difficultyForWeekday(d),
-      ];
+      final week = [for (var d = 1; d <= 7; d++) difficultyForWeekday(d)];
       expect(week.where((d) => d == Difficulty.easy).length, 3);
       expect(week.where((d) => d == Difficulty.medium).length, 2);
       expect(week.where((d) => d == Difficulty.hard).length, 2);

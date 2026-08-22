@@ -132,6 +132,10 @@ class _SettingsTabState extends State<SettingsTab> {
             fallback: NonaColors.defaultPalette,
           ),
         ),
+        // La lista de bloqueados no se enseña por ahora. El FILTRO sigue
+        // vivo: quien busca por @usuario no encuentra a quien bloqueó, porque
+        // la pantalla de Amigos carga la lista por su cuenta.
+        showBlocked: false,
         aboutTitle: l.aboutNona,
         aboutSubtitle: l.aboutSubtitle,
         onAbout: () => Navigator.of(context).push(

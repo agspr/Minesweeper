@@ -32,6 +32,8 @@ class HomeScreen extends StatefulWidget {
     required this.auth,
     required this.friends,
     required this.purchases,
+    required this.notifications,
+    required this.leaderboard,
     this.banner,
   });
 
@@ -43,6 +45,10 @@ class HomeScreen extends StatefulWidget {
   final AuthController auth;
   final FriendsService friends;
   final PurchaseService purchases;
+  final NotificationsService notifications;
+
+  /// De dónde salen los puntos de la clasificación. `null` sin Firebase.
+  final LeaderboardSource? leaderboard;
 
   /// El banner de anuncios, ya construido.
   ///
@@ -119,12 +125,34 @@ class _HomeScreenState extends State<HomeScreen> {
           // `onInvite` va nulo a propósito hasta el guardarraíl #3: con un solo
           // `fcmToken` por persona, una invitación desde Nona llega a la app
           // que registró el token la última vez — una moneda al aire.
+          // La pestaña Social es el MARCADOR. Las solicitudes y las
+          // invitaciones viven detrás del icono de persona, en Amigos, que se
+          // abre como pantalla completa (§15).
           ListenableBuilder(
-            listenable: widget.auth,
-            builder: (context, _) => widget.auth.signedIn
-                ? SendaFriendsScreen(
+            listenable: Listenable.merge([widget.auth, widget.progress]),
+            builder: (context, _) =>
+                widget.auth.signedIn && widget.leaderboard != null
+                ? SendaLeaderboardScreen(
                     friends: widget.friends,
+                    leaderboard: widget.leaderboard!,
                     gameId: nonaGameId,
+                    myUid: widget.auth.user!.uid,
+                    mySummary: widget.progress.summaryAsOf(DateTime.now()),
+                    onOpenFriends: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        fullscreenDialog: true,
+                        builder: (_) => SendaFriendsScreen(
+                          friends: widget.friends,
+                          gameId: nonaGameId,
+                          notifications: widget.notifications,
+                          // Las invitaciones cruzadas necesitan la Function y
+                          // las reglas desplegadas. Hasta entonces la sección
+                          // no se pinta: un "+" que no envía nada promete algo
+                          // que no cumple.
+                          invitesEnabled: kInvitesEnabled,
+                        ),
+                      ),
+                    ),
                   )
                 : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
           ),

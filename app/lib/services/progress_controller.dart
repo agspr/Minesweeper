@@ -15,8 +15,10 @@
 library;
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:juegos_senda/juegos_senda.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../game/day_key.dart';
@@ -52,18 +54,19 @@ class DayRecord {
     'seconds': seconds,
   };
 
-  factory DayRecord.fromJson(String dayKey, Map<String, dynamic> j) => DayRecord(
-    dayKey: dayKey,
-    points: (j['points'] as num?)?.toInt() ?? 0,
-    completed: j['completed'] as bool? ?? false,
-    mistakes: (j['mistakes'] as num?)?.toInt() ?? 0,
-    completionPercent: (j['percent'] as num?)?.toInt() ?? 0,
-    difficulty: Difficulty.values.firstWhere(
-      (d) => d.name == j['difficulty'],
-      orElse: () => Difficulty.easy,
-    ),
-    seconds: (j['seconds'] as num?)?.toInt() ?? 0,
-  );
+  factory DayRecord.fromJson(String dayKey, Map<String, dynamic> j) =>
+      DayRecord(
+        dayKey: dayKey,
+        points: (j['points'] as num?)?.toInt() ?? 0,
+        completed: j['completed'] as bool? ?? false,
+        mistakes: (j['mistakes'] as num?)?.toInt() ?? 0,
+        completionPercent: (j['percent'] as num?)?.toInt() ?? 0,
+        difficulty: Difficulty.values.firstWhere(
+          (d) => d.name == j['difficulty'],
+          orElse: () => Difficulty.easy,
+        ),
+        seconds: (j['seconds'] as num?)?.toInt() ?? 0,
+      );
 }
 
 class ProgressController extends ChangeNotifier {
@@ -75,6 +78,14 @@ class ProgressController extends ChangeNotifier {
   static const _kPoints = 'progress.totalPoints';
   static const _kLastDay = 'progress.lastPlayedDay';
   static String _kRecord(String day) => 'progress.day.$day';
+
+  // El SUELO adoptado de la nube. No son puntos que se sumen a nada: son lo
+  // que la nube decía de esta semana y de este mes cuando se adoptó, y sirven
+  // para no publicar un cero después de reinstalar. Ver [adoptCloud].
+  static const _kBaseWeekId = 'progress.base.weekId';
+  static const _kBaseWeek = 'progress.base.weekPoints';
+  static const _kBaseMonthId = 'progress.base.monthId';
+  static const _kBaseMonth = 'progress.base.monthPoints';
 
   final SharedPreferences _prefs;
 
@@ -121,6 +132,89 @@ class ProgressController extends ChangeNotifier {
     }
     out.sort((a, b) => b.dayKey.compareTo(a.dayKey));
     return out;
+  }
+
+  /// El progreso en la forma que entiende el paquete (clasificación y nube).
+  ///
+  /// Los puntos de semana y mes se SUMAN aquí a partir de los días guardados,
+  /// no se llevan en un contador aparte: un contador habría que reiniciarlo al
+  /// cambiar de semana, y quien no abriera la app ese día arrastraría los
+  /// puntos de la anterior. Sumando, el periodo se define solo.
+  ProgressSummary summaryAsOf(DateTime now) {
+    final week = weekIdFor(now);
+    final month = monthIdFor(now);
+    var weekPoints = 0;
+    var monthPoints = 0;
+    for (final r in allRecords) {
+      final day = DateTime.tryParse(r.dayKey);
+      if (day == null) continue;
+      if (weekIdFor(day) == week) weekPoints += r.points;
+      if (monthIdFor(day) == month) monthPoints += r.points;
+    }
+    // El suelo adoptado manda mientras siga siendo de ESTE periodo, y se
+    // combina con MÁXIMO, no sumando: sumar contaría dos veces un día que ya
+    // estuviera en los dos lados, y en el marcador de amigos eso es mentir
+    // hacia arriba. El máximo nunca baja y nunca infla.
+    if (_prefs.getString(_kBaseWeekId) == week) {
+      weekPoints = max(weekPoints, _prefs.getInt(_kBaseWeek) ?? 0);
+    }
+    if (_prefs.getString(_kBaseMonthId) == month) {
+      monthPoints = max(monthPoints, _prefs.getInt(_kBaseMonth) ?? 0);
+    }
+
+    return ProgressSummary(
+      streak: streakAsOf(now),
+      bestStreak: bestStreak,
+      totalPoints: totalPoints,
+      weekPoints: weekPoints,
+      weekId: week,
+      monthPoints: monthPoints,
+      monthId: month,
+      lastPlayedDay: lastCompletedDay,
+    );
+  }
+
+  /// Trae de la nube un progreso MAYOR que el de este teléfono.
+  ///
+  /// El caso real: alguien reinstala Nona, o entra en un teléfono nuevo. Sus
+  /// preferencias están vacías, así que sin esto la app publicaría un resumen
+  /// a cero encima del bueno y le borraría la racha y los puntos a quien
+  /// llevaba meses jugando. El fallo no se ve nunca en desarrollo.
+  ///
+  /// **Solo adopta si la nube va por delante en puntos totales**, y devuelve
+  /// si lo hizo. Al revés —local por delante— no se toca nada y el
+  /// sincronizador sube lo de aquí: quien acaba de jugar sin cobertura tiene
+  /// razón frente a un documento viejo.
+  ///
+  /// La mejor racha se queda con el máximo aunque el resto se adopte entero:
+  /// es un récord histórico y no debería bajar por una reconciliación.
+  ///
+  /// Los DÍAS no viajan en este corte (solo el resumen, que es lo que lee el
+  /// marcador), así que la semana y el mes adoptados se guardan como suelo y
+  /// [summaryAsOf] los combina con lo que haya en los registros locales.
+  bool adoptCloud(ProgressSummary cloud) {
+    if (cloud.totalPoints <= totalPoints) return false;
+
+    _prefs.setInt(_kStreak, cloud.streak);
+    _prefs.setInt(_kBest, max(bestStreak, cloud.bestStreak));
+    _prefs.setInt(_kPoints, cloud.totalPoints);
+    final last = cloud.lastPlayedDay;
+    if (last != null) _prefs.setString(_kLastDay, last);
+
+    // El id del periodo viaja con sus puntos: sin él, los puntos de la semana
+    // pasada se leerían como los de esta hasta que esa persona volviera a
+    // jugar.
+    if (cloud.weekId != null) {
+      _prefs.setString(_kBaseWeekId, cloud.weekId!);
+      _prefs.setInt(_kBaseWeek, cloud.weekPoints);
+    }
+    if (cloud.monthId != null) {
+      _prefs.setString(_kBaseMonthId, cloud.monthId!);
+      _prefs.setInt(_kBaseMonth, cloud.monthPoints);
+    }
+
+    notifyListeners();
+    return true;
   }
 
   /// Registra el resultado del día.

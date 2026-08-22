@@ -193,7 +193,7 @@ class LEs extends L {
   String get more => 'Más';
 
   @override
-  String get aboutNona => 'Sobre Nona';
+  String get aboutNona => 'Acerca de Nona';
 
   @override
   String get aboutSubtitle => 'Quiénes somos, términos, privacidad y contacto';

@@ -19,12 +19,25 @@ void main() {
     late Map<String, dynamic> en;
 
     setUpAll(() {
-      es = jsonDecode(File('lib/l10n/app_es.arb').readAsStringSync()) as Map<String, dynamic>;
-      en = jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync()) as Map<String, dynamic>;
+      es = jsonDecode(
+        File('lib/l10n/app_es.arb').readAsStringSync(),
+      ) as Map<String, dynamic>;
+      en = jsonDecode(
+        File('lib/l10n/app_en.arb').readAsStringSync(),
+      ) as Map<String, dynamic>;
     });
 
     Set<String> keysOf(Map<String, dynamic> arb) =>
         arb.keys.where((k) => !k.startsWith('@')).toSet();
+
+    test('la fila "Acerca de" se llama igual en los dos juegos', () {
+      // El dueño pidió que esa fila sea IDÉNTICA en Nona y en CINCO, y CINCO
+      // es la referencia: allí pone "Acerca de CINCO". Es la clase de detalle
+      // que se vuelve a torcer sin que nadie lo note, porque cada app se mira
+      // por separado y por separado las dos parecen bien.
+      expect(es['aboutNona'], 'Acerca de Nona');
+      expect(en['aboutNona'], startsWith('About '));
+    });
 
     test('el inglés no se deja ninguna clave del español', () {
       // Es el fallo clásico: se añade una cadena, se traduce a medias y en el
@@ -108,14 +121,16 @@ void main() {
         expect(c.resolvedCode(const Locale('en'), supported), 'es');
       });
 
-      test('un teléfono en un idioma que el juego no habla cae en el primero',
-          () async {
-        // Alemán: ni español ni inglés. Cae en español, que es lo mismo que
-        // resolvería Flutter — si aquí saliera otra cosa, el segmentado
-        // enseñaría encendido un idioma distinto del que se está leyendo.
-        final c = LocaleController(await SharedPreferences.getInstance());
-        expect(c.resolvedCode(const Locale('de'), supported), 'es');
-      });
+      test(
+        'un teléfono en un idioma que el juego no habla cae en el primero',
+        () async {
+          // Alemán: ni español ni inglés. Cae en español, que es lo mismo que
+          // resolvería Flutter — si aquí saliera otra cosa, el segmentado
+          // enseñaría encendido un idioma distinto del que se está leyendo.
+          final c = LocaleController(await SharedPreferences.getInstance());
+          expect(c.resolvedCode(const Locale('de'), supported), 'es');
+        },
+      );
     });
 
     test('la elección sobrevive a cerrar la app', () async {
@@ -138,9 +153,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        home: Builder(
-          builder: (context) => Text(L.of(context).menuPractice),
-        ),
+        home: Builder(builder: (context) => Text(L.of(context).menuPractice)),
       ),
     );
     expect(find.text('Practice mode'), findsOneWidget);

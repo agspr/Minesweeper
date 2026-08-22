@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:juegos_senda/juegos_senda.dart';
+import 'package:nona/nona_config.dart';
 import 'package:nona/game/daily_bank.dart';
 import 'package:nona/game/daily_controller.dart';
 import 'package:nona/game/difficulty.dart';
@@ -65,6 +66,13 @@ void main() {
             progress: ProgressController(prefs),
             auth: AuthController(firebaseReady: false, prefs: prefs),
             friends: FriendsService(firebaseReady: false),
+            notifications: NotificationsService(
+              firebaseReady: false,
+              gameId: nonaGameId,
+            ),
+            // Sin Firebase no hay de dónde leer puntos: la pestaña Social
+            // enseña el estado sin sesión, que es lo que se comprueba.
+            leaderboard: null,
             purchases: PurchaseService(
               prefs,
               const IapConfig(removeAdsId: 'x'),

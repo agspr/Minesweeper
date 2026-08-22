@@ -26,6 +26,7 @@ import 'l10n/app_localizations.dart';
 import 'nona_config.dart';
 import 'screens/home_screen.dart';
 import 'services/progress_controller.dart';
+import 'services/progress_sync.dart';
 import 'services/theme_controller.dart';
 import 'theme.dart';
 
@@ -46,6 +47,56 @@ Future<void> main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final daily = DailyController(prefs);
+  final progress = ProgressController(prefs);
+  final auth = AuthController(
+    firebaseReady: firebaseReady,
+    prefs: prefs,
+    // Sin esto no se escribe `apps.nona` y los amigos de la familia ven a
+    // quien juega a Nona como "todavía no lo tiene" — y le invitan a instalar
+    // lo que ya tiene.
+    gameId: nonaGameId,
+  );
+  final notifications = NotificationsService(
+    firebaseReady: firebaseReady,
+    gameId: nonaGameId,
+  );
+
+  // Los avisos: registrar el token de esta app en cuanto haya sesión, SIN pedir
+  // permiso todavía. Si ya está concedido —lo normal a partir de la segunda
+  // vez, y siempre si lo concedió en CINCO— el token se escribe solo. El
+  // permiso se pide en su momento con contexto, al aceptar una amistad, no de
+  // golpe al abrir la app.
+  //
+  // También en cada cambio de cuenta: el token va POR USUARIO, y sin `reset()`
+  // la cuenta nueva se quedaría sin registrar creyendo que ya lo estaba.
+  auth.addListener(() {
+    if (auth.signedIn) {
+      notifications.ensureReady(canAskPermission: false);
+    } else {
+      notifications.reset();
+    }
+  });
+
+  // La copia del progreso en la nube. Se enciende SOLO con Firebase: sin él no
+  // hay a dónde escribir, y montarlo igual dejaría un oyente comprobando una
+  // sesión que nunca existe.
+  //
+  // Vive lo que vive el proceso —no lo desecha nadie— porque el progreso hay
+  // que subirlo mientras la app esté abierta, y el único momento en que dejaría
+  // de hacer falta es cuando ya no hay app.
+  if (firebaseReady) {
+    ProgressSync(
+      progress: progress,
+      auth: auth,
+      uidOf: () => auth.user?.uid,
+      store: FirestoreProgressStore(nonaConfig.dataLayout),
+      session: SessionSync(
+        prefs,
+        ownedPrefixes: nonaConfig.ownedPrefKeyPrefixes,
+      ),
+    ).start();
+  }
+
   // Solo se espera a la diaria: es a lo que viene la gente. El modo libre se
   // carga la primera vez que se entra, para no meter una generación de puzle en
   // el arranque en frío.
@@ -58,9 +109,16 @@ Future<void> main() async {
       // Antes que `runApp`: el constructor aplica el tema guardado, y hacerlo
       // aquí evita que el primer fotograma salga con el de por defecto.
       theme: ThemeController(prefs),
-      progress: ProgressController(prefs),
-      auth: AuthController(firebaseReady: firebaseReady, prefs: prefs),
+      progress: progress,
+      auth: auth,
       friends: FriendsService(firebaseReady: firebaseReady),
+      notifications: notifications,
+      // La clasificación necesita Firestore ya en el constructor, así que sin
+      // Firebase no se construye: en modo local la pestaña Social enseña la
+      // invitación a entrar y nada más.
+      leaderboard: firebaseReady
+          ? LeaderboardService(layout: nonaConfig.dataLayout)
+          : null,
       purchases: PurchaseService(prefs, nonaConfig.iap)..init(),
       // El consentimiento (RGPD + ATT) se pide una vez por sesión y lo comparte
       // todo lo que muestre anuncios, así que vive aquí arriba y no dentro del
@@ -82,6 +140,8 @@ class NonaApp extends StatelessWidget {
     required this.friends,
     required this.purchases,
     required this.consent,
+    required this.notifications,
+    required this.leaderboard,
   });
 
   final DailyController daily;
@@ -93,6 +153,8 @@ class NonaApp extends StatelessWidget {
   final FriendsService friends;
   final PurchaseService purchases;
   final ConsentManager consent;
+  final NotificationsService notifications;
+  final LeaderboardService? leaderboard;
 
   @override
   Widget build(BuildContext context) {
@@ -103,29 +165,36 @@ class NonaApp extends StatelessWidget {
     // inferior, que están en otra rama del árbol.
     return ListenableBuilder(
       listenable: Listenable.merge([locale, theme]),
-      builder: (context, _) => MaterialApp(
-        title: 'Nona',
-        debugShowCheckedModeBanner: false,
-        theme: nonaTheme(),
-        // Bilingüe desde el primer día (diseño §0). `locale: null` significa
-        // seguir al sistema; con un idioma elegido a mano, manda ese.
-        locale: locale.locale,
-        supportedLocales: L.supportedLocales,
-        localizationsDelegates: const [
-          // Dos delegados: el del juego y el de la plataforma. Cada capa es
-          // dueña de su texto.
-          L.delegate,
-          SendaL.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        // La marca viaja por el árbol: las pantallas del paquete la leen de
-        // aquí en vez de una global, así que olvidarla es un error de
-        // compilación y no un color equivocado en producción.
-        home: SendaBrandScope(
-          brand: nonaBrand,
-          child: _OrientationGate(
+      // La marca ENVUELVE al MaterialApp, no vive en su `home`.
+      //
+      // Dentro de `home` queda por debajo del Navigator, así que las pantallas
+      // que se EMPUJAN como ruta no la heredan y revientan al abrirse. Pasaba
+      // ya: "Eliminar cuenta" se empuja desde el editor de perfil y lee la
+      // marca. Lo cazó una prueba del paquete que empuja la pantalla de Amigos
+      // en vez de montarla como `home`.
+      builder: (context, _) => SendaBrandScope(
+        brand: nonaBrand,
+        child: MaterialApp(
+          title: 'Nona',
+          debugShowCheckedModeBanner: false,
+          theme: nonaTheme(),
+          // Bilingüe desde el primer día (diseño §0). `locale: null` significa
+          // seguir al sistema; con un idioma elegido a mano, manda ese.
+          locale: locale.locale,
+          supportedLocales: L.supportedLocales,
+          localizationsDelegates: const [
+            // Dos delegados: el del juego y el de la plataforma. Cada capa es
+            // dueña de su texto.
+            L.delegate,
+            SendaL.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          // La marca viaja por el árbol: las pantallas del paquete la leen de
+          // aquí en vez de una global, así que olvidarla es un error de
+          // compilación y no un color equivocado en producción.
+          home: _OrientationGate(
             child: _AuthGate(
               auth: auth,
               child: HomeScreen(
@@ -137,6 +206,8 @@ class NonaApp extends StatelessWidget {
                 auth: auth,
                 friends: friends,
                 purchases: purchases,
+                notifications: notifications,
+                leaderboard: leaderboard,
                 // Se construye AQUÍ, una sola vez y arriba del todo: el banner
                 // reserva su alto desde el primer fotograma, y rehacerlo en
                 // cada reconstrucción del armazón lo haría recargar. Las

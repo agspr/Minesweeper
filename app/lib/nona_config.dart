@@ -15,6 +15,14 @@ import 'theme.dart';
 /// abandonar los datos de todo el mundo.
 const String nonaGameId = 'nona';
 
+/// ¿Funcionan ya las invitaciones cruzadas de punta a punta?
+///
+/// Se enciende cuando la Function `onInvite` y sus reglas estén desplegadas.
+/// Mientras esté en `false`, la pantalla de Amigos no pinta la sección de
+/// "todavía no lo tienen": una lista con un "+" que no manda nada prometería
+/// algo que no ocurre, y un icono desactivado no se distingue de uno pulsado.
+const bool kInvitesEnabled = false;
+
 final GameConfig nonaConfig = GameConfig(
   gameId: nonaGameId,
   appName: 'Nona',

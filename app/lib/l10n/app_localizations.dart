@@ -406,7 +406,7 @@ abstract class L {
   /// No description provided for @aboutNona.
   ///
   /// In es, this message translates to:
-  /// **'Sobre Nona'**
+  /// **'Acerca de Nona'**
   String get aboutNona;
 
   /// No description provided for @aboutSubtitle.
