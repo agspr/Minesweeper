@@ -217,6 +217,26 @@ class ProgressController extends ChangeNotifier {
     return true;
   }
 
+  /// Qué días de ESTA semana se completaron, de lunes a domingo.
+  ///
+  /// Siete booleanos, uno por día. **No es la racha**: con una racha de 13 días
+  /// y hoy miércoles, esto devuelve tres verdaderos y cuatro falsos, no siete
+  /// verdaderos. La racha la dice el número; esto dice la semana.
+  ///
+  /// Solo cuenta lo TERMINADO, igual que la racha: un día a medias da puntos
+  /// pero no llena su casilla, o la fila prometería una racha que no existe.
+  List<bool> weekDoneAsOf(DateTime now) {
+    final lunes = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(Duration(days: now.weekday - 1));
+    return [
+      for (var i = 0; i < 7; i++)
+        recordFor(dayKeyFor(lunes.add(Duration(days: i))))?.completed ?? false,
+    ];
+  }
+
   /// Registra el resultado del día.
   ///
   /// **Idempotente por día**: si ese día ya estaba registrado, devuelve lo

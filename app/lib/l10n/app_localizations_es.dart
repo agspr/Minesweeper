@@ -120,6 +120,12 @@ class LEs extends L {
   String get unfinished => 'Por hoy lo dejamos aquí';
 
   @override
+  String get streakDays => 'días de racha';
+
+  @override
+  String get keepPlayingPractice => 'Seguir jugando (Práctica)';
+
+  @override
   String get points => 'puntos';
 
   @override

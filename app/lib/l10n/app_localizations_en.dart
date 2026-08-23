@@ -120,6 +120,12 @@ class LEn extends L {
   String get unfinished => 'Let\'s leave it here for today';
 
   @override
+  String get streakDays => 'day streak';
+
+  @override
+  String get keepPlayingPractice => 'Keep playing (Practice)';
+
+  @override
   String get points => 'points';
 
   @override

@@ -106,6 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
               progress: widget.progress,
               theme: widget.theme,
               onExit: () => _goPlay(_Play.menu),
+              onPractice: () {
+                if (widget.practice.board == null) widget.practice.load();
+                _goPlay(_Play.practice);
+              },
             ),
             _Play.practice => PracticeScreen(
               controller: widget.practice,

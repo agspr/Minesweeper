@@ -117,6 +117,7 @@ void main() {
                   ),
                   theme: ThemeController(await SharedPreferences.getInstance()),
                   onExit: () {},
+                  onPractice: () {},
                 ),
                 bottomNavigationBar: Column(
                   mainAxisSize: MainAxisSize.min,

@@ -51,6 +51,8 @@
 
   "solved": "¡Resuelto!",
   "unfinished": "Por hoy lo dejamos aquí",
+  "streakDays": "días de racha",
+  "keepPlayingPractice": "Seguir jugando (Práctica)",
   "points": "puntos",
   "breakdownBase": "Base del día",
   "breakdownNoMistakes": "Sin errores",

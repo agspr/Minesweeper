@@ -271,6 +271,18 @@ abstract class L {
   /// **'Por hoy lo dejamos aquí'**
   String get unfinished;
 
+  /// No description provided for @streakDays.
+  ///
+  /// In es, this message translates to:
+  /// **'días de racha'**
+  String get streakDays;
+
+  /// No description provided for @keepPlayingPractice.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir jugando (Práctica)'**
+  String get keepPlayingPractice;
+
   /// No description provided for @points.
   ///
   /// In es, this message translates to:

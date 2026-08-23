@@ -36,6 +36,8 @@
 
   "solved": "Solved!",
   "unfinished": "Let's leave it here for today",
+  "streakDays": "day streak",
+  "keepPlayingPractice": "Keep playing (Practice)",
   "points": "points",
   "breakdownBase": "Today's base",
   "breakdownNoMistakes": "No mistakes",

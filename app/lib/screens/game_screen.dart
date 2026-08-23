@@ -39,6 +39,7 @@ class GameScreen extends StatefulWidget {
     required this.progress,
     required this.theme,
     required this.onExit,
+    required this.onPractice,
   });
 
   final DailyController controller;
@@ -48,6 +49,11 @@ class GameScreen extends StatefulWidget {
   /// Volver al menú. No es `Navigator.pop`: la pantalla no es una ruta, vive
   /// dentro de la pestaña Jugar (ver `home_screen.dart`).
   final VoidCallback onExit;
+
+  /// "Seguir jugando": lleva al modo práctica. La diaria ya está hecha, así que
+  /// quien quiera seguir solo puede seguir ahí, y mandarlo al menú a buscarlo
+  /// es un paso de más.
+  final VoidCallback onPractice;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -205,8 +211,15 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                     child: ResultOverlay(
                       score: scoreDaily(c.outcome!),
                       elapsed: c.elapsed,
-                      onClose: () => setState(() => _resultDismissed = true),
+                      // La racha YA está registrada cuando esto se pinta: la
+                      // partida se guarda al completarse, así que este número
+                      // incluye el día de hoy.
+                      streak: widget.progress.streakAsOf(DateTime.now()),
+                      weekDone: widget.progress.weekDoneAsOf(DateTime.now()),
+                      todayIndex: DateTime.now().weekday - 1,
                       onShare: () => _share(context, c),
+                      onPractice: widget.onPractice,
+                      onMenu: widget.onExit,
                     ),
                   ),
               ],
