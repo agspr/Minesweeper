@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: app_settings
-      sha256: "880b7086bd6789ff9cf1b027d68349ba4c2c933ea25c0ff120d340bfe496629d"
+      sha256: "64d50e666fd96ae90301bf71205f05019286f940ad6f5fed3d1be19c6af7546a"
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.0"
+    version: "7.0.0"
   app_tracking_transparency:
     dependency: transitive
     description:
@@ -505,11 +505,11 @@ packages:
     dependency: "direct main"
     description:
       path: package
-      ref: "package-v0.17.0"
-      resolved-ref: a3543d1c4196493f3bd2580562bd5071ff749f2a
+      ref: "package-v0.17.2"
+      resolved-ref: e09a866e567dc5af1b194d7a478659ebb4146f0c
       url: "https://github.com/agspr/juegos-senda.git"
     source: git
-    version: "0.17.0"
+    version: "0.17.2"
   leak_tracker:
     dependency: transitive
     description:
