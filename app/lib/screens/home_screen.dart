@@ -169,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             auth: widget.auth,
             friends: widget.friends,
             purchases: widget.purchases,
+            notifications: widget.notifications,
             locale: widget.locale,
             theme: widget.theme,
             progress: widget.progress,

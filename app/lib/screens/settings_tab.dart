@@ -21,6 +21,7 @@ class SettingsTab extends StatefulWidget {
     required this.auth,
     required this.friends,
     required this.purchases,
+    required this.notifications,
     required this.locale,
     required this.theme,
     required this.progress,
@@ -29,6 +30,7 @@ class SettingsTab extends StatefulWidget {
   final AuthController auth;
   final FriendsService friends;
   final PurchaseService purchases;
+  final NotificationsService notifications;
   final LocaleController locale;
   final ThemeController theme;
   final ProgressController progress;
@@ -135,6 +137,7 @@ class _SettingsTabState extends State<SettingsTab> {
         // La lista de bloqueados no se enseña por ahora. El FILTRO sigue
         // vivo: quien busca por @usuario no encuentra a quien bloqueó, porque
         // la pantalla de Amigos carga la lista por su cuenta.
+        notifications: widget.notifications,
         showBlocked: false,
         aboutTitle: l.aboutNona,
         aboutSubtitle: l.aboutSubtitle,
