@@ -138,6 +138,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     gameId: nonaGameId,
                     myUid: widget.auth.user!.uid,
                     mySummary: widget.progress.summaryAsOf(DateTime.now()),
+                    // Tu fila sale con tu nombre, como las de tus amigos. La
+                    // identidad la aporta Nona porque ya la tiene en la
+                    // sesión: pedírsela a Firestore sería pagar una lectura
+                    // por algo que está en memoria.
+                    myName: widget.auth.displayName,
+                    myUsername: widget.auth.username,
+                    myAvatar: widget.auth.avatarId,
+                    myCountry: widget.auth.country,
                     onOpenFriends: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         fullscreenDialog: true,

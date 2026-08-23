@@ -102,6 +102,7 @@ void main() {
           leaderboard: _FuenteFalsa(),
           gameId: nonaGameId,
           myUid: 'yo',
+          myName: 'André',
           mySummary: ProgressSummary(
             totalPoints: 40,
             weekPoints: 40,
@@ -116,7 +117,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Social'), findsOneWidget);
-    expect(find.text('Tú'), findsOneWidget);
+    // Tu fila lleva tu nombre, igual que las de tus amigos.
+    expect(find.text('André'), findsOneWidget);
     expect(find.text('40'), findsOneWidget);
     // El marcador no lleva solicitudes: eso está en Amigos.
     expect(find.text('PENDIENTES'), findsNothing);
