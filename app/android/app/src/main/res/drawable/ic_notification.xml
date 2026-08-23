@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  El icono de los avisos en la barra de estado.
+
+  Android IGNORA los colores de este dibujo: se queda con su SILUETA y la pinta
+  de blanco, tintándola con `default_notification_color`. Por eso aquí solo hay
+  formas, sin relleno de marca y sin fondo.
+
+  Sin este icono, FCM cae al del lanzador — y el de Nona no tiene ni canal alfa,
+  así que Android lo aplanaría a un CUADRADO BLANCO en la barra. Medido: tipo de
+  color 2, opaco al 100 %.
+
+  Es la rejilla del sudoku y nada más. Se probó también con el marco exterior
+  puesto y a 24 dp se leía como un bloque blanco con nueve agujeros: a ese
+  tamaño manda cuánto blanco hay, no qué dibuja. Cuatro líneas y aire de sobra
+  es lo que sí se reconoce. (El aviso, del agente de CINCO, que lo aprendió
+  probando tres siluetas en su app.)
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M6.8,2 h2.4 v20 h-2.4 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M14.8,2 h2.4 v20 h-2.4 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M2,6.8 h20 v2.4 h-20 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M2,14.8 h20 v2.4 h-20 z" />
+</vector>

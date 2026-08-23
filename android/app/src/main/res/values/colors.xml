@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Con lo que Android tiñe el icono del aviso. Es el acento de Cobalto, la
+      paleta con la que Nona se abre.
+
+      Fijo a propósito, aunque el tema se pueda cambiar dentro de la app: esto
+      lo lee el sistema al recibir el aviso, cuando la app puede ni estar
+      abierta, así que no hay forma de que siga a la paleta elegida. Mejor el
+      color de arranque que uno gris.
+    -->
+    <color name="senda_notification">#FF4FA8FF</color>
+</resources>
