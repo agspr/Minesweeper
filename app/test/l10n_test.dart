@@ -30,6 +30,14 @@ void main() {
     Set<String> keysOf(Map<String, dynamic> arb) =>
         arb.keys.where((k) => !k.startsWith('@')).toSet();
 
+    test('el castellano de Nona cumple el de la familia', () {
+      // Las reglas están en docs/CASTELLANO.md y las comprueba el paquete, así
+      // que aquí basta una línea. Sin esto, una regla de estilo la cumple
+      // quien haya leído el documento — y Nona la escribe otro agente.
+      final fallos = SendaCopyRules.violations(es);
+      expect(fallos, isEmpty, reason: fallos.join('\n'));
+    });
+
     test('la fila "Acerca de" se llama igual en los dos juegos', () {
       // El dueño pidió que esa fila sea IDÉNTICA en Nona y en CINCO, y CINCO
       // es la referencia: allí pone "Acerca de CINCO". Es la clase de detalle
