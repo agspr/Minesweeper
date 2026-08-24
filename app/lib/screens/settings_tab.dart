@@ -8,6 +8,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:juegos_senda/juegos_senda.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
 import '../nona_config.dart';
@@ -22,6 +23,7 @@ class SettingsTab extends StatefulWidget {
     required this.friends,
     required this.purchases,
     required this.notifications,
+    required this.prefs,
     required this.locale,
     required this.theme,
     required this.progress,
@@ -31,6 +33,9 @@ class SettingsTab extends StatefulWidget {
   final FriendsService friends;
   final PurchaseService purchases;
   final NotificationsService notifications;
+
+  /// Para poder LIMPIAR lo que Nona guarda al salirse de la cuenta.
+  final SharedPreferences prefs;
   final LocaleController locale;
   final ThemeController theme;
   final ProgressController progress;
@@ -46,6 +51,13 @@ class _SettingsTabState extends State<SettingsTab> {
   late final SendaAccountDeletion _deletion = SendaAccountDeletion(
     auth: widget.auth,
     gameId: nonaGameId,
+    // Sin esto, borrar Nona de la cuenta se deshace solo: el servidor borra, el
+    // teléfono conserva la racha y los puntos, y el sincronizador los vuelve a
+    // subir en cuanto se termine un puzle. El servidor no puede impedirlo.
+    session: SessionSync(
+      widget.prefs,
+      ownedPrefixes: nonaConfig.ownedPrefKeyPrefixes,
+    ),
   );
 
   @override

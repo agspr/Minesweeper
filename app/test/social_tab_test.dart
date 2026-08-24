@@ -74,6 +74,7 @@ void main() {
             firebaseReady: false,
             gameId: nonaGameId,
           ),
+          prefs: prefs,
           leaderboard: null,
         ),
       ),

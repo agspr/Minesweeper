@@ -113,6 +113,7 @@ Future<void> main() async {
       auth: auth,
       friends: FriendsService(firebaseReady: firebaseReady),
       notifications: notifications,
+      prefs: prefs,
       // La clasificación necesita Firestore ya en el constructor, así que sin
       // Firebase no se construye: en modo local la pestaña Social enseña la
       // invitación a entrar y nada más.
@@ -142,6 +143,7 @@ class NonaApp extends StatelessWidget {
     required this.consent,
     required this.notifications,
     required this.leaderboard,
+    required this.prefs,
   });
 
   final DailyController daily;
@@ -154,6 +156,9 @@ class NonaApp extends StatelessWidget {
   final PurchaseService purchases;
   final ConsentManager consent;
   final NotificationsService notifications;
+
+  /// Para poder limpiar lo que Nona guarda al salirse de la cuenta.
+  final SharedPreferences prefs;
   final LeaderboardService? leaderboard;
 
   @override
@@ -207,6 +212,7 @@ class NonaApp extends StatelessWidget {
                 friends: friends,
                 purchases: purchases,
                 notifications: notifications,
+                prefs: prefs,
                 leaderboard: leaderboard,
                 // Se construye AQUÍ, una sola vez y arriba del todo: el banner
                 // reserva su alto desde el primer fotograma, y rehacerlo en

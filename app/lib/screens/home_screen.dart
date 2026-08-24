@@ -11,6 +11,7 @@ import '../game/practice_controller.dart';
 import '../l10n/app_localizations.dart';
 
 import 'package:juegos_senda/juegos_senda.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../nona_config.dart';
 import 'settings_tab.dart';
@@ -33,6 +34,7 @@ class HomeScreen extends StatefulWidget {
     required this.friends,
     required this.purchases,
     required this.notifications,
+    required this.prefs,
     required this.leaderboard,
     this.banner,
   });
@@ -46,6 +48,9 @@ class HomeScreen extends StatefulWidget {
   final FriendsService friends;
   final PurchaseService purchases;
   final NotificationsService notifications;
+
+  /// Hace falta para poder LIMPIAR lo que Nona guarda al salirse de la cuenta.
+  final SharedPreferences prefs;
 
   /// De dónde salen los puntos de la clasificación. `null` sin Firebase.
   final LeaderboardSource? leaderboard;
@@ -174,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
             friends: widget.friends,
             purchases: widget.purchases,
             notifications: widget.notifications,
+            prefs: widget.prefs,
             locale: widget.locale,
             theme: widget.theme,
             progress: widget.progress,

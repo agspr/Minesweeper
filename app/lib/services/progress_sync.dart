@@ -112,8 +112,24 @@ class ProgressSync {
   }
 
   Future<void> _push(String uid) async {
+    final resumen = progress.summaryAsOf(_clock());
+
+    // Un resumen SIN NADA no se publica, y no es una optimización.
+    //
+    // Dos cosas se rompen si se publica: (1) tras "Borrar Nona de tu cuenta"
+    // el teléfono queda limpio, así que el primer aviso del progreso volvería a
+    // CREAR el documento que el servidor acaba de borrar —vacío, pero
+    // existiendo—; y (2) el marcador trata "tiene documento de progreso" como
+    // prueba de que juega aquí, así que quien instale y no termine ni un puzle
+    // saldría en la clasificación de sus amigos con un cero. Es el cero
+    // mentiroso que el §15 prohíbe, por la puerta de atrás.
+    //
+    // Se comprueba `lastPlayedDay` además de los puntos porque un día a medias
+    // puede dar cero puntos y aun así ser progreso de verdad.
+    if (resumen.totalPoints == 0 && resumen.lastPlayedDay == null) return;
+
     try {
-      await store.writeSummary(uid, progress.summaryAsOf(_clock()));
+      await store.writeSummary(uid, resumen);
     } catch (e) {
       if (kDebugMode) debugPrint('ProgressSync: no se pudo escribir: $e');
     }

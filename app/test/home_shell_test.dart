@@ -70,6 +70,7 @@ void main() {
               firebaseReady: false,
               gameId: nonaGameId,
             ),
+            prefs: prefs,
             // Sin Firebase no hay de dónde leer puntos: la pestaña Social
             // enseña el estado sin sesión, que es lo que se comprueba.
             leaderboard: null,

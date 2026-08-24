@@ -31,6 +31,7 @@ void main() {
             firebaseReady: false,
             gameId: nonaGameId,
           ),
+          prefs: prefs,
           locale: LocaleController(prefs),
           theme: ThemeController(prefs),
           progress: ProgressController(prefs),

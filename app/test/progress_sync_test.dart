@@ -195,11 +195,15 @@ void main() {
     // Hasta el despliegue de las reglas, TODA escritura es permission-denied.
     // Es una copia de seguridad, no una acción de quien juega: no se le enseña
     // un error por algo que ni pidió ni puede arreglar.
+    // Se juega ANTES de entrar: sin progreso no habría escritura que fallar,
+    // porque un resumen vacío no se publica.
+    jugar(DateTime(2026, 8, 18));
+
     final store = _StoreEspia(escribirFalla: true);
     sync(store).start();
     sesion.entrar('u1');
     await pumpEventQueue();
-    jugar(DateTime(2026, 8, 18));
+    jugar(DateTime(2026, 8, 19));
     await pumpEventQueue();
 
     expect(store.pasos, ['leer', 'escribir', 'escribir']);
@@ -218,6 +222,29 @@ void main() {
     await pumpEventQueue();
 
     expect(progress.totalPoints, 0);
-    expect(store.escrito.single.totalPoints, 0);
+    // Y NO se publica un cero en su nombre. Antes se escribía un resumen vacío
+    // y eso creaba `users/{uid}/apps/nona` para alguien que no ha jugado aquí
+    // — que es lo que el marcador toma por prueba de que sí juega.
+    expect(store.escrito, isEmpty);
+    expect(store.pasos, ['leer']);
+  });
+
+  test('un resumen vacío no se publica', () async {
+    // El otro lado del borrado: tras "Borrar Nona de tu cuenta" el teléfono
+    // queda limpio, así que el primer aviso del progreso volvería a CREAR el
+    // documento que el servidor acaba de borrar. Vacío, pero existiendo.
+    final store = _StoreEspia();
+    sync(store).start();
+    sesion.entrar('u1');
+    await pumpEventQueue();
+
+    expect(store.escrito, isEmpty);
+
+    // Y en cuanto hay algo de verdad, se publica.
+    jugar(DateTime(2026, 8, 18));
+    await pumpEventQueue();
+
+    expect(store.escrito, hasLength(1));
+    expect(store.escrito.single.totalPoints, greaterThan(0));
   });
 }
