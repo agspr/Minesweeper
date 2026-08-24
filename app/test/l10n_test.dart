@@ -30,6 +30,22 @@ void main() {
     Set<String> keysOf(Map<String, dynamic> arb) =>
         arb.keys.where((k) => !k.startsWith('@')).toSet();
 
+    test('los temas se leen en el idioma de la pantalla', () {
+      // Salían en castellano dentro de una pantalla en inglés: "Cobalto" no es
+      // una marca, es "Cobalt" mal escrito para quien lee en inglés. Lo vio
+      // André en su teléfono.
+      //
+      // Y lo que se GUARDA es el id, no la etiqueta: si dependiera del nombre
+      // visible, cambiar de idioma le quitaría el tema elegido.
+      expect(SendaPalettes.cobalto.id, 'cobalto');
+      expect(
+        SendaPalettes.byId('Cobalto', fallback: SendaPalettes.menta),
+        SendaPalettes.cobalto,
+        reason:
+            'lo guardado por versiones anteriores tiene que seguir valiendo',
+      );
+    });
+
     test('el castellano de Nona cumple el de la familia', () {
       // Las reglas están en docs/CASTELLANO.md y las comprueba el paquete, así
       // que aquí basta una línea. Sin esto, una regla de estilo la cumple

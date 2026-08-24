@@ -23,10 +23,10 @@ class ThemeController extends ChangeNotifier {
     // Se aplica en el constructor y no al primer `build`: `NonaColors.current`
     // lo leen widgets que pueden pintarse antes: un fotograma con el tema
     // equivocado sería un parpadeo de color en cada arranque.
-    // `byName` cae en Menta cuando no reconoce el nombre, que es el defecto de
+    // `byId` cae en Menta cuando no reconoce el id, que es el defecto de
     // la FAMILIA. El de Nona es otro, así que sin guardar nada se usa el suyo;
     // guardado, manda lo guardado.
-    NonaColors.current = SendaPalettes.byName(
+    NonaColors.current = SendaPalettes.byId(
       _prefs.getString(_kTheme),
       fallback: NonaColors.defaultPalette,
     );
@@ -46,10 +46,12 @@ class ThemeController extends ChangeNotifier {
   SendaPalette get palette => NonaColors.current;
 
   Future<void> select(SendaPalette value) async {
-    if (value.name == NonaColors.current.name) return;
+    if (value.id == NonaColors.current.id) return;
     NonaColors.current = value;
     notifyListeners();
-    await _prefs.setString(_kTheme, value.name);
+    // El ID, nunca el nombre visible: el nombre cambia con el idioma y esta
+    // clave tiene que sobrevivir a que alguien cambie de idioma.
+    await _prefs.setString(_kTheme, value.id);
   }
 
   /// Si el tablero sigue al tema o se queda en grises.

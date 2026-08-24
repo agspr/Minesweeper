@@ -100,18 +100,18 @@ void main() {
     for (final tinted in [true, false]) {
       final modo = tinted ? 'en color' : 'en gris';
 
-      group('${p.name} · $modo', () {
+      group('${p.id} · $modo', () {
         setUp(() {
           NonaColors.current = p;
           NonaColors.tinted = tinted;
         });
 
         test('todos los fondos se distinguen entre sí', () {
-          todasLasParejas(fondosPorTono(), p.name, modo);
+          todasLasParejas(fondosPorTono(), p.id, modo);
         });
 
         test('todos los dígitos se distinguen entre sí', () {
-          todasLasParejas(digitos(), p.name, modo);
+          todasLasParejas(digitos(), p.id, modo);
         });
 
         test('la seleccionada tiene borde visible: ese es su canal', () {
@@ -121,12 +121,12 @@ void main() {
           expect(
             dist(NonaColors.cellSelectedBorder, NonaColors.cellSelected),
             greaterThan(minima),
-            reason: '${p.name} $modo: el borde de la seleccionada no se ve',
+            reason: '${p.id} $modo: el borde de la seleccionada no se ve',
           );
           expect(
             dist(NonaColors.cellSelectedBorder, NonaColors.cell),
             greaterThan(minima),
-            reason: '${p.name} $modo: el borde no se ve contra el tablero',
+            reason: '${p.id} $modo: el borde no se ve contra el tablero',
           );
         });
 
@@ -151,7 +151,7 @@ void main() {
       expect(
         NonaColors.cellSelected,
         const Color(0xFF2C2C36),
-        reason: '${p.name}: la seleccionada sigue teñida con el color apagado',
+        reason: '${p.id}: la seleccionada sigue teñida con el color apagado',
       );
     }
   });
@@ -178,12 +178,12 @@ void main() {
       expect(
         dist(NonaColors.entered, NonaColors.given),
         greaterThan(minima),
-        reason: '${p.name}: lo escrito se confunde con la pista',
+        reason: '${p.id}: lo escrito se confunde con la pista',
       );
       expect(
         NonaColors.entered.computeLuminance(),
         greaterThan(NonaColors.given.computeLuminance()),
-        reason: '${p.name}: lo escrito tiene que ser MÁS claro que la pista',
+        reason: '${p.id}: lo escrito tiene que ser MÁS claro que la pista',
       );
     }
   });

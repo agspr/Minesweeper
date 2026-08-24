@@ -131,20 +131,22 @@ class _SettingsTabState extends State<SettingsTab> {
         themes: [
           for (final p in SendaPalettes.all)
             SendaThemeOption(
-              name: p.name,
+              // El id se guarda y se compara; la etiqueta se lee. Separados
+              // porque el nombre visible ya no es la identidad del tema: en
+              // inglés es "Mint", y quien lo tuviera elegido lo perdería si su
+              // preferencia dependiera de eso.
+              id: p.id,
+              label: sendaPaletteLabel(SendaL.of(context), p),
               brand: p.brand,
               swatches: p.swatches,
             ),
         ],
-        selectedTheme: widget.theme.palette.name,
+        selectedTheme: widget.theme.palette.id,
         // El fallback no debería usarse nunca —el nombre sale de la propia
         // lista— pero obligarlo es lo que hizo aparecer esta línea al cambiar
         // la API: antes caía en Menta en silencio.
         onPickTheme: (option) => widget.theme.select(
-          SendaPalettes.byName(
-            option.name,
-            fallback: NonaColors.defaultPalette,
-          ),
+          SendaPalettes.byId(option.id, fallback: NonaColors.defaultPalette),
         ),
         // La lista de bloqueados no se enseña por ahora. El FILTRO sigue
         // vivo: quien busca por @usuario no encuentra a quien bloqueó, porque
