@@ -51,4 +51,53 @@ void main() {
     expect(icono.existsSync(), isTrue);
     expect(icono.readAsStringSync(), contains('#FFFFFFFF'));
   });
+  test('todo lo que Nona guarda cae bajo un prefijo declarado', () {
+    // `SendaGameConformance` comprueba que `ownedPrefKeyPrefixes` no esté
+    // VACÍA, no que esté COMPLETA. Un juego que declare `['game.']` y escriba
+    // también `progress.` pasa la conformidad y deja la mitad sin borrar al
+    // cambiar de cuenta o al salirse del juego — y encima cree que está
+    // cubierto, que es lo peor de los dos.
+    //
+    // El agente de CINCO lo señaló con un caso suyo que duele: si se le olvida
+    // `days.`, la clave `days.seeded` sobrevive y quien vuelva **nunca** baja
+    // su historial. No da error: deja la semana vacía para siempre.
+    //
+    // Así que aquí no se comprueba la lista contra sí misma: se comprueba
+    // contra las claves que el código escribe DE VERDAD.
+    final claves = <String>{};
+    for (final f in Directory('lib').listSync(recursive: true)) {
+      if (f is! File || !f.path.endsWith('.dart')) continue;
+      final src = f.readAsStringSync();
+      // Constantes de clave (`static const _kAlgo = 'x.y'`) y literales
+      // pasados directamente a shared_preferences.
+      for (final m in RegExp(r"_k[A-Za-z]+ *= *'([^']+)'").allMatches(src)) {
+        claves.add(m.group(1)!);
+      }
+      for (final m in RegExp(
+        r"prefs\.(?:get|set)[A-Za-z]+\('([^']+)'",
+      ).allMatches(src)) {
+        claves.add(m.group(1)!);
+      }
+    }
+
+    // Lo que NO es de la cuenta, con su motivo. Una exención sin motivo escrito
+    // es un fallo disfrazado: son ajustes del APARATO, no de quien ha entrado,
+    // y no deben borrarse al cambiar de cuenta. Igual que hace la plataforma
+    // con `settings.locale`.
+    const delAparato = {'settings.'};
+
+    expect(claves, isNotEmpty, reason: 'sin claves no se comprueba nada');
+    final huerfanas = claves.where(
+      (k) =>
+          !nonaConfig.ownedPrefKeyPrefixes.any(k.startsWith) &&
+          !delAparato.any(k.startsWith),
+    );
+    expect(
+      huerfanas,
+      isEmpty,
+      reason:
+          'estas claves no las borraría nadie al cambiar de cuenta ni al '
+          'salirse del juego: $huerfanas',
+    );
+  });
 }
