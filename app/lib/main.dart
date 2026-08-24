@@ -45,6 +45,14 @@ Future<void> main() async {
     // Se juega igual; lo social simplemente no aparece.
   }
 
+  // App Check, en MONITOREO: certifica que las peticiones vienen de la app de
+  // verdad. Justo después de initializeApp y antes de tocar Firestore. No fuerza
+  // nada todavía —eso se enciende en la consola cuando el tráfico verificado se
+  // vea en el panel— así que añadirlo no puede romper esta versión ni las
+  // anteriores. Hallazgo #1 de la auditoría: Nona era la única de la familia que
+  // no lo llamaba.
+  await activateSendaAppCheck(firebaseReady: firebaseReady);
+
   final prefs = await SharedPreferences.getInstance();
   final daily = DailyController(prefs);
   final progress = ProgressController(prefs);
