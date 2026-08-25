@@ -44,8 +44,12 @@ class _StoreEspia implements ProgressStore {
     escrito.add(summary);
   }
 
+  final List<String> dias = [];
+
   @override
-  Future<void> writeDay(String uid, String d, Map<String, dynamic> r) async {}
+  Future<void> writeDay(String uid, String d, Map<String, dynamic> r) async {
+    dias.add('$uid:$d:${r['points']}');
+  }
 
   @override
   Future<void> deleteAllDays(String uid) async {}
@@ -246,5 +250,61 @@ void main() {
 
     expect(store.escrito, hasLength(1));
     expect(store.escrito.single.totalPoints, greaterThan(0));
+  });
+  group('el crudo del día (mitad cliente del #3)', () {
+    test('jugar sube el día, y el servidor recalcula desde él', () async {
+      final store = _StoreEspia();
+      sync(store).start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
+      expect(store.dias, isEmpty, reason: 'sin registro hoy, nada que subir');
+
+      jugar(DateTime(2026, 8, 18));
+      await pumpEventQueue();
+
+      expect(store.dias, hasLength(1));
+      expect(store.dias.single, startsWith('u1:2026-08-18:'));
+    });
+
+    test(
+      'lo idéntico no se reescribe: cada día dispara un recálculo',
+      () async {
+        // Contrato, cláusula 3: cada escritura de un día relee TODOS los días
+        // del juego en el servidor. Reescribir sin cambios es pagar eso por
+        // nada — y el oyente del progreso se dispara por cosas que no son el
+        // día (adoptar la nube, por ejemplo).
+        final store = _StoreEspia();
+        sync(store).start();
+        sesion.entrar('u1');
+        await pumpEventQueue();
+
+        jugar(DateTime(2026, 8, 18));
+        await pumpEventQueue();
+        // Un aviso más del progreso sin cambio del día:
+        progress.notifyListeners();
+        await pumpEventQueue();
+
+        expect(
+          store.dias,
+          hasLength(1),
+          reason: 'el mismo día subió dos veces',
+        );
+      },
+    );
+
+    test('al estrenar sesión, el día jugado sin red también sube', () async {
+      // Se jugó como invitado o sin cobertura, y luego se entra: el registro
+      // local de hoy existe y la nube no lo tiene. Es el mismo motivo por el
+      // que el resumen se empuja al reconciliar.
+      jugar(DateTime(2026, 8, 18));
+
+      final store = _StoreEspia();
+      sync(store).start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
+
+      expect(store.dias, hasLength(1));
+      expect(store.dias.single, startsWith('u1:2026-08-18:'));
+    });
   });
 }

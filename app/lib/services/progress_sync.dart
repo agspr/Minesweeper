@@ -31,6 +31,7 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 
+import '../game/day_key.dart';
 import 'progress_controller.dart';
 
 class ProgressSync {
@@ -60,6 +61,15 @@ class ProgressSync {
 
   bool _attached = false;
   bool _reconciling = false;
+
+  /// Último día subido, como `clave=json`, para no reescribir lo idéntico.
+  ///
+  /// Cada día escrito dispara `onDayRecorded` en el servidor, que relee TODOS
+  /// los días del juego (contrato del resumen, PARIDAD §"El resumen por
+  /// juego"). Reescribir un día sin cambios sería pagar ese recálculo por
+  /// nada. En memoria y no en preferencias a propósito: tras reinstalar
+  /// conviene reescribirlo una vez, que es barato y re-siembra el crudo.
+  String? _ultimoDiaSubido;
 
   /// Empieza a escuchar. Idempotente: llamarlo dos veces no duplica avisos.
   void start() {
@@ -98,6 +108,7 @@ class ProgressSync {
     } finally {
       _reconciling = false;
     }
+    await _pushDay(uid);
     await _push(uid);
   }
 
@@ -108,7 +119,39 @@ class ProgressSync {
     if (_reconciling) return;
     final uid = uidOf();
     if (uid == null) return;
+    _pushDay(uid);
     _push(uid);
+  }
+
+  /// Sube el CRUDO del día de hoy, si existe y cambió desde la última subida.
+  ///
+  /// Es la mitad cliente del hallazgo #3: el servidor (`onDayRecorded`)
+  /// recalcula el resumen desde estos días con la tabla de puntuación, y el
+  /// `points` que va dentro es informativo — la autoridad ya no es este
+  /// cliente. También es lo que hace RECONSTRUIBLE el historial: sin días en
+  /// la nube, un cambio de aparato conserva la racha pero pierde el detalle
+  /// diario (le pasó a CINCO antes de tener esto).
+  ///
+  /// Solo el día de HOY: `record()` corre al cerrar el puzle o al salir con
+  /// parcial, siempre sobre la fecha actual, así que no hay días pasados que
+  /// puedan cambiar. Y con moderación (contrato, cláusula 3): cada escritura
+  /// dispara un recálculo que relee todos los días del juego.
+  Future<void> _pushDay(String uid) async {
+    final clave = dayKeyFor(_clock());
+    final registro = progress.recordFor(clave);
+    if (registro == null) return;
+
+    final json = registro.toJson();
+    final huella = '$clave=${json.toString()}';
+    if (huella == _ultimoDiaSubido) return;
+
+    try {
+      await store.writeDay(uid, clave, json);
+      _ultimoDiaSubido = huella;
+    } catch (e) {
+      // Igual que el resumen: copia de seguridad, no acción de quien juega.
+      if (kDebugMode) debugPrint('ProgressSync: no se pudo subir el día: $e');
+    }
   }
 
   Future<void> _push(String uid) async {
