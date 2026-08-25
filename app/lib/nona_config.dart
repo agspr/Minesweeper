@@ -78,7 +78,7 @@ final GameConfig nonaConfig = GameConfig(
   // Claves locales que pertenecen a UNA cuenta. Si una se queda fuera, el
   // progreso de una persona se le atribuiría a quien entre después en el mismo
   // teléfono — y eso no se ve en desarrollo, hace falta cambiar de cuenta.
-  ownedPrefKeyPrefixes: const ['game.', 'progress.'],
+  ownedPrefKeyPrefixes: const ['game.', 'progress.', 'auth.name.'],
 );
 
 /// La marca de Nona para las pantallas de plataforma.
