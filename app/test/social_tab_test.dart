@@ -147,17 +147,20 @@ void main() {
 
     expect(find.text('PENDIENTES'), findsOneWidget);
     expect(find.text('AÑADIR AMIGO'), findsOneWidget);
-    expect(
-      find.text('TUS AMIGOS QUE AÚN NO LO TIENEN'),
-      findsNothing,
-      reason: 'las invitaciones aún no funcionan: la sección no se pinta',
-    );
+    // Sin amigos que sepamos que no lo tienen, la sección no se pinta: la
+    // pregunta devuelve "no se sabe" y eso no sugiere a nadie.
+    expect(find.text('TUS AMIGOS QUE AÚN NO LO TIENEN'), findsNothing);
   });
 
-  test('las invitaciones siguen apagadas', () {
-    // Un recordatorio con forma de prueba: encenderlas es una línea, y tiene
-    // que ir DESPUÉS de que `onInvite` esté desplegada. Si alguien la cambia
-    // sin querer, esto lo dice.
-    expect(kInvitesEnabled, isFalse);
+  test('las invitaciones están encendidas', () {
+    // Fue un recordatorio con forma de prueba mientras estuvo apagada:
+    // encenderla era una línea y tenía que ir DESPUÉS de que `onInvite`
+    // estuviera desplegada. La Function llevaba semanas arriba y nadie giró el
+    // interruptor, así que la Social decía "invítalos desde Amigos" y en
+    // Amigos no había nada — lo encontró André grabando las dos apps.
+    //
+    // Ahora vigila el sentido contrario: apagarla vuelve a dejar esa promesa
+    // sin cumplir, porque el estado vacío de la Social sigue mandando allí.
+    expect(kInvitesEnabled, isTrue);
   });
 }

@@ -15,13 +15,24 @@ import 'theme.dart';
 /// abandonar los datos de todo el mundo.
 const String nonaGameId = 'nona';
 
-/// ¿Funcionan ya las invitaciones cruzadas de punta a punta?
+/// Las invitaciones cruzadas están ENCENDIDAS desde el 25-8-2026.
 ///
-/// Se enciende cuando la Function `onInvite` y sus reglas estén desplegadas.
-/// Mientras esté en `false`, la pantalla de Amigos no pinta la sección de
-/// "todavía no lo tienen": una lista con un "+" que no manda nada prometería
-/// algo que no ocurre, y un icono desactivado no se distingue de uno pulsado.
-const bool kInvitesEnabled = false;
+/// Estuvo apagada desde que se construyó, esperando a que `onInvite` se
+/// desplegara. La Function llevaba semanas arriba y nadie giró el interruptor,
+/// así que **la Social decía "invítalos desde Amigos" y en Amigos no había
+/// nada**: André lo encontró grabando las dos apps lado a lado. La promesa y
+/// lo que la cumple viven en el paquete y estaban gobernadas por separado.
+///
+/// Lo que hubo que resolver antes de encenderla no fue solo el despliegue:
+/// enseñar "estos amigos no tienen Nona" revela qué juegos de la familia tiene
+/// cada uno, y eso era legible por CUALQUIERA con sesión. André lo zanjó —
+/// *"solo tus amigos deben poder ver qué juegos tienes"*— y el dato se mudó a
+/// `users/{uid}/apps/*`, cerrado a los amigos activos.
+///
+/// Se queda como constante, y no se borra, porque el parámetro del paquete es
+/// obligatorio: apagarla sigue siendo posible el día que haga falta, pero
+/// nadie la hereda apagada por olvido.
+const bool kInvitesEnabled = true;
 
 final GameConfig nonaConfig = GameConfig(
   gameId: nonaGameId,
