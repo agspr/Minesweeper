@@ -27,6 +27,15 @@ dependencies:
   # identidad (auth, amistades, avisos) llega por juegos_senda.
   firebase_core: ^4.13.0
 
+  # Telemetría (regla de familia, igual que CINCO): las tres se declaran e
+  # inicializan en CADA juego. Ya viajan por transitividad con el paquete, así
+  # que el coste de no declararlas no es que falte una función: es que los
+  # eventos de Analytics y los crashes se pierden EN SILENCIO — compila, corre,
+  # y no mide nada.
+  firebase_analytics: ^12.4.6
+  firebase_crashlytics: ^5.2.7
+  sentry_flutter: ^9.26.0
+
   # Lo usan el horneado del banco y su auditoría (sha256 del manifest), no la
   # app en tiempo de ejecución.
   crypto: ^3.0.7
@@ -41,6 +50,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  sentry_dart_plugin: ^3.4.0
 
 flutter:
   uses-material-design: true
@@ -51,3 +61,13 @@ flutter:
     # Banco diario horneado (tools/bake_bank.dart). Va DENTRO del binario a
     # propósito: el diario tiene que existir sin red.
     - assets/bank/
+
+# Subida de símbolos a Sentry (org senda-6q / proyecto nona).
+# Requiere SENTRY_AUTH_TOKEN en el entorno; se ejecuta tras el build de release:
+#   flutter build ipa --obfuscate --split-debug-info=build/symbols
+#   dart run sentry_dart_plugin
+sentry:
+  project: nona
+  org: senda-6q
+  upload_debug_symbols: true
+  upload_source_maps: false

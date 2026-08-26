@@ -4,9 +4,9 @@
 /// cumplió su papel: dejó demostrado que la misma cuenta de Apple da el mismo
 /// uid en CINCO y en Nona.
 ///
-/// La plataforma ya está encendida: cuentas, amistades y compras vienen del
-/// paquete `juegos_senda`. Lo que sigue sin encender es la CLASIFICACIÓN, que
-/// necesita `LeaderboardService` (fase B). El juego se sostiene solo igualmente:
+/// La plataforma ya está encendida entera: cuentas, amistades, clasificación,
+/// invitaciones y compras vienen del paquete `juegos_senda`. El juego se
+/// sostiene solo igualmente:
 /// la diaria sale del banco horneado y el progreso vive en el dispositivo. Así
 /// que esta app funciona entera sin red y sin cuenta, que es como debe ser el
 /// día que alguien la abra en un avión.
@@ -15,8 +15,11 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:juegos_senda/juegos_senda.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
@@ -29,6 +32,7 @@ import 'services/progress_controller.dart';
 import 'services/progress_sync.dart';
 import 'services/theme_controller.dart';
 import 'theme.dart';
+import 'sentry_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +56,27 @@ Future<void> main() async {
   // anteriores. Hallazgo #1 de la auditoría: Nona era la única de la familia que
   // no lo llamaba.
   await activateSendaAppCheck(firebaseReady: firebaseReady);
+
+  // Crashlytics: errores de Flutter y de plataforma. Desactivado en debug para
+  // no ensuciar el panel con crashes de desarrollo. Misma forma que CINCO
+  // (regla de familia): un juego de Juegos Senda declara su telemetría desde
+  // el día uno.
+  if (firebaseReady) {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
+    );
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
+  // Sin esta llamada, TODOS los eventos que el paquete emite en Nona se
+  // descartaban en silencio: `Analytics._ready` nunca pasaba a true, así que
+  // cada inicio de sesión y cada invitación median cero. La firma exacta del
+  // fallo silencioso — compila, corre, y no cuenta nada.
+  if (firebaseReady) Analytics.init();
 
   final prefs = await SharedPreferences.getInstance();
   final daily = DailyController(prefs);
@@ -109,32 +134,45 @@ Future<void> main() async {
   // carga la primera vez que se entra, para no meter una generación de puzle en
   // el arranque en frío.
   await daily.load();
-  runApp(
-    NonaApp(
-      daily: daily,
-      practice: PracticeController(prefs),
-      locale: LocaleController(prefs),
-      // Antes que `runApp`: el constructor aplica el tema guardado, y hacerlo
-      // aquí evita que el primer fotograma salga con el de por defecto.
-      theme: ThemeController(prefs),
-      progress: progress,
-      auth: auth,
-      friends: FriendsService(firebaseReady: firebaseReady),
-      notifications: notifications,
-      prefs: prefs,
-      // La clasificación necesita Firestore ya en el constructor, así que sin
-      // Firebase no se construye: en modo local la pestaña Social enseña la
-      // invitación a entrar y nada más.
-      leaderboard: firebaseReady
-          ? LeaderboardService(layout: nonaConfig.dataLayout)
-          : null,
-      purchases: PurchaseService(prefs, nonaConfig.iap)..init(),
-      // El consentimiento (RGPD + ATT) se pide una vez por sesión y lo comparte
-      // todo lo que muestre anuncios, así que vive aquí arriba y no dentro del
-      // banner.
-      consent: ConsentManager(),
-    ),
+  final app = NonaApp(
+    daily: daily,
+    practice: PracticeController(prefs),
+    locale: LocaleController(prefs),
+    // Antes que `runApp`: el constructor aplica el tema guardado, y hacerlo
+    // aquí evita que el primer fotograma salga con el de por defecto.
+    theme: ThemeController(prefs),
+    progress: progress,
+    auth: auth,
+    friends: FriendsService(firebaseReady: firebaseReady),
+    notifications: notifications,
+    prefs: prefs,
+    // La clasificación necesita Firestore ya en el constructor, así que sin
+    // Firebase no se construye: en modo local la pestaña Social enseña la
+    // invitación a entrar y nada más.
+    leaderboard: firebaseReady
+        ? LeaderboardService(layout: nonaConfig.dataLayout)
+        : null,
+    purchases: PurchaseService(prefs, nonaConfig.iap)..init(),
+    // El consentimiento (RGPD + ATT) se pide una vez por sesión y lo comparte
+    // todo lo que muestre anuncios, así que vive aquí arriba y no dentro del
+    // banner.
+    consent: ConsentManager(),
   );
+
+  // Sentry envuelve los manejadores de error ya instalados (los de Crashlytics
+  // incluidos), así que ambos reciben cada error. Con el DSN vacío, Sentry
+  // queda apagado y Crashlytics sigue: el default del DSN vive en
+  // `sentry_config.dart` — SIN default real, todas las builds saldrían con
+  // Sentry apagado sin que nada falle (los builds no pasan --dart-define).
+  if (sentryDsn.isNotEmpty) {
+    await SentryFlutter.init((options) {
+      options.dsn = sentryDsn;
+      options.environment = kDebugMode ? 'debug' : 'production';
+      options.tracesSampleRate = 0.2;
+    }, appRunner: () => runApp(app));
+  } else {
+    runApp(app);
+  }
 }
 
 class NonaApp extends StatelessWidget {
