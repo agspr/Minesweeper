@@ -81,19 +81,28 @@ de CINCO sin comprobarlo en Nona.
 
 ---
 
-## Analítica y diagnóstico — RESUELTO, y la política habrá que revisarla
+## Analítica y diagnóstico — CERRADO, política ya actualizada
 
-> **Actualización 26-8-2026.** Esto ya no es una decisión abierta. André lo
-> confirmó: **era un descuido**, no una postura de privacidad distinta, y el
-> agente de desarrollo lo está corrigiendo. La **build 21** llevará la
-> telemetría completa (Analytics, Crashlytics y Sentry).
+> **Cerrado el 26-8-2026.** Era un descuido, confirmado por André, no una
+> postura de privacidad distinta. La **build 21** ya lleva la telemetría
+> completa (Analytics + Crashlytics + Sentry), está **subida a las dos
+> tiendas**, y **`privacy-policy.md` ya está actualizada en consecuencia**:
 >
-> **Consecuencia directa: el texto de `privacy-policy.md` que hay hoy describe
-> el estado ANTERIOR a la 21 y quedará corto en cuanto la 21 salga.** Ver
-> "Qué hay que cambiar cuando salga la 21", más abajo. **No publicar la
-> política dando por hecho que este apartado está cerrado.**
+> - **§3.8** — añadida la lista de acciones concretas que se registran
+>   (invitado, inicio de sesión, compra/restauración, compartir, solicitud
+>   enviada/aceptada, empujón, invitación, y el desenlace de la revocación de
+>   Apple), más las preferencias de tema e idioma.
+> - **§3.9** — añadido **Sentry** junto a Crashlytics.
+> - **§5** — añadido **Sentry** a la tabla de proveedores.
+> - **§9** — la fila de informes de fallos ahora nombra los dos servicios.
+> - **"Última actualización" subida a 26 de agosto de 2026**, porque añadir
+>   categorías de datos recogidos es un cambio sustantivo.
+>
+> **Ya no hay nada que esperar aquí: la política describe la build que está en
+> las tiendas.** Queda pendiente solo el punto 3 de abajo (alinear la cifra de
+> retención con CINCO), que es cosmético y no bloquea publicar.
 
-El diagnóstico original, que sigue explicando por qué el texto está como está:
+El diagnóstico original, que explica por qué hizo falta el cambio:
 
 Nona **no se comporta como CINCO** en esto, y creo que no es intencional:
 
@@ -151,17 +160,42 @@ Es un cambio sustantivo —añade categorías de datos recogidos—, y publicarl
 bajo la fecha del 25-8-2026 lo escondería. Es exactamente el error que hubo que
 corregir en CINCO esta semana.
 
-### Secuencia recomendada
+### Secuencia — ya resuelta
 
-**No publicar la política antes que la build 21**, si se puede evitar. El orden
-limpio es: sale la 21 → reviso §3.8, §3.9 y §5 → se publica todo junto. Así la
-política describe la app que la gente tiene.
+Se siguió el orden limpio: salió la 21 → se subió a las dos tiendas → se
+revisaron §3.8, §3.9, §5 y §9 → **la política ya describe la build publicada**.
+No hace falta una segunda publicación por este motivo.
 
-Si por lo que sea las páginas tienen que subir **antes** que la 21 (por ejemplo
-para desbloquear el envío a Apple, que exige el URL de privacidad), el texto
-actual es correcto **para el estado de hoy** y se puede publicar tal cual — pero
-entonces queda pendiente una segunda publicación en cuanto salga la 21, y hay
-que contarla como tal, no como un retoque.
+---
+
+## PENDIENTE NUEVO — el nombre de la app cambió, y las fichas no
+
+**26-8-2026.** La build 21 trae un cambio de última hora de André: **la app se
+llama ahora "Nona Sudoku"** bajo el icono. Verificado en los dos binarios:
+`android:label="Nona Sudoku"` en el AAB y `CFBundleDisplayName = "Nona Sudoku"`
+en el IPA.
+
+**Las fichas de tienda siguen diciendo otra cosa:**
+
+| Sitio | Dice hoy |
+|---|---|
+| Nombre en el dispositivo (las dos plataformas) | **Nona Sudoku** |
+| Ficha de Play (`es-419`) | Nona — Sudoku del día |
+| App Store Connect | Nona — Sudoku del día |
+| Estos documentos legales | "Nona" a secas |
+
+Que difieran **está permitido** y es normal —el nombre de tienda y el del
+lanzador son campos distintos—, así que no lo he cambiado por mi cuenta: el
+nombre de un producto es de André.
+
+**Es decisión suya**, y cuando la tome:
+- Si quiere alinear las fichas, lo hago yo (Play por consola, ASC por API).
+- Si además quiere que los documentos legales digan "Nona Sudoku" en vez de
+  "Nona", es un reemplazo en los tres markdown **y otra subida de "Última
+  actualización"**.
+
+Mientras no decida, lo dejo tal cual y anotado aquí para que no se publique sin
+haberlo mirado.
 
 ---
 

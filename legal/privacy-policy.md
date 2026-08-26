@@ -1,7 +1,7 @@
 # Política de Privacidad de Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 25 de agosto de 2026
+**Última actualización:** 26 de agosto de 2026
 
 ---
 
@@ -260,11 +260,29 @@ confirmarla.
 
 ### 3.8 Datos de uso
 
-La App incluye **Google Analytics para Firebase**, que registra datos de uso
-básicos de forma automática: cuándo se abre la App por primera vez, cuándo
-empieza y termina una sesión, qué pantallas se visitan, si la App se actualiza,
-y datos técnicos del dispositivo (modelo, versión del sistema, idioma y país
-aproximado por IP).
+Usamos **Google Analytics para Firebase** para entender cómo se usa la App y
+decidir qué mejorar.
+
+Por un lado se registran datos de uso **de forma automática**: cuándo se abre la
+App por primera vez, cuándo empieza y termina una sesión, qué pantallas se
+visitan, si la App se actualiza, y datos técnicos del dispositivo (modelo,
+versión del sistema, idioma y país aproximado por IP).
+
+Por otro, registramos un conjunto acotado de **acciones concretas**, que son
+estas y ninguna más:
+
+- Elegir "Jugar sin cuenta".
+- Iniciar sesión, indicando solo si fue con Google o con Apple.
+- Comprar o restaurar "Quitar anuncios".
+- Compartir un resultado.
+- Enviar o aceptar una solicitud de amistad, enviar un empujón, y enviar una
+  invitación a otro juego de la familia.
+- Al eliminar la cuenta, si la revocación del permiso de "Iniciar sesión con
+  Apple" salió bien o falló. Lo registramos porque un fallo ahí no se ve por
+  ningún otro sitio y necesitamos poder detectarlo.
+
+Guardamos además, como preferencia para poder segmentar el análisis, el **tema
+de color** y el **idioma** que eliges. Nunca nada que te identifique.
 
 **Qué NO registramos:** el contenido de tus partidas, tu correo, tu nombre, tu
 @usuario, ni ningún dato que te identifique como persona.
@@ -284,11 +302,11 @@ una persona concreta ni para construir un perfil suyo.
 
 ### 3.9 Diagnóstico de fallos
 
-Para poder arreglar lo que se rompe, la App incluye **Firebase Crashlytics**.
-Cuando la App falla nos llega un informe técnico: modelo del dispositivo,
-versión del sistema operativo, versión de la App y la traza del error. Estos
-informes existen para diagnosticar defectos, no para perfilar usuarios, y no
-contienen tu perfil ni el contenido de tus partidas.
+Para poder arreglar lo que se rompe usamos **Firebase Crashlytics** y
+**Sentry**. Cuando la App falla nos llega un informe técnico: modelo del
+dispositivo, versión del sistema operativo, versión de la App y la traza del
+error. Estos informes existen para diagnosticar defectos, no para perfilar
+usuarios, y no contienen tu perfil ni el contenido de tus partidas.
 
 ### 3.10 Datos que se quedan en tu teléfono
 
@@ -380,6 +398,7 @@ proveedores que hacen funcionar la App:
 |---|---|
 | Google Firebase (Authentication, Firestore, Cloud Messaging, Cloud Functions) | Cuentas, base de datos, notificaciones |
 | Firebase Crashlytics | Informes de fallos |
+| Sentry | Monitoreo de errores |
 | Google AdMob | Publicidad |
 | Google Analytics para Firebase | Datos de uso |
 | Google BigQuery (Google Cloud) | Almacenar y consultar los datos de uso, en nuestro propio proyecto |
@@ -505,7 +524,7 @@ Con más detalle, por tipo de dato:
 | Dato | Cuánto lo conservamos |
 |---|---|
 | Perfil, @usuario, marcadores, partidas, amistades, bloqueos y token de notificaciones | Mientras la cuenta esté activa. Al eliminarla se borran **de inmediato** |
-| Informes de fallos (Crashlytics) | El plazo de retención del servicio, **90 días por defecto**. No contienen tu perfil |
+| Informes de fallos (Crashlytics y Sentry) | El plazo de retención de cada servicio, **90 días por defecto**. No contienen tu perfil |
 | Datos de uso | **Un máximo de 400 días**, tanto en Google Analytics para Firebase como en la copia exportada a BigQuery. Pasado ese plazo se borran solos |
 | Datos guardados sólo en tu teléfono | Hasta que desinstales la App |
 | Registros que la ley nos obliga a conservar | El plazo que marque la norma aplicable |

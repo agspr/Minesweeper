@@ -373,6 +373,30 @@ abstract class L {
   /// **'¿Puedes con la de hoy?'**
   String get shareChallenge;
 
+  /// No description provided for @statsPracticeByLevel.
+  ///
+  /// In es, this message translates to:
+  /// **'Práctica por nivel'**
+  String get statsPracticeByLevel;
+
+  /// No description provided for @statsPlayedShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Jugadas'**
+  String get statsPlayedShort;
+
+  /// No description provided for @statsCompletedShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Completadas'**
+  String get statsCompletedShort;
+
+  /// No description provided for @statsBestShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Mejor'**
+  String get statsBestShort;
+
   /// No description provided for @statsDaysPlayed.
   ///
   /// In es, this message translates to:

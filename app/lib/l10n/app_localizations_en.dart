@@ -178,6 +178,18 @@ class LEn extends L {
   String get shareChallenge => 'Can you beat today’s?';
 
   @override
+  String get statsPracticeByLevel => 'Practice by level';
+
+  @override
+  String get statsPlayedShort => 'Played';
+
+  @override
+  String get statsCompletedShort => 'Completed';
+
+  @override
+  String get statsBestShort => 'Best';
+
+  @override
   String get statsDaysPlayed => 'Days played';
 
   @override

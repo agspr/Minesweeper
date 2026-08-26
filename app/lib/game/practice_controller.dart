@@ -37,16 +37,33 @@ Map<String, dynamic>? _generateInIsolate((int, int) args) {
 }
 
 class PracticeController extends ChangeNotifier {
-  PracticeController(this._prefs, {int Function()? seedSource})
-    : _seedSource =
-          seedSource ??
-          (() => DateTime.now().microsecondsSinceEpoch & 0x7FFFFFFF);
+  PracticeController(
+    this._prefs, {
+    int Function()? seedSource,
+    DateTime Function()? clock,
+  }) : _seedSource =
+           seedSource ??
+           (() => DateTime.now().microsecondsSinceEpoch & 0x7FFFFFFF),
+       _clock = clock ?? DateTime.now;
 
   static const _kState = 'game.nona.practice';
   static const _kDifficulty = 'game.nona.practice.difficulty';
+  static const _kStats = 'game.nona.practice.stats';
 
   final SharedPreferences _prefs;
   final int Function() _seedSource;
+  final DateTime Function() _clock;
+
+  /// Cronómetro del puzle en curso, con la misma mecánica que la diaria:
+  /// segundos acumulados + desde cuándo corre. Se persiste en el estado del
+  /// tablero para que cerrar la app a medias no regale un "mejor tiempo".
+  int _accumulatedSeconds = 0;
+  DateTime? _runningSince;
+
+  /// ¿Este tablero ya contó como "jugada"? Cuenta al PRIMER toque, no al
+  /// generarse: entrar en la pestaña genera tablero, y contar eso inflaría
+  /// las jugadas con puzles que nadie llegó a mirar.
+  bool _countedThisBoard = false;
 
   SudokuBoard? _board;
   Difficulty _difficulty = Difficulty.easy;
@@ -62,6 +79,77 @@ class PracticeController extends ChangeNotifier {
   bool get notesMode => _notesMode;
   int get hintsUsed => _hintsUsed;
   bool get isComplete => _board?.isComplete ?? false;
+
+  Duration get elapsed => Duration(
+    seconds:
+        _accumulatedSeconds +
+        (_runningSince == null
+            ? 0
+            : _clock().difference(_runningSince!).inSeconds),
+  );
+
+  /// Las cifras de práctica de [d]: jugadas, completadas y mejor tiempo.
+  ///
+  /// Solo cuentan desde que existen (26-8-2026): los puzles anteriores no
+  /// dejaron rastro y no se inventan — la regla de siempre, sin datos crudos
+  /// no se escribe nada.
+  PracticeLevelStats statsFor(Difficulty d) {
+    final all = _readStats();
+    final m = all[d.name];
+    if (m is! Map) return const PracticeLevelStats();
+    final best = (m['b'] as num?)?.toInt();
+    return PracticeLevelStats(
+      played: (m['j'] as num?)?.toInt() ?? 0,
+      completed: (m['c'] as num?)?.toInt() ?? 0,
+      bestSeconds: best,
+    );
+  }
+
+  Map<String, dynamic> _readStats() {
+    final raw = _prefs.getString(_kStats);
+    if (raw == null) return {};
+    try {
+      return (jsonDecode(raw) as Map).cast<String, dynamic>();
+    } catch (_) {
+      return {};
+    }
+  }
+
+  void _bumpStats(void Function(Map<String, dynamic> nivel) update) {
+    final all = _readStats();
+    final nivel = ((all[_difficulty.name] as Map?) ?? <String, dynamic>{})
+        .cast<String, dynamic>();
+    update(nivel);
+    all[_difficulty.name] = nivel;
+    _prefs.setString(_kStats, jsonEncode(all));
+  }
+
+  /// El primer toque de un tablero: arranca el cronómetro y cuenta la jugada.
+  void _touch() {
+    _runningSince ??= _clock();
+    if (_countedThisBoard) return;
+    _countedThisBoard = true;
+    _bumpStats((n) => n['j'] = ((n['j'] as num?)?.toInt() ?? 0) + 1);
+  }
+
+  /// El tablero acaba de completarse: cierra el cronómetro y apunta las
+  /// cifras. Las pistas no lo invalidan — en práctica no penalizan nada, por
+  /// decisión de André, y eso incluye estas cuentas.
+  void _finished() {
+    if (_runningSince != null) {
+      _accumulatedSeconds += _clock().difference(_runningSince!).inSeconds;
+      _runningSince = null;
+    }
+    final t = _accumulatedSeconds;
+    _bumpStats((n) {
+      n['c'] = ((n['c'] as num?)?.toInt() ?? 0) + 1;
+      final best = (n['b'] as num?)?.toInt();
+      // El mejor tiempo solo MEJORA. Con `t > 0` además: un tablero
+      // restaurado de un guardado corrupto podría dar 0 segundos, y un
+      // "mejor: 0:00" es mentira por construcción.
+      if (t > 0 && (best == null || t < best)) n['b'] = t;
+    });
+  }
 
   /// Recupera el puzle a medias que hubiera, o genera uno nuevo.
   Future<void> load() async {
@@ -82,6 +170,9 @@ class PracticeController extends ChangeNotifier {
           saved: data,
         );
         _hintsUsed = (data['hints'] as num?)?.toInt() ?? 0;
+        _accumulatedSeconds = (data['seconds'] as num?)?.toInt() ?? 0;
+        _runningSince = null;
+        _countedThisBoard = data['counted'] == true;
         notifyListeners();
         return;
       } catch (_) {
@@ -104,6 +195,9 @@ class PracticeController extends ChangeNotifier {
     _selected = -1;
     _notesMode = false;
     _hintsUsed = 0;
+    _accumulatedSeconds = 0;
+    _runningSince = null;
+    _countedThisBoard = false;
     notifyListeners();
 
     Map<String, dynamic>? json;
@@ -145,11 +239,13 @@ class PracticeController extends ChangeNotifier {
   void tapDigit(int digit) {
     final b = _board;
     if (b == null || _selected < 0 || isComplete) return;
+    _touch();
     if (_notesMode) {
       b.toggleNote(_selected, digit);
     } else {
       // Un fallo se siente, no solo se ve: ver NonaHaptics.mistake.
       if (b.place(_selected, digit)) NonaHaptics.mistake();
+      if (b.isComplete) _finished();
     }
     _save();
     notifyListeners();
@@ -158,6 +254,7 @@ class PracticeController extends ChangeNotifier {
   void erase() {
     final b = _board;
     if (b == null || _selected < 0 || isComplete) return;
+    _touch();
     b.erase(_selected);
     _save();
     notifyListeners();
@@ -166,6 +263,7 @@ class PracticeController extends ChangeNotifier {
   void undo() {
     final b = _board;
     if (b == null || isComplete) return;
+    _touch();
     b.undo();
     _save();
     notifyListeners();
@@ -185,7 +283,9 @@ class PracticeController extends ChangeNotifier {
       if (cell < 0) return;
     }
     // Se coloca el dígito correcto, así que nunca cuenta como fallo.
+    _touch();
     b.place(cell, b.solution[cell]);
+    if (b.isComplete) _finished();
     _selected = cell;
     _hintsUsed++;
     _save();
@@ -209,7 +309,32 @@ class PracticeController extends ChangeNotifier {
         'solution': encodeGrid(b.solution),
         ...b.toJson(),
         'hints': _hintsUsed,
+        // El cronómetro se congela al guardar: los segundos con la app
+        // cerrada no son juego, y contarlos regalaría un "mejor tiempo" malo
+        // o robaría uno bueno.
+        'seconds': elapsed.inSeconds,
+        'counted': _countedThisBoard,
       }),
     );
+    if (_runningSince != null) {
+      _accumulatedSeconds += _clock().difference(_runningSince!).inSeconds;
+      _runningSince = _clock();
+    }
   }
+}
+
+/// Las cifras de práctica de un nivel. Ver [PracticeController.statsFor].
+class PracticeLevelStats {
+  const PracticeLevelStats({
+    this.played = 0,
+    this.completed = 0,
+    this.bestSeconds,
+  });
+
+  final int played;
+  final int completed;
+
+  /// `null` mientras no se haya completado ninguno: no hay mejor tiempo que
+  /// enseñar, y un cero sería mentira.
+  final int? bestSeconds;
 }

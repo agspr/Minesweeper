@@ -178,6 +178,18 @@ class LEs extends L {
   String get shareChallenge => '¿Puedes con la de hoy?';
 
   @override
+  String get statsPracticeByLevel => 'Práctica por nivel';
+
+  @override
+  String get statsPlayedShort => 'Jugadas';
+
+  @override
+  String get statsCompletedShort => 'Completadas';
+
+  @override
+  String get statsBestShort => 'Mejor';
+
+  @override
   String get statsDaysPlayed => 'Días jugados';
 
   @override

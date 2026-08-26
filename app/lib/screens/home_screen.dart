@@ -175,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           SettingsTab(
+            practice: widget.practice,
             auth: widget.auth,
             friends: widget.friends,
             purchases: widget.purchases,

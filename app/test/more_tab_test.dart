@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 import 'package:nona/nona_config.dart';
+import 'package:nona/game/practice_controller.dart';
 import 'package:nona/screens/settings_tab.dart';
 import 'package:nona/services/progress_controller.dart';
 import 'package:nona/services/theme_controller.dart';
@@ -24,6 +25,7 @@ void main() {
     await tester.pumpWidget(
       testApp(
         SettingsTab(
+          practice: PracticeController(prefs),
           auth: AuthController(firebaseReady: false, prefs: prefs),
           friends: FriendsService(firebaseReady: false),
           purchases: PurchaseService(prefs, const IapConfig(removeAdsId: 'x')),

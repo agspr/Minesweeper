@@ -13,12 +13,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../nona_config.dart';
 import '../theme.dart';
+import '../game/difficulty.dart';
+import '../game/practice_controller.dart';
 import '../services/progress_controller.dart';
+import '../widgets/result_overlay.dart' show difficultyLabel;
 import '../services/theme_controller.dart';
 
 class SettingsTab extends StatefulWidget {
   const SettingsTab({
     super.key,
+    required this.practice,
     required this.auth,
     required this.friends,
     required this.purchases,
@@ -29,6 +33,7 @@ class SettingsTab extends StatefulWidget {
     required this.progress,
   });
 
+  final PracticeController practice;
   final AuthController auth;
   final FriendsService friends;
   final PurchaseService purchases;
@@ -66,6 +71,37 @@ class _SettingsTabState extends State<SettingsTab> {
     super.dispose();
   }
 
+  SendaStatTable? _practiceTable(L l) {
+    final stats = {
+      for (final d in Difficulty.values) d: widget.practice.statsFor(d),
+    };
+    if (stats.values.every((s) => s.played == 0)) return null;
+    String mejor(PracticeLevelStats s) {
+      final b = s.bestSeconds;
+      if (b == null) return '—';
+      final m = b ~/ 60, sec = b % 60;
+      return '$m:${sec.toString().padLeft(2, '0')}';
+    }
+
+    return SendaStatTable(
+      title: l.statsPracticeByLevel,
+      columns: [l.statsPlayedShort, l.statsCompletedShort, l.statsBestShort],
+      rows: [
+        for (final d in Difficulty.values)
+          SendaStatTableRow(
+            label: _difficultyName(d),
+            values: [
+              '${stats[d]!.played}',
+              '${stats[d]!.completed}',
+              mejor(stats[d]!),
+            ],
+          ),
+      ],
+    );
+  }
+
+  String _difficultyName(Difficulty d) => difficultyLabel(context, d);
+
   @override
   Widget build(BuildContext context) {
     final l = L.of(context);
@@ -73,7 +109,7 @@ class _SettingsTabState extends State<SettingsTab> {
     final avg = progress.averageMistakes;
 
     return ListenableBuilder(
-      listenable: progress,
+      listenable: Listenable.merge([progress, widget.practice]),
       builder: (context, _) => SendaSettingsScreen(
         config: nonaConfig,
         auth: widget.auth,
@@ -124,6 +160,12 @@ class _SettingsTabState extends State<SettingsTab> {
             ],
           ),
         ],
+        // La práctica por nivel (pedido de André): mejor tiempo, jugadas y
+        // completadas de cada dificultad, en la tarjeta-tabla de la familia.
+        // Solo si hay algo que contar — las cifras existen desde el 26-8-2026
+        // y una tabla de ceros es ruido, igual que la de intentos de CINCO se
+        // esconde vacía.
+        statsChart: _practiceTable(l),
         // Los CUATRO de la familia, los mismos que CINCO y en el mismo orden.
         // No son "los temas de Nona": son los de Juegos Senda, y por eso los
         // define el paquete. Que las dos apps ofrezcan lo mismo aquí es el
