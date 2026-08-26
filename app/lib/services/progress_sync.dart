@@ -32,6 +32,9 @@ import 'package:flutter/foundation.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 
 import '../game/day_key.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'progress_controller.dart';
 
 class ProgressSync {
@@ -41,8 +44,16 @@ class ProgressSync {
     required this.uidOf,
     required this.store,
     required this.session,
+    required this.prefs,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now;
+
+  /// La bandera del backfill vive aquí y no en el controlador: es un hecho de
+  /// SINCRONIZACIÓN ("esta cuenta ya subió su histórico desde este aparato"),
+  /// no de progreso.
+  static const _kBackfilled = 'progress.daysBackfilled';
+
+  final SharedPreferences prefs;
 
   final ProgressController progress;
 
@@ -108,8 +119,45 @@ class ProgressSync {
     } finally {
       _reconciling = false;
     }
+    await _backfillDays(uid);
     await _pushDay(uid);
     await _push(uid);
+  }
+
+  /// Sube UNA VEZ el histórico completo de días de este aparato.
+  ///
+  /// Es la migración del hallazgo #3 (go de André, 26-8-2026): los días crudos
+  /// en la nube empezaron a existir con `writeDay`, así que el recálculo del
+  /// servidor siempre salía corto — 150 puntos contra los 515 reales — y dos
+  /// escritores del mismo resumen significaba que el que ganara podía pisar al
+  /// otro. Subiendo el histórico REAL del teléfono, el servidor cuadra desde
+  /// datos completos y puede pasar a ser la autoridad; el guardia de
+  /// "nunca bajar" del servidor queda de cinturón para lo que este teléfono ya
+  /// no tenga.
+  ///
+  /// La bandera se marca SOLO cuando todos los días subieron: marcada a medias
+  /// sería no reintentar nunca, y el reintento es gratis porque cada escritura
+  /// es un `set` con clave por día — idempotente. Lleva prefijo `progress.`
+  /// (de cuenta): cambiar de cuenta la borra junto con los registros a los que
+  /// se refiere.
+  Future<void> _backfillDays(String uid) async {
+    if (prefs.getBool(_kBackfilled) ?? false) return;
+    final hoy = dayKeyFor(_clock());
+    var todos = true;
+    for (final r in progress.allRecords) {
+      try {
+        final json = r.toJson();
+        await store.writeDay(uid, r.dayKey, json);
+        // El día de HOY acaba de subir: dejar la huella evita que `_pushDay`
+        // lo repita en esta misma pasada — cada escritura dispara un recálculo
+        // que relee todos los días, y pagarlo dos veces por el mismo dato es
+        // exactamente lo que la huella existe para impedir.
+        if (r.dayKey == hoy) _ultimoDiaSubido = '$hoy=${json.toString()}';
+      } catch (_) {
+        todos = false;
+      }
+    }
+    if (todos) await prefs.setBool(_kBackfilled, true);
   }
 
   void _onProgressChanged() {

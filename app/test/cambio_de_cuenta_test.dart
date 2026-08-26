@@ -103,6 +103,7 @@ void main() {
     prefs.setString('account.owner', 'ana');
 
     ProgressSync sync() => ProgressSync(
+      prefs: prefs,
       progress: progress,
       auth: sesion,
       uidOf: () => sesion.uid,

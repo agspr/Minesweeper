@@ -46,8 +46,12 @@ class _StoreEspia implements ProgressStore {
 
   final List<String> dias = [];
 
+  /// Días cuya escritura FALLA, para ejercer el reintento del backfill.
+  final Set<String> fallan = {};
+
   @override
   Future<void> writeDay(String uid, String d, Map<String, dynamic> r) async {
+    if (fallan.contains(d)) throw Exception('sin red');
     dias.add('$uid:$d:${r['points']}');
   }
 
@@ -79,6 +83,7 @@ void main() {
   });
 
   ProgressSync sync(_StoreEspia store) => ProgressSync(
+    prefs: prefs,
     progress: progress,
     auth: sesion,
     uidOf: () => sesion.uid,
@@ -305,6 +310,55 @@ void main() {
 
       expect(store.dias, hasLength(1));
       expect(store.dias.single, startsWith('u1:2026-08-18:'));
+    });
+  });
+  group('el backfill del histórico (la migración del #3)', () {
+    test('al entrar, TODO el histórico local sube una vez', () async {
+      jugar(DateTime(2026, 8, 16));
+      jugar(DateTime(2026, 8, 17));
+      jugar(DateTime(2026, 8, 18));
+
+      final store = _StoreEspia();
+      sync(store).start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
+
+      expect(store.dias.where((d) => d.startsWith('u1:')).length, 3);
+      expect(prefs.getBool('progress.daysBackfilled'), isTrue);
+
+      // Un ARRANQUE nuevo (sincronizador nuevo, mismas prefs) no vuelve a
+      // subir nada: la bandera manda.
+      store.dias.clear();
+      final s2 = sync(store)..start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
+      expect(store.dias.where((d) => d.contains('2026-08-16')), isEmpty);
+      expect(store.dias.where((d) => d.contains('2026-08-17')), isEmpty);
+      s2.dispose();
+    });
+
+    test('si UN día falla, la bandera no se marca y se reintenta', () async {
+      // Marcada a medias sería no reintentar nunca: el fallo silencioso de
+      // siempre, en su variante de migración.
+      jugar(DateTime(2026, 8, 16));
+      jugar(DateTime(2026, 8, 17));
+
+      final store = _StoreEspia()..fallan.add('2026-08-16');
+      sync(store).start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
+
+      expect(prefs.getBool('progress.daysBackfilled'), isNot(isTrue));
+
+      // Vuelve la red: el siguiente ARRANQUE (sincronizador nuevo) completa
+      // y marca.
+      store.fallan.clear();
+      final s2 = sync(store)..start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
+      expect(store.dias.where((d) => d.contains('2026-08-16')), isNotEmpty);
+      expect(prefs.getBool('progress.daysBackfilled'), isTrue);
+      s2.dispose();
     });
   });
 }

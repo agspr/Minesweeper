@@ -122,6 +122,7 @@ Future<void> main() async {
   // de hacer falta es cuando ya no hay app.
   if (firebaseReady) {
     ProgressSync(
+      prefs: prefs,
       progress: progress,
       auth: auth,
       uidOf: () => auth.user?.uid,
