@@ -83,23 +83,29 @@ class _SettingsTabState extends State<SettingsTab> {
       return '$m:${sec.toString().padLeft(2, '0')}';
     }
 
+    // TRANSPUESTA a propósito: de cabecera van las dificultades —cortas y de
+    // largo parejo— y las métricas van al carril izquierdo, donde el texto
+    // cabe. "Completadas" de cabecera partió dos versiones de esta tarjeta.
     return SendaStatTable(
       title: l.statsPracticeByLevel,
-      // El mejor tiempo es la columna protagonista: la cifra por la que se
-      // vuelve a esta tarjeta. Sale en el acento del tema.
-      accentColumn: 2,
-      columns: [l.statsPlayedShort, l.statsCompletedShort, l.statsBestShort],
+      columns: [for (final d in Difficulty.values) _difficultyName(d)],
       rows: [
-        for (final d in Difficulty.values)
-          SendaStatTableRow(
-            label: _difficultyName(d),
-            values: [
-              '${stats[d]!.played}',
-              '${stats[d]!.completed}',
-              mejor(stats[d]!),
-            ],
-          ),
+        SendaStatTableRow(
+          label: l.statsPlayedShort,
+          values: [for (final d in Difficulty.values) '${stats[d]!.played}'],
+        ),
+        SendaStatTableRow(
+          label: l.statsCompletedShort,
+          values: [for (final d in Difficulty.values) '${stats[d]!.completed}'],
+        ),
+        SendaStatTableRow(
+          label: l.statsBestTime,
+          values: [for (final d in Difficulty.values) mejor(stats[d]!)],
+        ),
       ],
+      // El mejor tiempo es la fila protagonista: la cifra por la que se
+      // vuelve a esta tarjeta. Sale en el acento del tema.
+      accentRow: 2,
     );
   }
 

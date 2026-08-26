@@ -391,6 +391,12 @@ abstract class L {
   /// **'Completadas'**
   String get statsCompletedShort;
 
+  /// No description provided for @statsBestTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Mejor tiempo'**
+  String get statsBestTime;
+
   /// No description provided for @statsBestShort.
   ///
   /// In es, this message translates to:

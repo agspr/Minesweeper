@@ -187,6 +187,9 @@ class LEs extends L {
   String get statsCompletedShort => 'Completadas';
 
   @override
+  String get statsBestTime => 'Mejor tiempo';
+
+  @override
   String get statsBestShort => 'Mejor';
 
   @override
