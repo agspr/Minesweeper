@@ -81,9 +81,19 @@ de CINCO sin comprobarlo en Nona.
 
 ---
 
-## DECISIÓN QUE NO ES MÍA — analítica y diagnóstico
+## Analítica y diagnóstico — RESUELTO, y la política habrá que revisarla
 
-**Es lo único que dejo abierto, y conviene resolverlo antes de publicar.**
+> **Actualización 26-8-2026.** Esto ya no es una decisión abierta. André lo
+> confirmó: **era un descuido**, no una postura de privacidad distinta, y el
+> agente de desarrollo lo está corrigiendo. La **build 21** llevará la
+> telemetría completa (Analytics, Crashlytics y Sentry).
+>
+> **Consecuencia directa: el texto de `privacy-policy.md` que hay hoy describe
+> el estado ANTERIOR a la 21 y quedará corto en cuanto la 21 salga.** Ver
+> "Qué hay que cambiar cuando salga la 21", más abajo. **No publicar la
+> política dando por hecho que este apartado está cerrado.**
+
+El diagnóstico original, que sigue explicando por qué el texto está como está:
 
 Nona **no se comporta como CINCO** en esto, y creo que no es intencional:
 
@@ -114,22 +124,44 @@ automática de uso, informes de fallos, export a BigQuery con 400 días. No he
 copiado la lista de eventos propios de CINCO, porque en Nona no se disparan.
 **No he mencionado Sentry**, porque hoy no transmite.
 
-Lo que hay que decidir, y no me corresponde:
+### Qué hay que cambiar cuando salga la build 21
 
-1. **¿Nona debe emitir los eventos propios** (inicio de sesión, compra,
-   solicitud de amistad, invitación…) como CINCO? Si sí, es añadir
-   `Analytics.init()` — y entonces la política necesita la lista de eventos,
-   como la de CINCO. Si no, conviene decirlo explícitamente.
-2. **¿Sentry debe estar activo en Nona?** Si se inicializa, hay que añadirlo a
-   la tabla de proveedores de la política. Si no, valdría la pena quitar la
-   dependencia para que el binario no arrastre providers inertes.
-3. **Coherencia con CINCO**: la política de CINCO dice que la analítica se
-   guarda *"nunca más de 14 meses"*; la consola dice **400 días** (≈13,1 meses).
-   No se contradicen, pero las dos políticas deberían usar la misma cifra. Yo
-   he puesto 400 días en Nona por ser lo medido.
+Los tres puntos que estaban abiertos ya tienen respuesta, y **los tres tocan la
+política**. Esto lo hago yo (agente de listings) en cuanto el agente de
+desarrollo confirme que la 21 está construida y verificada:
 
-**Publicar y corregir después es publicar dos veces**, que es justo lo que el
-`PENDIENTE.md` de CINCO advertía. Mejor zanjarlo antes.
+1. **Eventos propios de Analytics.** Con `Analytics.init()` llamado, empiezan a
+   dispararse los eventos del paquete: `modo_invitado`, `inicio_sesion`,
+   `compra_quitar_anuncios`, `compartio`, `solicitud_enviada`,
+   `solicitud_aceptada`, `empujon_enviado`, `invitacion_enviada` y
+   `revocacion_apple`. **§3.8 hay que ampliarla** con esa lista, como la §3.8 de
+   CINCO. Hoy solo describe la recogida automática, que es lo único cierto
+   antes de la 21.
+2. **Sentry.** Pasa a transmitir de verdad. Hay que **añadirlo a §3.9** (junto a
+   Crashlytics) y **a la tabla de proveedores de §5**. Hoy no aparece en ninguna
+   de las dos, a propósito, porque sin DSN no envía nada.
+3. **Coherencia con CINCO en la retención.** La política de CINCO dice *"nunca
+   más de 14 meses"*; la consola de `cinco-fe5cc` dice **400 días** (≈13,1
+   meses). No se contradicen, pero las dos políticas deberían usar la misma
+   cifra. En Nona he puesto 400 días por ser lo medido. **Conviene alinear las
+   dos**, y eso cruza con el `PENDIENTE.md` de CINCO.
+
+**Y hay que subir "Última actualización" al día en que se haga ese cambio.**
+Es un cambio sustantivo —añade categorías de datos recogidos—, y publicarlo
+bajo la fecha del 25-8-2026 lo escondería. Es exactamente el error que hubo que
+corregir en CINCO esta semana.
+
+### Secuencia recomendada
+
+**No publicar la política antes que la build 21**, si se puede evitar. El orden
+limpio es: sale la 21 → reviso §3.8, §3.9 y §5 → se publica todo junto. Así la
+política describe la app que la gente tiene.
+
+Si por lo que sea las páginas tienen que subir **antes** que la 21 (por ejemplo
+para desbloquear el envío a Apple, que exige el URL de privacidad), el texto
+actual es correcto **para el estado de hoy** y se puede publicar tal cual — pero
+entonces queda pendiente una segunda publicación en cuanto salga la 21, y hay
+que contarla como tal, no como un retoque.
 
 ---
 
