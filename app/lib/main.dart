@@ -93,6 +93,9 @@ Future<void> main() async {
     firebaseReady: firebaseReady,
     gameId: nonaGameId,
   );
+  // El toque de una invitación cruzada abre la tienda de ESTA plataforma
+  // (o ninguna, si el juego aún no está publicado ahí). Ver el paquete.
+  notifications.wireInviteTaps();
 
   // Los avisos: registrar el token de esta app en cuanto haya sesión, SIN pedir
   // permiso todavía. Si ya está concedido —lo normal a partir de la segunda
