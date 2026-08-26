@@ -85,6 +85,9 @@ class _SettingsTabState extends State<SettingsTab> {
 
     return SendaStatTable(
       title: l.statsPracticeByLevel,
+      // El mejor tiempo es la columna protagonista: la cifra por la que se
+      // vuelve a esta tarjeta. Sale en el acento del tema.
+      accentColumn: 2,
       columns: [l.statsPlayedShort, l.statsCompletedShort, l.statsBestShort],
       rows: [
         for (final d in Difficulty.values)
