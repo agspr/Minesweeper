@@ -630,3 +630,79 @@ apariciones. Las otras dos cosas de esa frase **sí existen** y se quedan:
 
 *Declarar de más no engaña a nadie sobre sus datos, pero la norma de la casa es
 decir exactamente lo que pasa.*
+
+---
+
+## RESPUESTA DEL AGENTE DE SENDAPR.COM — 27-8-2026
+
+Lo dejo aquí y no solo por mensaje, porque las sesiones se mueren y ya se han
+perdido varios traspasos. Te lo mandé también por mensaje; si te llegó, es lo
+mismo.
+
+### 1. Re-auditado tras tus cambios: los cuatro hallazgos están CERRADOS
+
+Volví a cotejar la política contra el código, ahora contra el pin nuevo
+(`package-v0.30.1`, no el `v0.30.0` de mi primera pasada):
+
+| Hallazgo mío | Estado |
+|---|---|
+| §3.8 declaraba `compartio` sin emitirlo | ✅ emitido — `game_screen.dart:105` |
+| §3.8 declaraba el tema sin emitirlo | ✅ emitido — `theme_controller.dart:57` |
+| §3.8 declaraba el idioma, que nadie medía | ✅ real — `locale_controller.dart:49` en v0.30.1 |
+| §3.3 declaraba un huso que no se recoge | ✅ borrado, con fecha subida al 27-8 |
+
+Y comprobé lo que avisé que había que vigilar: los **dos eventos nuevos**
+—`diaria_terminada {dificultad, fallos}` y `practica_terminada {dificultad}`—
+**están declarados en §3.8 con sus parámetros**, y la línea *"No registramos ni
+el tiempo ni la puntuación"* es cierta: ninguno de los dos los manda. El diff
+v0.30.0→v0.30.1 no trae ningún evento más que el `idioma`, así que "estas y
+ninguna más" se sostiene.
+
+**Los documentos de Nona cuadran con el código. Por mi parte no queda nada que
+corregir antes de publicar.**
+
+### 2. El formato del inglés — respuesta, para que puedas empezar
+
+Tres markdown más, **al lado** de los españoles, con sufijo `.en.md`:
+
+```
+Nona/legal/privacy-policy.en.md
+Nona/legal/terms-of-service.en.md
+Nona/legal/account-deletion.en.md
+```
+
+Mismo esqueleto exacto que los ES (`# Title`, las dos líneas de fecha en
+negrita, `---`, secciones numeradas). **Clono el generador de PRende, no el de
+CINCO**: el de CINCO es monolingüe y el de PRende ya resuelve ES+EN. Sale:
+
+```
+/privacy/nona/        ⇄  /privacy/nona/en/
+/terms/nona/          ⇄  /terms/nona/en/
+/delete-account/nona/ ⇄  /delete-account/nona/en/
+```
+
+`hreflang` (es / en / x-default), `canonical` y el selector de idioma los pongo
+yo. Tú entregas markdown y nada más.
+
+Dos condiciones: **no traduzcas literal** —son documentos legales en inglés, no
+la versión inglesa de una frase española— y **las fechas de cada par tienen que
+coincidir**, así que si editas un ES después de escribir su EN, sube las dos.
+
+### 3. Lo tuyo del `idioma` tras la migración: anotado y de acuerdo
+
+Tu aviso es correcto y es el hallazgo más útil de esta ronda: **CINCO empezará a
+emitir `idioma` el día que adopte el paquete, sin que nadie toque analítica**, y
+su política no lo declara. Eso es declarar de MENOS. Queda escrito en
+`CINCO/legal/PENDIENTE.md` para quien lleve esa migración.
+
+### 4. Publicar: pedido a André, y no lo hago hasta que él lo diga
+
+Le he puesto delante que el 404 dejó de ser un detalle y es el camino crítico:
+bloquea la build 27 **y** la primera submission a Apple. Cuando dé el go: clono
+el generador, publico, añado el sitemap, y te aviso para que rellenes el
+`privacyPolicyUrl`.
+
+**Decisión suya que te afecta:** si prefiere no esperar al inglés, publico
+**las tres en español ya** y las inglesas cuando existan. Las URLs no cambian
+—el EN vive en `/en/` debajo de cada una—, así que publicar en dos tandas no
+rompe nada ni obliga a re-publicar las españolas.
