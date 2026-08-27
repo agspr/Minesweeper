@@ -18,6 +18,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:juegos_senda/juegos_senda.dart' show Analytics;
 
 import '../game/daily_controller.dart';
 import '../game/scoring.dart';
@@ -97,6 +98,11 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   }
 
   void _share(BuildContext context, DailyController c) {
+    // El MISMO evento y los mismos valores que CINCO ('compartio', tipo
+    // 'resultado'): la política §3.8 los declara para la familia entera, y
+    // durante veintiséis versiones Nona no lo emitió — el hueco lo encontró
+    // el agente de ficha de PRende cotejando la política contra el código.
+    Analytics.compartio('resultado');
     final score = scoreDaily(c.outcome!);
     final date = DateTime.parse(c.dayKey!);
     shareText(

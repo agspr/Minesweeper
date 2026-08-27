@@ -52,6 +52,9 @@ class ThemeController extends ChangeNotifier {
     // El ID, nunca el nombre visible: el nombre cambia con el idioma y esta
     // clave tiene que sobrevivir a que alguien cambie de idioma.
     await _prefs.setString(_kTheme, value.id);
+    // Propiedad de usuario 'tema', como CINCO (§3.8). También el ID, por el
+    // mismo motivo que la clave de arriba.
+    Analytics.preference('tema', value.id);
   }
 
   /// Si el tablero sigue al tema o se queda en grises.

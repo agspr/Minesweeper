@@ -106,4 +106,26 @@ void main() {
       reason: 'la fase existe pero ningún target la ejecuta',
     );
   });
+  test('los eventos que la política declara SE EMITEN (§3.8)', () {
+    // El hueco que encontró el agente de ficha de PRende cotejando la
+    // política contra el código: §3.8 declaraba "compartió" y "tema"
+    // describiendo a CINCO, y Nona no emitía ninguno de los dos — declarar de
+    // más también es inexactitud, y la política es un contrato.
+    final game = _sinComentarios(
+      File('lib/screens/game_screen.dart').readAsStringSync(),
+    );
+    expect(
+      game,
+      contains("Analytics.compartio('resultado')"),
+      reason: 'compartir el resultado se declara en §3.8 y no se emitía',
+    );
+    final theme = _sinComentarios(
+      File('lib/services/theme_controller.dart').readAsStringSync(),
+    );
+    expect(
+      theme,
+      contains("Analytics.preference('tema'"),
+      reason: 'el tema elegido se declara en §3.8 y no se emitía',
+    );
+  });
 }
