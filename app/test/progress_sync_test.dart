@@ -10,24 +10,26 @@ import 'package:nona/services/progress_controller.dart';
 import 'package:nona/services/progress_sync.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// La copia del progreso en la nube, y sobre todo el ORDEN en que la hace.
+/// La copia del progreso en la nube — y desde el 27-8-2026, su contrato final:
+/// **el cliente escribe DÍAS y lee el resumen; el resumen lo escribe SOLO el
+/// servidor**, recalculado desde los días crudos más `legacyPoints`.
 ///
-/// El fallo que vigila esto no aparece nunca en desarrollo: hace falta la app
-/// recién instalada Y una cuenta con historia. Escribir antes de leer publica
-/// un resumen a cero encima del bueno y le borra la racha y los puntos a quien
-/// llevaba meses jugando. No hay error, no hay aviso, y no se recupera.
+/// Mientras el cliente escribía el resumen, cualquiera con su sesión podía
+/// ponerse los puntos que quisiera, y dos escritores del mismo documento
+/// significaba que el que ganara podía pisar al otro — pasó en producción
+/// (el hallazgo #3, cerrado por fases con el agente de CINCO).
 class _StoreEspia implements ProgressStore {
   _StoreEspia({
     this.enLaNube = const ProgressSummary(),
     this.leerFalla = false,
-    this.escribirFalla = false,
   });
 
   final ProgressSummary enLaNube;
   final bool leerFalla;
-  final bool escribirFalla;
 
   final List<String> pasos = [];
+
+  /// Si esto deja de estar vacío, el cliente ha vuelto a escribir el resumen.
   final List<ProgressSummary> escrito = [];
 
   @override
@@ -40,7 +42,6 @@ class _StoreEspia implements ProgressStore {
   @override
   Future<void> writeSummary(String uid, ProgressSummary summary) async {
     pasos.add('escribir');
-    if (escribirFalla) throw Exception('permission-denied');
     escrito.add(summary);
   }
 
@@ -117,29 +118,49 @@ void main() {
     lastPlayedDay: '2026-08-17',
   );
 
-  test('al estrenar sesión LEE antes de escribir', () async {
+  test('el cliente NUNCA escribe el resumen — ni una vez, en ningún flujo', () async {
+    // El contrato final del #3. Se ejercen los tres flujos que ANTES escribían
+    // —estrenar sesión con historia en la nube, jugar con sesión abierta, y
+    // el teléfono de otra cuenta— y ninguno puede producir un writeSummary:
+    // el resumen es del servidor, y un cliente que vuelva a escribirlo reabre
+    // el fraude Y la pisada mutua de dos escritores.
     final store = _StoreEspia(enLaNube: conHistoria());
-    sync(store).start();
+    final s = sync(store)..start();
     sesion.entrar('u1');
     await pumpEventQueue();
+    jugar(DateTime(2026, 8, 18));
+    await pumpEventQueue();
+    s.dispose();
 
-    expect(store.pasos, ['leer', 'escribir']);
+    prefs.setString('account.owner', 'otro');
+    final store2 = _StoreEspia();
+    sync(store2).start();
+    sesion.entrar('u2');
+    await pumpEventQueue();
+    jugar(DateTime(2026, 8, 19));
+    await pumpEventQueue();
+
+    expect(store.escrito, isEmpty);
+    expect(store2.escrito, isEmpty);
+    expect(store.pasos, isNot(contains('escribir')));
+    expect(store2.pasos, isNot(contains('escribir')));
   });
 
-  test('un teléfono recién instalado no borra el progreso de la cuenta', () {
-    // La prueba entera de por qué existe el orden: prefs vacías, nube con
-    // 4000 puntos. Al revés, se publicaría un cero encima.
-    final store = _StoreEspia(enLaNube: conHistoria());
-    sync(store).start();
-    sesion.entrar('u1');
-    return pumpEventQueue().then((_) {
+  test(
+    'un teléfono recién instalado ADOPTA el progreso de la cuenta',
+    () async {
+      // Prefs vacías, nube con 4000 puntos: la nube manda hacia abajo. (Hacia
+      // arriba ya no hay nada que mandar: el resumen lo escribe el servidor.)
+      final store = _StoreEspia(enLaNube: conHistoria());
+      sync(store).start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
+
       expect(progress.totalPoints, 4000);
-      expect(store.escrito.single.totalPoints, 4000);
-      expect(store.escrito.single.weekPoints, 200);
-    });
-  });
+    },
+  );
 
-  test('lo local por delante sube, y la nube vieja no lo pisa', () async {
+  test('la nube vieja no pisa lo local que va por delante', () async {
     jugar(DateTime(2026, 8, 18));
     final local = progress.totalPoints;
 
@@ -149,79 +170,39 @@ void main() {
     await pumpEventQueue();
 
     expect(progress.totalPoints, local);
-    expect(store.escrito.last.totalPoints, local);
   });
 
-  test('si la lectura falla, el teléfono sigue siendo la verdad', () async {
-    // Reglas sin desplegar o sin cobertura. Adoptar es una MEJORA, no un
-    // requisito: lo que no puede pasar es que un fallo de red pare la subida.
-    jugar(DateTime(2026, 8, 18));
-    final store = _StoreEspia(leerFalla: true);
-    sync(store).start();
-    sesion.entrar('u1');
-    await pumpEventQueue();
+  test(
+    'si la lectura falla, el teléfono sigue siendo la verdad y el día sube',
+    () async {
+      // Reglas o red caídas. Adoptar es una MEJORA, no un requisito: lo que no
+      // puede pasar es que un fallo de lectura pare la subida de los DÍAS, que
+      // son la materia prima del recálculo.
+      jugar(DateTime(2026, 8, 18));
+      final store = _StoreEspia(leerFalla: true);
+      sync(store).start();
+      sesion.entrar('u1');
+      await pumpEventQueue();
 
-    expect(store.pasos, ['leer', 'escribir']);
-    expect(store.escrito.single.totalPoints, progress.totalPoints);
-  });
+      expect(store.pasos, ['leer']);
+      expect(store.dias, isNotEmpty);
+    },
+  );
 
-  test('cada partida sube sola', () async {
-    final store = _StoreEspia();
-    sync(store).start();
-    sesion.entrar('u1');
-    await pumpEventQueue();
-    final tras = store.escrito.length;
-
-    jugar(DateTime(2026, 8, 18));
-    await pumpEventQueue();
-
-    expect(store.escrito.length, tras + 1);
-    expect(store.escrito.last.totalPoints, progress.totalPoints);
-  });
-
-  test('sin sesión no se escribe nada', () async {
+  test('sin sesión no se toca la nube', () async {
     final store = _StoreEspia();
     sync(store).start();
     jugar(DateTime(2026, 8, 18));
     await pumpEventQueue();
 
     expect(store.pasos, isEmpty);
-  });
-
-  test('adoptar no rebota una escritura a mitad de reconciliación', () async {
-    // `adoptCloud` avisa a los oyentes, y el oyente del progreso escribe. Sin
-    // el candado, la adopción devolvería a la nube lo que se acaba de leer,
-    // antes incluso de terminar de reconciliar.
-    final store = _StoreEspia(enLaNube: conHistoria());
-    sync(store).start();
-    sesion.entrar('u1');
-    await pumpEventQueue();
-
-    expect(store.escrito, hasLength(1));
-  });
-
-  test('que la escritura falle no rompe nada', () async {
-    // Hasta el despliegue de las reglas, TODA escritura es permission-denied.
-    // Es una copia de seguridad, no una acción de quien juega: no se le enseña
-    // un error por algo que ni pidió ni puede arreglar.
-    // Se juega ANTES de entrar: sin progreso no habría escritura que fallar,
-    // porque un resumen vacío no se publica.
-    jugar(DateTime(2026, 8, 18));
-
-    final store = _StoreEspia(escribirFalla: true);
-    sync(store).start();
-    sesion.entrar('u1');
-    await pumpEventQueue();
-    jugar(DateTime(2026, 8, 19));
-    await pumpEventQueue();
-
-    expect(store.pasos, ['leer', 'escribir', 'escribir']);
+    expect(store.dias, isEmpty);
   });
 
   test('el aparato de otra cuenta se limpia ANTES de reconciliar', () async {
     // Sin esto, el progreso del dueño anterior se le regalaría a quien acaba
-    // de entrar: local va por delante, así que "local manda" lo subiría a la
-    // cuenta nueva.
+    // de entrar. Y limpio significa limpio: ni resumen ni días en nombre de
+    // quien no ha jugado aquí.
     jugar(DateTime(2026, 8, 18));
     prefs.setString('account.owner', 'otro');
 
@@ -231,30 +212,9 @@ void main() {
     await pumpEventQueue();
 
     expect(progress.totalPoints, 0);
-    // Y NO se publica un cero en su nombre. Antes se escribía un resumen vacío
-    // y eso creaba `users/{uid}/apps/nona` para alguien que no ha jugado aquí
-    // — que es lo que el marcador toma por prueba de que sí juega.
     expect(store.escrito, isEmpty);
+    expect(store.dias, isEmpty);
     expect(store.pasos, ['leer']);
-  });
-
-  test('un resumen vacío no se publica', () async {
-    // El otro lado del borrado: tras "Borrar Nona de tu cuenta" el teléfono
-    // queda limpio, así que el primer aviso del progreso volvería a CREAR el
-    // documento que el servidor acaba de borrar. Vacío, pero existiendo.
-    final store = _StoreEspia();
-    sync(store).start();
-    sesion.entrar('u1');
-    await pumpEventQueue();
-
-    expect(store.escrito, isEmpty);
-
-    // Y en cuanto hay algo de verdad, se publica.
-    jugar(DateTime(2026, 8, 18));
-    await pumpEventQueue();
-
-    expect(store.escrito, hasLength(1));
-    expect(store.escrito.single.totalPoints, greaterThan(0));
   });
   group('el crudo del día (mitad cliente del #3)', () {
     test('jugar sube el día, y el servidor recalcula desde él', () async {

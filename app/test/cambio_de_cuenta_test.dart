@@ -134,7 +134,15 @@ void main() {
     sesion.entrar('ana');
     await pumpEventQueue();
 
-    // La nube de ana sigue intacta: 300, no 0.
+    // La nube de ana sigue intacta: 300, no 0. Desde el 27-8-2026 esto está
+    // garantizado DOS veces: el cliente ya no escribe el resumen en absoluto
+    // (contrato final del #3), y aunque volviera a hacerlo, el orden
+    // lee-adopta-escribe seguiría protegiéndolo.
+    expect(
+      store.escrituras,
+      isEmpty,
+      reason: 'el cliente escribió un resumen: el contrato del #3 está roto',
+    );
     expect(
       store.nube['ana']!.totalPoints,
       300,

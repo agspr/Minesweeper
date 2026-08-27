@@ -121,7 +121,16 @@ class ProgressSync {
     }
     await _backfillDays(uid);
     await _pushDay(uid);
-    await _push(uid);
+    // Y AQUÍ TERMINA: el resumen ya no se escribe desde el cliente — es la
+    // mitad cliente del cierre del #3 (27-8-2026). Lo recalcula SOLO el
+    // servidor desde los días crudos más `legacyPoints` (el residuo anterior a
+    // que los días existieran). Mientras el cliente pudiera escribirlo,
+    // cualquiera con su sesión podía ponerse los puntos que quisiera; y dos
+    // escritores del mismo documento significaba que el que ganara podía
+    // pisar al otro — pasó en producción. El cliente conserva tres cosas, y
+    // no es contradicción: sembrar el doc VACÍO (decir "tengo este juego" es
+    // del cliente; el servidor solo hace update para no resucitar borrados),
+    // escribir los DÍAS (la materia prima), y LEER (adoptar la nube).
   }
 
   /// Sube UNA VEZ el histórico completo de días de este aparato.
@@ -168,7 +177,6 @@ class ProgressSync {
     final uid = uidOf();
     if (uid == null) return;
     _pushDay(uid);
-    _push(uid);
   }
 
   /// Sube el CRUDO del día de hoy, si existe y cambió desde la última subida.
@@ -199,30 +207,6 @@ class ProgressSync {
     } catch (e) {
       // Igual que el resumen: copia de seguridad, no acción de quien juega.
       if (kDebugMode) debugPrint('ProgressSync: no se pudo subir el día: $e');
-    }
-  }
-
-  Future<void> _push(String uid) async {
-    final resumen = progress.summaryAsOf(_clock());
-
-    // Un resumen SIN NADA no se publica, y no es una optimización.
-    //
-    // Dos cosas se rompen si se publica: (1) tras "Borrar Nona de tu cuenta"
-    // el teléfono queda limpio, así que el primer aviso del progreso volvería a
-    // CREAR el documento que el servidor acaba de borrar —vacío, pero
-    // existiendo—; y (2) el marcador trata "tiene documento de progreso" como
-    // prueba de que juega aquí, así que quien instale y no termine ni un puzle
-    // saldría en la clasificación de sus amigos con un cero. Es el cero
-    // mentiroso que el §15 prohíbe, por la puerta de atrás.
-    //
-    // Se comprueba `lastPlayedDay` además de los puntos porque un día a medias
-    // puede dar cero puntos y aun así ser progreso de verdad.
-    if (resumen.totalPoints == 0 && resumen.lastPlayedDay == null) return;
-
-    try {
-      await store.writeSummary(uid, resumen);
-    } catch (e) {
-      if (kDebugMode) debugPrint('ProgressSync: no se pudo escribir: $e');
     }
   }
 }
