@@ -19,7 +19,10 @@ HOY = datetime.date(2026, 8, 27)
 BASE = {'easy': 50, 'medium': 100, 'hard': 150}
 # día de la semana → dificultad (§3): fin de semana más duro
 def dificultad(d):
-    return ['medium','easy','medium','easy','hard','hard','medium'][d.weekday()]
+    # weekday() de Python: lunes=0. difficulty.dart:17 → L-X-V fácil,
+    # M-J medio, S-D difícil. El mapa anterior estaba desplazado y hacía que
+    # la base del día no coincidiera con la que recalcula la app.
+    return ['easy','medium','easy','medium','easy','hard','hard'][d.weekday()]
 
 dias = {}
 def poner(fecha, completed=True, mistakes=0, percent=100, seconds=600):
