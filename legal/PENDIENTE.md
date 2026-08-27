@@ -886,3 +886,46 @@ es capricho: el de PRende se habría comido en silencio el párrafo de entrada d
 
 Si prefieres que rellene yo el `privacyPolicyUrl` por API, dilo y lo hago; tengo
 la clave del equipo. Lo dejo tuyo porque así lo pediste.
+
+---
+
+## PARA EL AGENTE DE FICHA — Social listo para capturar (27-8-2026, agente de desarrollo)
+
+*Escrito aquí porque tu sesión se cayó antes de que pudiera avisarte por
+mensaje. Es el tercer corte de hoy; este fichero es el canal que aguanta.*
+
+**Todo está sembrado y verificado EN PANTALLA. Puedes disparar las capturas de
+Social.** Así se ve la clasificación en el iPhone (comprobado con captura):
+
+| # | Jugador | @usuario | País | PTS |
+|---|---|---|---|---|
+| 1 | **Rosa** | @rosa_pr | 🇵🇷 | 280 |
+| 2 | Ana Rivera | @ana_rivera | 🇲🇽 | 260 |
+| 3 | Luis Méndez | @luis_mendez | 🇨🇴 | 211 |
+| 4 | Marta Ortiz | @marta_ortiz | 🇦🇷 | 157 |
+
+**Tres cambios sobre el plan, los tres a mejor:**
+
+1. **No se creó cuenta nueva ni se quemó ningún @usuario.** La de SENDA LLC ya
+   existía —André la recreó el 24-8 tras las pruebas del borrado—, así que solo
+   hubo que renombrarla: él cambió el nombre a "Rosa" desde la app, y el
+   @usuario pasó a `rosa_pr` por administrador **sin liberar `senda_llc`**, que
+   sigue reclamado por la misma cuenta para que nadie pueda cogerlo entretanto.
+2. **Los handles de los amigos son naturales.** Los puse con prefijo `zz_demo_`
+   para poder barrer restos, y **eso se ve en la fila**: arruinaba justo la
+   captura. Corregido.
+3. **Cuatro países hispanohablantes** (decisión de André): PR, MX, CO, AR. La
+   ficha dice de un vistazo que Nona es de toda Hispanoamérica.
+
+**OJO CON EL iPad:** la cuenta ya está iniciada ahí (el perfil viaja), pero
+**relanza la app en ese simulador antes de capturar** o saldrá la clasificación
+sin los amigos.
+
+**Cuando termines, avisa y limpio yo** (`tools/amigos_demo.py --borrar
+aXIGKu2WqnfcX0OVT0MmgVZ9QJu1`): los tres amigos completos, `rosa_pr`
+—devolviendo el perfil a `senda_llc`— y el token de depuración de App Check
+("BORRAR - simulador capturas 27-8-2026", en App Check → nona (ios)).
+
+**Y la 27 está lista y verificada** en `~/Nona-releases/` (AAB versionCode 27 e
+IPA build 27, con el arreglo del esquema de Google dentro, comprobado). Es la
+que desbloquea la primera submission a Apple.
