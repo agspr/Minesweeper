@@ -1,55 +1,58 @@
 # Nona Terms of Service
 
-**Effective:** 25 August 2026
-**Last updated:** 25 August 2026
+**Effective:** August 25, 2026
+**Last updated:** August 25, 2026
 
 ---
 
 ## 1. Acceptance of the Terms
 
-These Terms of Service (the "Terms") are a contract between you and **SENDA
-LLC** ("we", "us", "our", "Senda"), a limited liability company organised under
-the laws of the Commonwealth of Puerto Rico, with a mailing address at 410
-Avenida Montesol, Ste 14 #2078, Fajardo, Puerto Rico 00738.
+These Terms of Service (the "Terms") are an agreement between you and
+**SENDA LLC** ("we", "us", "our", "Senda"), a limited liability company
+organized under the laws of the Commonwealth of Puerto Rico, with a mailing
+address at 410 Avenida Montesol, Ste 14 #2078, Fajardo, Puerto Rico 00738.
 
-By downloading, installing or using the **Nona** mobile application (the "App")
-you accept these Terms. If you do not agree with them, do not use the App.
+By downloading, installing or using the **Nona** mobile application (the
+"App") you agree to these Terms. If you do not agree to them, do not use the
+App.
 
-You must be at least 13 years old to use Nona. If you are between 13 and 18, you
-represent that your parent or guardian has reviewed and accepted these Terms.
+You must be at least 13 years old to use Nona. If you are between 13 and 18,
+you represent that a parent or guardian has reviewed and accepted these Terms
+on your behalf.
 
 ---
 
 ## 2. Important Notices — Please Read Them
 
-- **Nona is a game.** It is not a certified educational tool nor an authority on
-  sudoku.
-- **You can play without an account.** An account is needed only for the social
-  features.
-- **Your account is a Juegos Senda account, not just a Nona one.** The same
-  profile, the same @username and the same friends apply across every game in
-  the family. See Section 4.
-- **Your @username is permanent.** If you create an account, once chosen it
-  cannot be changed, because it is how your friends find you.
-- **The App shows ads.** This is what funds its development.
-- **These Terms include a limitation of liability** (Section 9) and an agreement
-  on governing law and forum (Section 13).
+- **Nona is a game.** It is not a certified educational tool, nor an authority
+  on sudoku.
+- **You can play without an account.** An account is only needed for the
+  social features.
+- **Your account belongs to Juegos Senda, not just to Nona.** The same profile,
+  the same @username and the same friends apply across every game in the
+  family. See Section 4.
+- **Your @username is permanent.** If you create an account, the @username you
+  choose cannot be changed afterwards, because it is how your friends find you.
+- **The App shows ads.** They are what pays for its development.
+- **These Terms include a limitation of liability** (Section 9) and an
+  agreement on governing law and venue (Section 13).
 
 ---
 
 ## 3. Description of the Service
 
-Nona offers **a different sudoku each day**, the same one for everyone, with a
-difficulty that varies by the day of the week. The App marks mistakes as they
-happen, keeps count of your points and your streak, and shows a clock that
-**does not score**. It also includes an **offline practice mode** with unlimited
-puzzles, which awards neither points nor streak.
+Nona offers **a different sudoku every day**, the same one for everybody, at a
+difficulty that varies with the day of the week. The App flags mistakes as you
+make them, keeps count of your points and your streak, and shows a clock that
+**does not affect scoring**. It also includes an **offline free play mode**
+with unlimited puzzles, which awards neither points nor streak.
 
-The daily sudoku ships **inside the App**: no connection is needed to play it.
-For those who create an account, the App adds a profile with an @username,
-friendships, a friends leaderboard and invitations to other games in the family.
+The daily sudoku travels **inside the App**: no connection is needed to play
+it. For anyone who creates an account, the App adds a profile with an
+@username, friendships, a friends leaderboard, and invitations to other games
+in the family.
 
-We may add, change or withdraw features at any time. We strive to keep the
+We may add, change or withdraw features at any time. We work to keep the
 service available, but we do not guarantee that it will run uninterrupted or
 error-free.
 
@@ -57,132 +60,134 @@ error-free.
 
 ## 4. User Account
 
-**Playing requires no account.** From the entry screen you can tap "Play without
-an account" and reach the daily sudoku and practice mode.
+**Playing does not require an account.** From the entry screen you can tap
+"Play without an account" and reach both the daily sudoku and free play.
 
 An account is optional and unlocks the social features: a profile with an
-@username, friends, leaderboard and invitations. It is created by signing in
-with **Google** or **Apple**; we neither create nor store passwords.
+@username, friends, the leaderboard and invitations. It is created by signing
+in with **Google** or **Apple**; we neither create nor store passwords.
 
 ### 4.1 One account for the whole family of games
 
-Nona is part of **Juegos Senda**, a family of games by Senda LLC. When you
-create your account in Nona you create your Juegos Senda account: if you install
-another game in the family and sign in with the same Google or Apple account,
-**it is the same account**. Your @username, display name, avatar, country and
-friends list are common to all of them, and changing them in one game changes
-them in the others.
+Nona is part of **Juegos Senda**, a family of games by Senda LLC. Creating your
+account in Nona creates your Juegos Senda account: if you install another game
+in the family and sign in with the same Google or Apple credentials, **it is
+the same account**. Your @username, display name, avatar, country and friends
+list are shared across all of them, and changing any of these in one game
+changes it in the others.
 
-**Your progress, by contrast, belongs to each game**: your Nona points and
-streak are not mixed with any other game's.
+**Your progress, by contrast, belongs to each game individually**: your Nona
+points and streak are never mixed with those of any other game.
 
-This has an important consequence when leaving, which is why the App offers
-**two distinct options**: leave Nona only, or delete the entire Juegos Senda
-account. See Section 12.
+This has an important consequence when you leave, which is why the App offers
+**two distinct options**: leaving Nona only, or deleting your entire Juegos
+Senda account. See Section 12.
 
 ### 4.2 Your @username
 
 When you create your account you choose a unique and permanent **@username**,
 valid across the whole family of games. We reserve the right to reclaim or
-reassign an @username that impersonates a person or brand, that is offensive, or
-that has been registered solely to resell it or hold it unused.
+reassign an @username that impersonates a person or a brand, that is offensive,
+or that has been registered solely to resell it or to hold it unused.
 
-You are responsible for the activity that occurs on your account. If you believe
-someone has accessed it without your permission, write to us at
+You are responsible for the activity that takes place in your account. If you
+believe someone has accessed it without your permission, write to us at
 support@sendapr.com.
 
 The handling of your data is governed by our
-[Privacy Policy](https://sendapr.com/en/privacy/nona/).
+[Privacy Policy](https://sendapr.com/privacy/nona/en/).
 
 ---
 
 ## 5. Ads and Purchases
 
-Nona is free and is funded by **Google AdMob** advertising. By using the App you
-accept that ads will be shown.
+Nona is free and is funded by advertising through **Google AdMob**. By using
+the App you accept that ads will be shown.
 
 We do not control the content of third-party ads and we do not endorse the
-products or services advertised. Any transaction you make with an advertiser is
-solely between that company and you.
+products or services advertised. Any transaction you enter into with an
+advertiser is solely between that company and you.
 
 ### The "Remove ads" purchase
 
-The App offers **a single optional purchase**: *Remove ads*, a one-off payment
-(it is not a subscription; nothing renews or is charged recurrently) that
-removes advertising from the App on the device.
+The App offers **a single optional purchase**: *Remove ads*, a one-time payment
+(not a subscription; nothing renews and nothing is charged on a recurring
+basis) that removes advertising from the App on your device.
 
 - The purchase is processed **exclusively** through Apple's App Store or Google
   Play; SENDA LLC never sees or stores your payment details.
-- The price is shown in the store itself before you confirm and may vary
-  according to your country and applicable taxes.
-- If you reinstall the App or change device, use **"Restore purchases"** on the
-  More screen to recover it without paying again (same store account).
-- **Refunds** are handled by the store you bought from, in accordance with its
+- The price is shown by the store itself before you confirm, and may vary with
+  your country and applicable taxes.
+- If you reinstall the App or change devices, use **"Restore purchases"** on
+  the More screen to recover it without paying again (same store account).
+- **Refunds** are handled by the store where you bought it, under that store's
   policies; we cannot issue them directly.
 - The purchase removes ads but does not alter the game: nobody gains an
-  advantage in play or in the standings by paying.
+  advantage in play or in the leaderboards by paying.
 - The purchase is tied to the **store account** you paid with, not to your
   Juegos Senda account. Deleting your account does not cancel it, and changing
   your Apple or Google account does leave you without it.
-- It is a purchase **per game and per platform**: removing ads in Nona does not
+- It is a **per-game and per-platform** purchase: removing ads in Nona does not
   remove them in another game in the family, and paying for it on Android does
   not remove them on iOS.
 
 ### Right of withdrawal (European Union, EEA and United Kingdom)
 
-If you buy from the European Union, the EEA or the United Kingdom, consumer law
-grants you **fourteen (14) calendar days** to withdraw from a distance contract.
+If you purchase from the European Union, the EEA or the United Kingdom,
+consumer law grants you **fourteen (14) calendar days** to withdraw from a
+distance contract.
 
-By confirming the "Remove ads" purchase you **expressly request that performance
-begin immediately** — the ads disappear at once — and you **acknowledge that,
-once fully performed, you lose the right of withdrawal**, in accordance with
-Article 16(m) of Directive 2011/83/EU and the national rules transposing it.
+By confirming the "Remove ads" purchase you **expressly request that
+performance begin immediately** — the ads disappear at once — and you
+**acknowledge that, once performance is complete, you lose the right of
+withdrawal**, in accordance with Article 16(m) of Directive 2011/83/EU and the
+national rules transposing it.
 
 This does not affect your statutory rights if the product is defective or does
-not work as described, nor Apple's and Google's refund policies, as they are the
-ones who handle any return (see above).
+not work as described, nor the refund policies of Apple and Google, who are the
+ones handling any return (see above).
 
 ---
 
 ## 6. Acceptable Use
 
-In using Nona you undertake **not** to:
+In using Nona, you agree **not** to:
 
 - Cheat, automate play, or use bots, external solvers, scripts or modified
   clients to influence your score or the leaderboard.
-- Extract the puzzle bank from the App, reverse-engineer it, or access our
-  servers by means other than the App itself.
+- Extract the App's puzzle bank, reverse-engineer it, or reach our servers by
+  any means other than the App itself.
 - Impersonate another person, or choose an @username or display name that
   misleads others about who you are.
 - Harass, threaten, or send repeated and unwanted nudges or invitations to
   another player.
-- Post illegal, hateful, sexually explicit content on your profile, or content
-  that infringes third-party rights.
+- Post content on your profile that is unlawful, hateful, sexually explicit, or
+  that infringes the rights of third parties.
 - Interfere with the operation of the service or attempt to overload it.
-- Create multiple accounts to manipulate the leaderboard.
+- Create multiple accounts in order to manipulate the leaderboard.
 
-You can **block** any player from their profile, which prevents them sending you
-requests, and **report** conduct that breaks these rules. Reports are reviewed
-and may lead to the suspension of the reported account. A block applies across
-the whole family of games, not just to Nona.
+You can **block** any player from their profile, which prevents them from
+sending you requests, and **report** conduct that breaks these rules. Reports
+are reviewed and may lead to suspension of the reported account. A block
+applies across the whole family of games, not only to Nona.
 
 ---
 
 ## 7. Intellectual Property
 
 The App, its code, its design, its name, its logo and its puzzle bank are the
-property of Senda LLC and are protected by intellectual property laws. You
-acquire no rights over them beyond the personal, limited, non-exclusive,
+property of Senda LLC and are protected by intellectual property law. You
+acquire no rights in them beyond the personal, limited, non-exclusive,
 non-transferable and revocable licence to use the App under these Terms.
 
 The content you contribute — your display name and your @username — remains
-yours. You grant us a limited licence to display it inside the App, and inside
-the other Juegos Senda games, to other players; which is exactly what the social
+yours. You grant us a limited licence to display it to other players inside the
+App, and inside the other Juegos Senda games; which is exactly what the social
 features do.
 
 Nona is an independent development and is not affiliated with, sponsored by or
-endorsed by any other sudoku application or publication, nor by Apple, Google or
-other companies mentioned in these Terms.
+endorsed by any other sudoku application or publication, nor by Apple, Google
+or the other companies named in these Terms.
 
 ---
 
@@ -194,94 +199,96 @@ disclaim the warranties of **merchantability**, **fitness for a particular
 purpose** and **non-infringement**.
 
 We do not warrant that the App will be error-free, that it will be available
-uninterrupted, or that your progress data will be preserved indefinitely.
+without interruption, or that your progress data will be kept indefinitely.
 
 ---
 
 ## 9. Limitation of Liability
 
-To the maximum extent permitted by law, Senda LLC shall not be liable for
-indirect, incidental, special, consequential or punitive damages, nor for the
-loss of data, game progress, streaks or points.
+To the maximum extent permitted by law, Senda LLC will not be liable for
+indirect, incidental, special, consequential or punitive damages, nor for loss
+of data, game progress, streaks or points.
 
-Our total aggregate liability to you for any claim relating to the App shall not
-exceed **the total amount you have paid us in the preceding twelve (12)
-months** or **US$25**, whichever is greater. Given that Nona is free, in most
-cases that amount will be US$25.
+Our total, aggregate liability to you for any claim relating to the App will
+not exceed **the total amount you have paid us in the preceding twelve (12)
+months** or **US$25**, whichever is greater. Since Nona is free, in most cases
+that amount will be US$25.
 
-Some jurisdictions do not allow certain warranty exclusions or limitations of
-liability; in those cases, the above limitations shall apply to the maximum
-extent the law permits.
+Some jurisdictions do not allow certain warranty exclusions or liability
+limitations; in those cases, the limitations above apply to the maximum extent
+the law permits.
 
 ---
 
 ## 10. Indemnification
 
 You agree to indemnify and hold harmless Senda LLC, its members and
-collaborators, against any claim, loss or expense (including reasonable
-attorney's fees) arising from your use of the App in breach of these Terms or of
-the law.
+contributors, against any claim, loss or expense (including reasonable
+attorneys' fees) arising from your use of the App in breach of these Terms or
+of the law.
 
 ---
 
 ## 11. Changes to the App and to the Terms
 
-**11.1** We may modify, suspend or discontinue the App — or any of its features
-— at any time.
+**11.1** We may modify, suspend or discontinue the App — or any of its
+features — at any time.
 
 **11.2** We may update these Terms. When we do, we will change the "Last
-updated" date at the top of the document. If the change is substantial, we will
-give notice inside the App. Continued use of Nona after a change takes effect
-means you accept it.
+updated" date at the top of this document. If the change is significant, we
+will give notice inside the App. Continuing to use Nona after a change takes
+effect means that you accept it.
 
 ---
 
 ## 12. Termination
 
-You may stop using Nona whenever you like. The App offers **two distinct
-options**, and they should not be confused:
+You can stop using Nona whenever you want. The App offers **two distinct
+options**, and it is worth not confusing them:
 
-- **Leave Nona**: your Nona progress — streak, points and games — is erased and
-  you stop appearing in its leaderboard. **You keep your Juegos Senda account**,
-  your @username, your avatar, your friends and your progress in the other
-  games.
-- **Delete your Juegos Senda account**: everything is erased, across **all** the
-  games in the family, including those you don't have installed on that phone.
-  It is immediate, irreversible and **releases your @username** to someone else.
+- **Leave Nona**: your Nona progress — streak, points and games — is deleted,
+  and you stop appearing in its leaderboard. **You keep your Juegos Senda
+  account**, your @username, your avatar, your friends and your progress in the
+  other games.
+- **Delete your Juegos Senda account**: everything is deleted, across **every**
+  game in the family, including those you do not have installed on that phone.
+  It is immediate, irreversible, and it **releases your @username** for someone
+  else.
 
-The full procedure is in
-[How to delete your account](https://sendapr.com/en/delete-account/nona/).
+The full procedure is at
+[How to delete your account](https://sendapr.com/delete-account/nona/en/).
 
-We may suspend or cancel your access if you breach these Terms, if your conduct
-harms other players, or if the law obliges us to. Where circumstances allow, we
-will give you notice beforehand.
+We may suspend or terminate your access if you breach these Terms, if your
+conduct harms other players, or if the law requires us to. Where circumstances
+allow, we will give you notice beforehand.
 
 Sections 7, 8, 9, 10 and 13 survive termination.
 
 ---
 
-## 13. Governing Law and Forum
+## 13. Governing Law and Venue
 
 These Terms are governed by **the laws of the Commonwealth of Puerto Rico**,
-without regard to its conflict-of-laws rules. Any dispute shall be submitted to
-the **exclusive jurisdiction of the courts of Puerto Rico**, and both you and we
-consent to that jurisdiction.
+without regard to its conflict-of-laws rules. Any dispute will be submitted to
+the **exclusive jurisdiction of the courts of Puerto Rico**, and both you and
+we consent to that jurisdiction.
 
 ---
 
 ## 14. General Provisions
 
-- **Entire agreement.** These Terms and the Privacy Policy constitute the entire
-  agreement between you and Senda LLC regarding the App.
-- **Severability.** If a court declares any provision invalid, the remainder
-  continues in full force.
-- **No waiver.** Our not exercising a right at a given moment does not mean we
-  waive it.
-- **Assignment.** You may not assign these Terms without our written consent; we
-  may assign them in the context of a merger, acquisition or sale of assets.
+- **Entire agreement.** These Terms and the Privacy Policy constitute the
+  complete agreement between you and Senda LLC regarding the App.
+- **Severability.** If a court holds any provision invalid, the rest remains in
+  full force.
+- **No waiver.** Our failure to exercise a right at a given moment does not
+  mean we waive it.
+- **Assignment.** You may not assign these Terms without our written consent;
+  we may assign them in connection with a merger, acquisition or sale of
+  assets.
 - **App stores.** Apple and Google are not parties to these Terms and have no
-  obligation to provide support for the App. Apple is a third-party beneficiary
-  of these Terms and may enforce them against you.
+  obligation whatsoever to provide support for the App. Apple is a third-party
+  beneficiary of these Terms and may enforce them against you.
 
 ---
 
