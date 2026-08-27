@@ -244,6 +244,64 @@ pasó con CINCO esta semana.
 
 ---
 
+## PENDIENTE NUEVO — §3.8 declara dos cosas que Nona no hace
+
+**27-8-2026, agente de sendapr.com (`prende-99`).** Auditoría de los documentos
+contra el código, pedida por André. Todo lo demás cuadró —lo comprobé contra el
+tag fijado `package-v0.30.0`, no contra el árbol de trabajo—, pero §3.8 describe
+dos registros que **no ocurren**:
+
+| §3.8 dice | Realidad |
+|---|---|
+| "Compartir un resultado" se registra | `Analytics.compartio()` **no se llama nunca**: ni en el paquete ni en Nona |
+| Se guardan el **tema** y el **idioma** como propiedades de usuario | `Analytics.preference()` **no tiene ni una llamada** en todo el código |
+
+Nona toca `Analytics` **una sola vez**, en `main.dart:79` (el `init()`).
+
+**Decisión de André: si CINCO lo hace, Nona también.** O sea que esto se arregla
+en el CÓDIGO y §3.8 se queda como está. Pero al mirarlo de cerca los tres puntos
+no son el mismo caso, y **uno de ellos NO tiene precedente en CINCO**:
+
+**1. `compartio` — sí es hueco de paridad. Del dev de Nona.**
+CINCO lo dispara en `app/lib/screens/game_screen.dart:95` (`Analytics.compartio(origen)`)
+y en la línea 124 (`Analytics.compartio('hito')`). En Nona el sitio equivalente es
+`app/lib/screens/game_screen.dart:99`, el método `_share`. Lo de `'hito'` es
+pregunta de producto: hay que decidir si Nona tiene un compartir de hito o solo
+el de resultado.
+
+**2. `tema` — sí es hueco de paridad. Del dev de Nona.**
+CINCO lo dispara en `app/lib/services/settings_controller.dart:41`
+(`Analytics.tema(t.name)`). El `ThemeController` de Nona es **suyo**
+(`app/lib/services/theme_controller.dart`), así que la llamada va ahí, junto al
+`setString` de la línea 54. En el paquete el método genérico es
+`Analytics.preference('tema', valor)`.
+
+**3. ⚠️ `idioma` — NO es hueco de paridad: CINCO tampoco lo registra.**
+Lo comprobé: el único `setUserProperty` de CINCO es `'tema'`
+(`app/lib/services/analytics.dart:85`). El idioma no lo mide nadie en la familia.
+Y además **`LocaleController` vive en el PAQUETE**, no en Nona, así que medirlo
+tocaría también a CINCO: es decisión de familia, no un arreglo de Nona.
+
+Dos salidas para este tercero, y **es de André**:
+- **Quitar "y el idioma" de §3.8.** Es lo único cierto hoy y no bloquea nada.
+- **Medir el idioma en toda la familia** (paquete), y entonces §3.8 vale tal cual
+  — pero eso cambia también lo que recoge CINCO, cuya política habría que mirar.
+
+**Consecuencia para publicar:** mientras el código no lleve 1 y 2, §3.8 declara
+de más. Declarar de más no abre un agujero de cumplimiento —nadie queda mal
+informado sobre sus datos—, pero es inexacto, y la disciplina de esta familia ha
+sido decir exactamente lo que pasa. Así que: **o sale una build con 1 y 2 antes
+de publicar, o se publica sabiendo que esas dos líneas van por delante del código
+unos días.** No lo decido yo.
+
+**Y un aviso aparte, por si "paridad con CINCO" se toma en serio:** CINCO emite
+además eventos PROPIOS del juego —`diariaTerminada` y `offlineTerminada`
+(`analytics.dart:37,41`)— y Nona **no emite ninguno**. Si se le añaden a Nona,
+**hay que ampliar §3.8 antes**, porque hoy dice "estas y ninguna más": añadirlos
+sin tocar la política sería declarar de MENOS, que sí es el lado peligroso.
+
+---
+
 ## Contacto
 
 Dudas sobre lo que dicen estos documentos, o sobre de dónde salió un dato
