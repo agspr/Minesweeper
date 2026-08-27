@@ -604,3 +604,29 @@ ES + EN completos en `Nona/store/copy/listing-copy.md` — todos los campos de
 Play y App Store, límites verificados por conteo. **Sin subir: la aprueba
 André.** Pendientes que no son copia: capturas de pantalla y la support URL
 (propuesta: sendapr.com).
+
+### Copia de tienda PUBLICADA + §3.3 corregida — 27-8-2026
+
+**Copia subida a las dos tiendas tras el visto bueno de André**, en ES y EN, y
+verificada leyendo de vuelta:
+
+- **Play** (`es-419` + `en-US`): título, descripción corta (75) y completa
+  (1637 ES / 1520 EN). Commit OK.
+- **App Store** (`es-MX` + `en-US`): subtítulo, texto promocional, descripción,
+  palabras clave y **support URL** (`https://sendapr.com`). Todo 200.
+
+El subtítulo ES quedó **"Un reto al día, con racha"** (cambio de André: "puzle"
+→ "reto"). Al entrar "reto" en el subtítulo lo quité de las palabras clave
+—Apple ya indexa el subtítulo y repetirlo desperdicia caracteres— y entró
+"desafío" en su lugar.
+
+**§3.3: quitada la declaración del huso horario.** Decía que guardábamos el
+"desfase horario" del dispositivo. **No es cierto**: busqué `timezone`,
+`utcOffset`, `zona horaria` y variantes por la app y por el paquete fijado, cero
+apariciones. Las otras dos cosas de esa frase **sí existen** y se quedan:
+`lastSeenAt` (`auth_controller.dart:544`) y `fcmTokens.{juego}`
+(`auth_controller.dart:277`). Corrección quirúrgica, bajo la misma fecha del
+27-8 que ya llevaba la política.
+
+*Declarar de más no engaña a nadie sobre sus datos, pero la norma de la casa es
+decir exactamente lo que pasa.*

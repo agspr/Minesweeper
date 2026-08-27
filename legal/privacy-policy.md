@@ -1,7 +1,7 @@
 # Política de Privacidad de Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 26 de agosto de 2026
+**Última actualización:** 27 de agosto de 2026
 
 ---
 
@@ -152,9 +152,7 @@ Guardamos en Firestore dos cosas distintas, y la diferencia importa:
   las creó.
 
 Guardamos además, en una zona **privada que sólo tú puedes leer**, tu **última
-actividad**, el **desfase horario** de tu dispositivo —que usamos para saber
-cuándo empieza tu día y cuándo caduca una racha— y tu **token de
-notificaciones** (ver 3.5).
+actividad** y tu **token de notificaciones** (ver 3.5).
 
 ### 3.4 Amistades, invitaciones cruzadas y bloqueos
 
@@ -271,6 +269,10 @@ versión del sistema, idioma y país aproximado por IP).
 Por otro, registramos un conjunto acotado de **acciones concretas**, que son
 estas y ninguna más:
 
+- Terminar el sudoku del día, indicando la **dificultad** de ese día y
+  **cuántos fallos** se te contaron (de 0 a 5). No registramos ni el tiempo ni
+  la puntuación.
+- Terminar un puzle del **modo libre**, indicando solo su dificultad.
 - Elegir "Jugar sin cuenta".
 - Iniciar sesión, indicando solo si fue con Google o con Apple.
 - Comprar o restaurar "Quitar anuncios".
