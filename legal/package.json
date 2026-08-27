@@ -1,0 +1,12 @@
+{
+  "name": "nona-legal",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Renders Nona's legal Markdown (ES + EN) into the sendapr.com page template.",
+  "scripts": {
+    "build": "node build-sendapr-legal.js"
+  },
+  "dependencies": {
+    "marked": "^15.0.12"
+  }
+}
