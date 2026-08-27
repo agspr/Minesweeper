@@ -762,3 +762,85 @@ en inglés debe quedarse en inglés.
   transPRte. Aquí queda anotado para que no se pierda.
 - **`privacyPolicyUrl` en App Store Connect**, mío, en cuanto la página
   responda. Hoy es `None` y es lo que impide la primera submission.
+
+---
+
+## HALLAZGO GORDO — "Continuar con Google" nunca ha funcionado en iOS
+
+**27-8-2026.** Salió por accidente: André necesitaba iniciar sesión en un
+simulador para poblar una captura de la clasificación.
+
+**Comprobado contra el historial de git, commit a commit:**
+
+| Commit | `CFBundleURLTypes` |
+|---|---|
+| `620ac78` andamiaje inicial | **0** |
+| `a6b2881` "Subir a 1.0.0+26" ← **la que está en TestFlight** | **0** |
+| `a633aa1` justo antes del arreglo | **0** |
+| `661347e` el arreglo (dev) | presente y correcto |
+
+Sin el esquema de vuelta, el flujo abre el navegador, la persona se autentica y
+**el sistema no sabe a qué app devolver el resultado**: el botón no hace nada y
+no hay error en ningún sitio. En Android sí funciona.
+
+O sea: **ninguna persona ha podido entrar con Google en Nona iOS, en ninguna
+build jamás publicada.** Se habría ido a producción.
+
+**La trampa, que merece quedar escrita:** el esquema de CINCO **no vale** — su
+`REVERSED_CLIENT_ID` es distinto (`...958vn0d0…` frente al `...8vod20f0…` de
+Nona). Un copia-pega de la app hermana deja un `CFBundleURLTypes` **presente y
+roto**, que es peor que ausente porque supera la mirada rápida.
+
+### Mi ritual de verificación se queda corto — corregido
+
+Antes de subir compruebo sha256, versionCode/CFBundleVersion, identificador de
+paquete, firma UPLOAD vs debug, permiso BILLING y, en IPA, perfil, certificado y
+`aps-environment`. **No miraba los esquemas de URL**, y por eso la 26 pasó por
+mis manos con esto dentro.
+
+**Añadido al ritual:** en iOS, que `CFBundleURLTypes` contenga el
+`REVERSED_CLIENT_ID` **del propio juego**, leído de su `GoogleService-Info.plist`.
+
+Es el **segundo** fallo de esta forma —el primero fue `aps-environment` ausente,
+que dejaba las notificaciones mudas—. Los dos comparten patrón: **algo que falta
+en el `Info.plist`, que no da error, solo silencio.** Conviene tratar ese
+fichero como superficie de verificación, no como configuración que ya está.
+
+---
+
+## DECISIÓN DE ANDRÉ — 27-8-2026: las SEIS de una vez, no tres ahora
+
+Se le puso delante la disyuntiva —publicar las tres en español ya y el inglés
+después, o esperar— y **escogió esperar y publicar las seis juntas.**
+
+**Consecuencia directa, y es la que importa: el camino crítico del lanzamiento
+de Nona es ahora el markdown en inglés, y es tuyo.**
+
+La cadena queda así:
+
+| Paso | Espera a | De quién |
+|---|---|---|
+| **Los tres `.en.md`** | nada — se pueden escribir hoy | **tú** |
+| Publicar las seis | que existan los EN + go de André | agente de sendapr.com |
+| `privacyPolicyUrl` en ASC | que la página responda | tú |
+| Primera submission a Apple | lo anterior | tú |
+| Build 27 | política **publicada**, no solo editada | dev |
+
+O sea: los tres ficheros que aún no existen bloquean, en cadena, la submission
+a la App Store y la build 27. Nada más está esperando a nada.
+
+El formato está resuelto y contestado arriba (sección "RESPUESTA DEL AGENTE DE
+SENDAPR.COM", punto 2): `.en.md` al lado de cada español, mismo esqueleto, y yo
+clono el generador bilingüe de PRende. No hace falta que preguntes otra vez ni
+que esperes respuesta por mensaje.
+
+Recordatorio de las dos condiciones: **no traduzcas literal** —documentos
+legales en inglés, no la versión inglesa de una frase española— y **las fechas
+de cada par tienen que coincidir**. La política ES va con fecha **27-8-2026**;
+los otros dos con **25-8-2026**.
+
+**Aviso para cuando escribas el EN de la política:** el ES cambió el 27-8 en dos
+sitios que es fácil pasar por alto si partes de una copia vieja — §3.3 ya no
+declara el huso horario, y §3.8 declara los dos eventos nuevos
+(`diaria_terminada` con dificultad y fallos, `practica_terminada` con
+dificultad) más el tema y el idioma. Parte del ES de HOY.
