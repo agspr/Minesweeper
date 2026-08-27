@@ -94,6 +94,23 @@ def borrar(mio):
         pedir("DELETE", f"friendships/{par(mio, uid)}")
         print(f"  borrado @{handle}")
 
+    # El PROGRESO de pega que la app subió sola.
+    #
+    # Esto no estaba en la primera versión y era un hueco de verdad: el guion
+    # hermano (`sembrar_demo.py`) siembra días en las preferencias del
+    # simulador, y al iniciar sesión `ProgressSync` los sube a la nube como
+    # progreso legítimo — que es exactamente su trabajo. Así que la cuenta se
+    # quedaba con 33 días inventados dentro aunque los amigos desaparecieran.
+    # Lo cazó el agente de ficha leyendo el log del iPad.
+    dias = pedir("GET", f"users/{mio}/apps/nona/days?pageSize=300")
+    for doc in (dias or {}).get("documents", []):
+        pedir("DELETE", "/".join(doc["name"].split("/documents/")[1:]))
+    print(f"  borrados {len((dias or {}).get('documents', []))} días de pega")
+    # Y el resumen que el servidor recalculó a partir de ellos: sin los días,
+    # el número que quedaría no lo respalda nada.
+    pedir("DELETE", f"users/{mio}/apps/nona")
+    print("  borrado el resumen de nona de la cuenta de pruebas")
+
 if __name__ == "__main__":
     if len(sys.argv) != 3 or sys.argv[1] not in ("--sembrar","--borrar"):
         print(__doc__); sys.exit(1)
