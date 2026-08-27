@@ -19,15 +19,23 @@ import json, subprocess, sys, urllib.request, datetime
 
 PROJ = "cinco-fe5cc"
 BASE = f"https://firestore.googleapis.com/v1/projects/{PROJ}/databases/(default)/documents"
-PREFIJO = "zz_demo_"
+# Handles NATURALES a propósito. El primer intento usó un prefijo `zz_demo_`
+# para poder barrer restos... y se veía en la fila del marcador: arruinaba la
+# captura, que era el único motivo de todo esto. La seguridad de la limpieza no
+# depende del prefijo — depende de que la lista de abajo sea la autoridad y de
+# que `--borrar` la recorra entera, que está comprobado.
+PREFIJO = ""
 
 # Nombres neutros e inventados: NUNCA gente real de la lista de André — sus
 # amigos son personas y no pueden acabar en una ficha de tienda.
+# Tres países hispanohablantes distintos (decisión de André): la clasificación
+# enseña de un vistazo que Nona es de toda Hispanoamérica y no solo de Puerto
+# Rico. Los apellidos acompañan al país para que la fila no chirríe.
 AMIGOS = [
-    # (uid falso,        @usuario,          nombre,    avatar,     país, puntos, racha)
-    (f"{PREFIJO}ana",   f"{PREFIJO}ana",   "Ana",     "montana",  "PR", 3120, 21),
-    (f"{PREFIJO}luis",  f"{PREFIJO}luis",  "Luis",    "guitarra", "PR", 2540, 14),
-    (f"{PREFIJO}marta", f"{PREFIJO}marta", "Marta",   "ola",      "US", 1890, 9),
+    # (uid falso,             @usuario,       nombre,          avatar,     país, puntos, racha)
+    ("demo_uid_ana",   "ana_rivera",   "Ana Rivera",    "montana",  "MX", 3120, 21),
+    ("demo_uid_luis",  "luis_mendez",  "Luis Méndez",   "guitarra", "CO", 2540, 14),
+    ("demo_uid_marta", "marta_ortiz",  "Marta Ortiz",   "ola",      "AR", 1890, 9),
 ]
 
 def token():
