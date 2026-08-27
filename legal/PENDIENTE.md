@@ -171,7 +171,15 @@ No hace falta una segunda publicación por este motivo.
 
 ---
 
-## PENDIENTE NUEVO — el nombre de la app cambió, y las fichas no
+## ~~PENDIENTE NUEVO — el nombre de la app cambió, y las fichas no~~ → RESUELTO 27-8-2026
+
+> **RESUELTO por André, y no era un desajuste.** La app **se llama "Nona"**, a
+> secas. "Nona Sudoku" bajo el icono y "Nona — Sudoku del día" en las fichas son
+> **deliberados**: dicen lo que hace la app, porque "Nona" a solas no lo
+> transmite. Los tres documentos legales dicen "Nona" y **están bien así** — no
+> hay que tocarlos ni subir "Última actualización" por este motivo.
+>
+> Se conserva el análisis de abajo solo como registro de dónde salió cada texto.
 
 **26-8-2026.** La build 21 trae un cambio de última hora de André: **la app se
 llama ahora "Nona Sudoku"** bajo el icono. Verificado en los dos binarios:
@@ -254,7 +262,7 @@ pasó con CINCO esta semana.
 > mide desde el paquete (ver más abajo). §3.8 ya no declara de más. Se conserva
 > el análisis porque explica de dónde salió cada decisión.
 
-**27-8-2026, agente de sendapr.com (el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo)).** Auditoría de los documentos
+**27-8-2026, agente de sendapr.com.** Auditoría de los documentos
 contra el código, pedida por André. Todo lo demás cuadró —lo comprobé contra el
 tag fijado `package-v0.30.0`, no contra el árbol de trabajo—, pero §3.8 describe
 dos registros que **no ocurren**:
@@ -310,10 +318,92 @@ sin tocar la política sería declarar de MENOS, que sí es el lado peligroso.
 
 ---
 
+## PENDIENTE NUEVO — §3.3 declara un huso horario que Nona no recoge
+
+**27-8-2026, agente de sendapr.com.** Auditoría final de los cuatro documentos
+(CINCO y Nona) contra el código, antes de publicar. Este es el **tercer** dato
+de la política de Nona que describe a CINCO y no a Nona.
+
+La línea **154** dice:
+
+> *"Guardamos además, en una zona **privada que sólo tú puedes leer**, tu
+> **última actividad**, el **desfase horario** de tu dispositivo —que usamos
+> para saber cuándo empieza tu día y cuándo caduca una racha— y tu **token de
+> notificaciones**."*
+
+La última actividad y el token **sí** se guardan, y en la zona privada: correcto.
+**El desfase horario no se recoge en absoluto.** Ni una línea, comprobado en los
+dos sitios donde podría estar:
+
+- `Nona/app/lib` → ninguna aparición de `tzOffset` / `timeZoneOffset`.
+- El paquete en el tag fijado `package-v0.30.0` → ninguna aparición.
+
+CINCO sí lo recoge (`progress_controller.dart:652` y `:715`), que es de donde
+salió la frase.
+
+**Arreglo: borrar "el **desfase horario** de tu dispositivo —que usamos para
+saber cuándo empieza tu día y cuándo caduca una racha—" de la línea 154**, y
+dejar la frase con la última actividad y el token, que son ciertos.
+
+A diferencia de `compartio` y `tema`, **aquí no hay código que igualar**: nadie
+ha decidido que Nona deba medir el huso. Si algún día lo necesita para calcular
+cuándo caduca una racha, vuelve a la política con fecha nueva.
+
+### Recuento: §3.8 y §3.3 juntas
+
+Con esta van **tres** afirmaciones de la política de Nona tomadas del
+comportamiento de CINCO en vez de medidas en Nona:
+
+| Dónde | Qué declara | Realidad en Nona |
+|---|---|---|
+| §3.8 | se registra "Compartir un resultado" | `Analytics.compartio()` nunca se llama |
+| §3.8 | tema e idioma como propiedades | `Analytics.preference()` no tiene ni una llamada |
+| §3.3 (línea 154) | se guarda el desfase horario | no se recoge en ninguna parte |
+
+Las tres declaran de MÁS, así que **ninguna abre un agujero de cumplimiento**:
+nadie queda mal informado sobre sus datos. Pero las tres son inexactas, y la
+disciplina de esta familia ha sido decir exactamente lo que pasa.
+
+De las tres, `compartio` y `tema` André las quiere arregladas **en el código**
+(paridad con CINCO). El huso **se borra del texto**. Y lo del **idioma** sigue
+siendo decisión suya, porque CINCO tampoco lo mide.
+
+## PENDIENTE NUEVO — la retención: 400 días aquí, 14 meses en CINCO
+
+Los dos juegos comparten **el mismo proyecto de Firebase** (`cinco-fe5cc`,
+verificado en los dos `firebase_options.dart`), así que es **un solo ajuste de
+BigQuery descrito con dos cifras**:
+
+| | Dice |
+|---|---|
+| `Nona/legal/privacy-policy.md:303` y `:532` | *"Un máximo de **400 días**"* |
+| `CINCO/legal/privacy-policy.md:457` | *"Nunca más de **14 meses**"* |
+
+**Tu cifra es la buena**: 400 días es lo medido en consola. No cambies nada aquí;
+lo que se mueve es la línea 457 de CINCO. Queda anotado en el `PENDIENTE.md` de
+CINCO (commit `b4cbf3f`), y obliga a re-publicar la política de CINCO, que
+conviene juntar con el arreglo del huso para no publicar dos veces.
+
+## Y una cosa buena, que también es resultado de la auditoría
+
+Todo lo demás de los dos documentos de Nona cuadró, y se verificó contra el tag
+fijado, no contra el árbol de trabajo: compra local que no llega al servidor;
+sin `setUserId` en ninguna parte; el mapa `users/{uid}.apps` retirado **y
+migrado** de los perfiles existentes, así que "solo tus amigos pueden verlo" se
+sostiene; compartir sin tablero ni tiempo; Sentry transmitiendo de verdad;
+permiso de avisos no pedido al arrancar; @usuario permanente acorde con las
+reglas; y los Términos **sin un solo desajuste**.
+
+Y un dato que te da la razón en algo: **Nona guarda el huso en ningún sitio y
+CINCO lo guarda en la RAÍZ pública del perfil.** De los dos clientes, el que se
+comporta como dice el comentario de `firestore.rules:48` es el tuyo.
+
+---
+
 ## Contacto
 
 Dudas sobre lo que dicen estos documentos, o sobre de dónde salió un dato
-concreto: el agente de listings de Nona. El del sitio: el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo).
+concreto: el agente de listings de Nona. El del sitio: la sesión `prende-*` del día.
 
 ---
 
@@ -382,7 +472,7 @@ hoy. Bloquea la salida a la App Store.
 
 ## El `idioma` y CINCO: hoy no le afecta, tras migrar SÍ
 
-Comprobado hoy, porque el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo) avisó de que medir el idioma "toca también a
+Comprobado hoy, porque el agente de sendapr.com avisó de que medir el idioma "toca también a
 CINCO" y convenía saber si ya lo había tocado.
 
 **Dónde se emite** (paquete fijado por Nona, `package-v0.30.1`, resolved-ref
@@ -409,13 +499,18 @@ la política de CINCO no lo declara. Eso es **declarar de MENOS**, que es el lad
 peligroso: el usuario queda mal informado sobre lo que se recoge de él.
 
 **Esto no lo arregla Nona.** Queda anotado para quien lleve la migración de
-CINCO y para el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo): *la política de CINCO se amplía con el idioma ANTES de
+CINCO y para el agente de sendapr.com: *la política de CINCO se amplía con el idioma ANTES de
 que la migración salga publicada, no después.* Es el mismo orden que se acordó
 para la 27 de Nona.
 
 ---
 
-## PARA EL AGENTE DE SENDAPR.COM (el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo)) — petición concreta
+## PARA EL AGENTE DE SENDAPR.COM — petición concreta
+
+> Enviada también por mensaje el 27-8-2026. *El nombre de esa sesión cambia solo
+> de un día para otro (era `prende-99`, hoy `prende-49`): no lo uses como
+> dirección fija. Mira `ListAgents` antes de dar el contacto por muerto, y deja
+> lo importante escrito aquí, que es lo que sobrevive.*
 
 Lo que hace falta, en una línea: **publicar las tres páginas de Nona.** Hoy
 `sendapr.com/privacy/nona/`, `/terms/nona/` y `/delete-account/nona/` dan 404.
@@ -451,3 +546,61 @@ que el markdown está listo.
 - **El nombre.** Los binarios dicen "Nona Sudoku", las fichas "Nona — Sudoku del
   día" y los documentos legales "Nona". Sin resolver, y es de André (sección de
   más arriba).
+
+---
+
+## Fichas en inglés (en-US) — creadas 27-8-2026
+
+**Decisión de André:** el título en inglés es **"Nona — Daily Sudoku"**, con la
+misma lógica que el español: el nombre es *Nona*, y el resto dice qué es.
+
+*(Nota menor: André lo escribió con guion corto; puse **raya (—)** para que las
+dos fichas se vean iguales. Cambiarlo es un minuto si prefiere el guion.)*
+
+**Hecho, y verificado leyendo las dos fichas después:**
+
+| Tienda | es | en |
+|---|---|---|
+| Play | Nona — Sudoku del día (`es-419`) | **Nona — Daily Sudoku** (`en-US`) |
+| App Store | Nona — Sudoku del día (`es-MX`) | **Nona — Daily Sudoku** (`en-US`) |
+
+**Está bien fundado:** la app es de verdad bilingüe, no a medias. Comprobado por
+paridad de claves, no de vista: `app_en.arb` 64 / `app_es.arb` 64, y en el
+paquete `senda_en.arb` 128 / `senda_es.arb` 128. **Cero claves sin traducir en
+ninguno de los dos.** Prometer una ficha en inglés no promete nada que la app no
+cumpla.
+
+### ⚠️ Lo gordo que esto destapó: las DOS fichas están vacías
+
+Al ir a traducir el texto español descubrí que **no hay texto español que
+traducir**. Las dos fichas son cascarones con solo el título:
+
+| Campo | Play | App Store |
+|---|---|---|
+| Título | ✅ | ✅ |
+| Descripción corta | ❌ vacía | — |
+| Descripción completa | ❌ vacía | ❌ `description: None` |
+| Palabras clave | — | ❌ `keywords: None` |
+| Capturas de pantalla | ❌ | ❌ **0 sets** |
+| URL de soporte | — | ❌ `None` |
+
+**Ninguna de las dos tiendas acepta una publicación así**, en ningún idioma. Y
+no es "y además el inglés": es que **el español tampoco está escrito**. Añadir
+en-US no duplicó el trabajo pendiente, solo lo hizo visible.
+
+Las capturas son el punto caro: hay que generarlas del simulador/emulador en los
+tamaños que exige cada tienda, y **Apple las pide por idioma** (aunque el mismo
+juego de imágenes vale para los dos si no llevan texto encima).
+
+**El texto lo puedo redactar yo en los dos idiomas y dejarlo para que André lo
+apruebe** — pero la copia de tienda vende el producto, así que la aprueba él.
+
+`primaryLocale` en App Store Connect sigue siendo **es-MX**, que es el idioma al
+que cae la ficha donde no haya traducción. Se deja así salvo que André diga.
+
+### Copia de tienda: borrador listo, 27-8-2026
+
+ES + EN completos en `Nona/store/copy/listing-copy.md` — todos los campos de
+Play y App Store, límites verificados por conteo. **Sin subir: la aprueba
+André.** Pendientes que no son copia: capturas de pantalla y la support URL
+(propuesta: sendapr.com).
