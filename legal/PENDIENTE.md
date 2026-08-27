@@ -844,3 +844,45 @@ sitios que es fácil pasar por alto si partes de una copia vieja — §3.3 ya no
 declara el huso horario, y §3.8 declara los dos eventos nuevos
 (`diaria_terminada` con dificultad y fallos, `practica_terminada` con
 dificultad) más el tema y el idioma. Parte del ES de HOY.
+
+---
+
+## ✅ PUBLICADO — 27-8-2026. Las seis están vivas.
+
+**Ya no hay 404.** Verificado en vivo, no asumido: las seis dan **200**, y las
+tres que la app trae cableadas en `nona_config.dart:69-71` también.
+
+| URL | |
+|---|---|
+| `sendapr.com/privacy/nona/` · `/en/` | 200 · 200 |
+| `sendapr.com/terms/nona/` · `/en/` | 200 · 200 |
+| `sendapr.com/delete-account/nona/` · `/en/` | 200 · 200 |
+
+Comprobado además, página a página: el `<h1>` correcto en las seis, el
+selector de idioma enlazando en los dos sentidos, `hreflang` es/en/x-default,
+y contenido real de cada documento (los "400 días", los "catorce (14) días" del
+desistimiento y su par inglés). Las seis en el sitemap con sus pares.
+
+**El markdown inglés lo escribí yo**, por instrucción de André, en vez de
+esperar. No son traducción literal: son los mismos documentos redactados en
+inglés jurídico, con la sustancia intacta —cada afirmación sobre qué se recoge,
+quién lo lee y cuánto se conserva dice lo mismo que su par español—. Commit
+`98a99b0`. Si algo no te convence de la redacción inglesa, es tuyo: edita el
+`.en.md` y avísame, que regenerar es una orden.
+
+**Generador:** `Nona/legal/build-sendapr-legal.js` (`656ca2f`). Clona la
+estructura bilingüe del de PRende y el `parseDoc` del de CINCO, y esa mezcla no
+es capricho: el de PRende se habría comido en silencio el párrafo de entrada de
+`account-deletion.md`. Acento cobalto `#4FA8FF`, que es tu `defaultPalette`.
+
+### Lo que te toca ahora, y ya no está bloqueado
+
+1. **`privacyPolicyUrl` en App Store Connect** → `https://sendapr.com/privacy/nona/`
+   (app id **6802670347**). Es lo único que faltaba para poder enviar.
+2. **La primera submission a Apple.** Recuerda: `reviewSubmissions` = 0, así que
+   es un envío nuevo, no un reenvío tras rechazo.
+3. **Avisar al dev de que la política está PUBLICADA**, no solo editada, que era
+   su condición para cortar la build 27.
+
+Si prefieres que rellene yo el `privacyPolicyUrl` por API, dilo y lo hago; tengo
+la clave del equipo. Lo dejo tuyo porque así lo pediste.
