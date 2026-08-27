@@ -183,11 +183,22 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             if (c.isComplete && !_wasComplete) {
               _wasComplete = true;
               _resultDismissed = false;
+              final score = scoreDaily(c.outcome!);
               widget.progress.record(
-                scoreDaily(c.outcome!),
+                score,
                 DateTime.parse(c.dayKey!),
                 seconds: c.elapsed.inSeconds,
               );
+              // El evento de juego de Nona, hermano del diaria_terminada de
+              // CINCO. Solo agregados de la partida — dificultad y fallos —
+              // nunca nada que identifique a la persona. GATE: la política
+              // §3.8 dice "estas y ninguna más", así que el build que lleve
+              // esto NO SALE hasta que la política lo declare (orden acordado
+              // con André: la política se ensancha primero).
+              Analytics.gameEvent('diaria_terminada', {
+                'dificultad': c.difficulty!.name,
+                'fallos': score.countedMistakes,
+              });
             }
 
             final board = c.board!;

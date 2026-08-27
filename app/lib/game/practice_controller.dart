@@ -14,6 +14,7 @@ library;
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:juegos_senda/juegos_senda.dart' show Analytics;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/haptics.dart';
@@ -136,6 +137,9 @@ class PracticeController extends ChangeNotifier {
   /// cifras. Las pistas no lo invalidan — en práctica no penalizan nada, por
   /// decisión de André, y eso incluye estas cuentas.
   void _finished() {
+    // Hermano del offline_terminada de CINCO. Mismo gate que diaria_terminada:
+    // no sale en build hasta que §3.8 lo declare.
+    Analytics.gameEvent('practica_terminada', {'dificultad': _difficulty.name});
     if (_runningSince != null) {
       _accumulatedSeconds += _clock().difference(_runningSince!).inSeconds;
       _runningSince = null;

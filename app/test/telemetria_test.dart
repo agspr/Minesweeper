@@ -128,4 +128,19 @@ void main() {
       reason: 'el tema elegido se declara en §3.8 y no se emitía',
     );
   });
+  test('los eventos de juego existen — y su gate es la política', () {
+    // diaria_terminada y practica_terminada, hermanos de los de CINCO. Van en
+    // el código ANTES que en la política publicada, y por eso el build que
+    // los lleve tiene un gate: §3.8 dice "estas y ninguna más", así que
+    // publicar sin ensancharla sería declarar de menos — la dirección que sí
+    // importa (orden acordado con André el 27-8-2026: política primero).
+    final game = _sinComentarios(
+      File('lib/screens/game_screen.dart').readAsStringSync(),
+    );
+    expect(game, contains("Analytics.gameEvent('diaria_terminada'"));
+    final practica = _sinComentarios(
+      File('lib/game/practice_controller.dart').readAsStringSync(),
+    );
+    expect(practica, contains("Analytics.gameEvent('practica_terminada'"));
+  });
 }
