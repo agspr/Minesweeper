@@ -706,3 +706,59 @@ el generador, publico, añado el sitemap, y te aviso para que rellenes el
 **las tres en español ya** y las inglesas cuando existan. Las URLs no cambian
 —el EN vive en `/en/` debajo de cada una—, así que publicar en dos tandas no
 rompe nada ni obliga a re-publicar las españolas.
+
+---
+
+## LAS TRES PÁGINAS EN INGLÉS: ESCRITAS — 27-8-2026
+
+Escritas y en el repo, **sin publicar**:
+
+- `privacy-policy.en.md` (572 líneas · 30 secciones)
+- `terms-of-service.en.md` (20 secciones)
+- `account-deletion.en.md` (212 líneas · 15 secciones)
+
+**Paridad estructural verificada por conteo**: cada fichero EN tiene
+exactamente las mismas secciones que su hermano español. No son traducciones
+literales —el inglés legal quiere sus propias fórmulas ("as is", "as
+available", "hold harmless")— pero **no dicen nada que el español no diga, ni
+al revés**. Salieron de la versión de HOY, o sea con §3.8 ya ensanchada y sin
+la frase del huso horario.
+
+Las fechas se copian del español y **no se suben**: traducir no es un cambio
+sustantivo de lo que recogemos. Política 27-8-2026, los otros dos 25-8-2026.
+
+### ⚠️ LO ÚNICO QUE PUEDE ESTAR MAL: tres URLs
+
+Escribí los enlaces entre documentos como **`/en/privacy/nona/`**,
+`/en/terms/nona/` y `/en/delete-account/nona/`. **Es una suposición mía**,
+porque `prende-49` se cayó dos veces antes de poder contestar el formato.
+
+Si el generador usa otra forma (`/privacy/nona/en/`, un sufijo, un parámetro),
+**se arregla con un sed y nada más** — están aisladas y no hay ninguna otra:
+
+```bash
+cd ~/Documents/Coding/Nona/legal && sed -i '' 's|/en/privacy/nona/|LA-BUENA|g' *.en.md
+```
+
+Los ficheros EN **no** enlazan a las páginas españolas, a propósito: quien lee
+en inglés debe quedarse en inglés.
+
+### Las cuatro preguntas para el agente de sendapr.com
+
+1. **Nombre de fichero.** Puse `privacy-policy.en.md` al lado del español.
+   ¿O el generador espera `en/privacy-policy.md`?
+2. **Rótulos de cabecera.** Puse `**Effective:**` y `**Last updated:**`.
+   ¿Los lee literales o por posición?
+3. **Forma de las URLs.** La de arriba.
+4. **Conmutador ES/EN.** ¿Lo pone el generador, o hay que dejar algo en el
+   markdown? Ahora mismo no hay nada.
+
+### Lo que sigue faltando para el lanzamiento
+
+- **Publicar las seis.** André decidió esperar a ES+EN y no publicar solo el
+  español ("podemos esperar, no toma tanto tiempo"). Con esto escrito, **falta
+  solo el generador y su go**.
+- **La página de borrado en EN de transPRte.** No es de Nona; es de quien lleve
+  transPRte. Aquí queda anotado para que no se pierda.
+- **`privacyPolicyUrl` en App Store Connect**, mío, en cuanto la página
+  responda. Hoy es `None` y es lo que impide la primera submission.

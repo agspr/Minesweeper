@@ -100,4 +100,41 @@ void main() {
           'salirse del juego: $huerfanas',
     );
   });
+  test('iOS registra el esquema de vuelta de Google, y es el SUYO', () {
+    // Sin este esquema, "Continuar con Google" abre el navegador, la persona
+    // se autentica, y el sistema no sabe a qué app devolver el resultado: el
+    // botón no hace nada y no hay error en ninguna parte. Nona no lo tuvo
+    // NUNCA — se descubrió al ir a iniciar sesión en el simulador para las
+    // capturas de tienda, no porque nadie lo probara.
+    //
+    // Y se comprueba que sea EL SUYO, leído de su propio
+    // `GoogleService-Info.plist`: el de CINCO tiene otro client id, así que un
+    // copia-pega del de la app hermana pasaría "tener un esquema" y seguiría
+    // sin funcionar. Es el fallo con mejor disfraz de los dos.
+    final info = File('ios/Runner/Info.plist').readAsStringSync();
+    final google = File('ios/Runner/GoogleService-Info.plist')
+        .readAsStringSync();
+
+    final reverso = RegExp(
+      r'<key>REVERSED_CLIENT_ID</key>\s*<string>([^<]*)</string>',
+    ).firstMatch(google)?.group(1);
+    expect(
+      reverso,
+      isNotNull,
+      reason: 'GoogleService-Info sin REVERSED_CLIENT_ID',
+    );
+
+    expect(
+      info,
+      contains('CFBundleURLTypes'),
+      reason: 'sin esquemas de URL, el inicio de sesión con Google no vuelve',
+    );
+    expect(
+      info,
+      contains('<string>$reverso</string>'),
+      reason:
+          'el esquema registrado no es el de ESTE proyecto: el navegador '
+          'volvería a otra app, o a ninguna',
+    );
+  });
 }

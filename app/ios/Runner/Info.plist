@@ -289,5 +289,29 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- El esquema de vuelta de "Continuar con Google", que es el
+	     REVERSED_CLIENT_ID de este proyecto (leído de GoogleService-Info.plist,
+	     no escrito a mano).
+
+	     SIN esto, Google Sign-In abre el navegador, la persona se autentica...
+	     y el sistema no sabe a qué app devolver el resultado: se queda colgado
+	     o vuelve al escritorio. La app no falla, no avisa, y el botón
+	     simplemente no hace nada — el fallo silencioso de siempre.
+
+	     Nona no lo ha tenido NUNCA: es su propio client id (distinto del de
+	     CINCO, que sí lo llevaba), así que copiar el de CINCO tampoco habría
+	     valido. Se descubrió al ir a iniciar sesión en el simulador para las
+	     capturas de tienda, no porque nadie lo probara. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.708221297560-8vod20f0f10oeam53gd7g0e45n0rt0ka</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
