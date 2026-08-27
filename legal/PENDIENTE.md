@@ -133,7 +133,10 @@ automática de uso, informes de fallos, export a BigQuery con 400 días. No he
 copiado la lista de eventos propios de CINCO, porque en Nona no se disparan.
 **No he mencionado Sentry**, porque hoy no transmite.
 
-### Qué hay que cambiar cuando salga la build 21
+### ~~Qué hay que cambiar cuando salga la build 21~~ → HECHO
+
+> **HECHO.** Los tres puntos se aplicaron cuando salió la 21. Solo sigue abierto
+> el 3 (alinear la cifra de retención con CINCO: 14 meses vs 400 días).
 
 Los tres puntos que estaban abiertos ya tienen respuesta, y **los tres tocan la
 política**. Esto lo hago yo (agente de listings) en cuanto el agente de
@@ -244,9 +247,14 @@ pasó con CINCO esta semana.
 
 ---
 
-## PENDIENTE NUEVO — §3.8 declara dos cosas que Nona no hace
+## ~~PENDIENTE NUEVO — §3.8 declara dos cosas que Nona no hace~~ → CERRADO 27-8-2026
 
-**27-8-2026, agente de sendapr.com (`prende-99`).** Auditoría de los documentos
+> **CERRADO.** Los tres puntos se resolvieron por el lado del CÓDIGO, como
+> decidió André. `compartio` y `tema` se emiten desde `50aea19`; el `idioma` se
+> mide desde el paquete (ver más abajo). §3.8 ya no declara de más. Se conserva
+> el análisis porque explica de dónde salió cada decisión.
+
+**27-8-2026, agente de sendapr.com (el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo)).** Auditoría de los documentos
 contra el código, pedida por André. Todo lo demás cuadró —lo comprobé contra el
 tag fijado `package-v0.30.0`, no contra el árbol de trabajo—, pero §3.8 describe
 dos registros que **no ocurren**:
@@ -305,4 +313,141 @@ sin tocar la política sería declarar de MENOS, que sí es el lado peligroso.
 ## Contacto
 
 Dudas sobre lo que dicen estos documentos, o sobre de dónde salió un dato
-concreto: el agente de listings de Nona. El del sitio es `prende-99`.
+concreto: el agente de listings de Nona. El del sitio: el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo).
+
+---
+
+## §3.8 ensanchada para los eventos de juego — 27-8-2026
+
+**Hecho.** `privacy-policy.md` §3.8 ya declara los dos eventos propios de Nona,
+y **"Última actualización" subida a 27 de agosto de 2026**.
+
+Añadido, verificado leyendo el código y no la descripción:
+
+- **`diaria_terminada`** (`app/lib/screens/game_screen.dart:198`) — al terminar
+  el sudoku del día. Lleva `dificultad` y `fallos` (los contados, 0–5).
+  Declarado con esos dos y diciendo explícitamente que **no** se registra ni el
+  tiempo ni la puntuación.
+- **`practica_terminada`** (`app/lib/game/practice_controller.dart:142`) — al
+  terminar un puzle del modo libre. Lleva solo `dificultad`.
+
+Los dos huecos que documentó la auditoría de André (commit `c0ab99b`) están
+cerrados en `50aea19`: `compartio('resultado')` y la propiedad `tema` ya se
+emiten, así que las líneas de §3.8 que los declaraban pasan de aspiracionales a
+ciertas. El **idioma** también se mide ya (`Analytics.preference('idioma', …)`,
+con `'sistema'` cuando se sigue al teléfono), así que esa línea también es
+exacta. *Nota: CINCO no mide el idioma; si alguien compara las dos políticas,
+esa diferencia es real y deliberada.*
+
+### EL GATE, y a quién le toca
+
+Acordado con André y escrito en los comentarios del propio código: **§3.8 dice
+"estas y ninguna más", así que la build 27 no sale hasta que la política los
+declare.**
+
+- **Ensanchar el texto: hecho** (esto).
+- **Publicar: NO hecho, y no es mío.** Las tres páginas siguen dando 404. El
+  gate real no se levanta con el markdown editado, sino con la página viva —
+  una política que nadie puede leer no declara nada.
+
+O sea que la 27 sigue bloqueada, pero ya no por mí: por el generador y la
+publicación (agente de sendapr.com, con el go del dueño).
+
+### Estado real en Apple, comprobado hoy (27-8-2026)
+
+Consultado por API, no de memoria, porque el malentendido "Nona está en
+revisión" ya circuló una vez:
+
+- `appStoreVersions` → **una sola, 1.0, en `PREPARE_FOR_SUBMISSION`**
+- `reviewSubmissions` → **count = 0**. Nunca se ha enviado. No hay rechazo ni
+  revisión en curso: lo que viene será la **primera** submission, no un reenvío.
+- `appInfoLocalizations` (es-MX) → **`privacyPolicyUrl: None`** ← aquí muerde el
+  404. Apple no acepta el envío sin política accesible. Rellenarlo es mío, en
+  cuanto la página responda.
+- Builds `VALID` en TestFlight: 26, 22, 21.
+
+**El 404 NO bloquea la 26 en TestFlight** — la 26 está `VALID` y se puede probar
+hoy. Bloquea la salida a la App Store.
+
+### Quién espera a quién
+
+| Cosa | Espera a | De quién |
+|---|---|---|
+| Build 27 | que la política esté **publicada** | dev (build), yo (aviso) |
+| Submission a Apple | publicación + `privacyPolicyUrl` | yo |
+| Publicación de las 3 páginas | generador + go | agente de sendapr.com + André |
+| Probar la 26 | **nada** | ya disponible |
+
+---
+
+## El `idioma` y CINCO: hoy no le afecta, tras migrar SÍ
+
+Comprobado hoy, porque el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo) avisó de que medir el idioma "toca también a
+CINCO" y convenía saber si ya lo había tocado.
+
+**Dónde se emite** (paquete fijado por Nona, `package-v0.30.1`, resolved-ref
+`4553669c`, cotejado por hash y no "una carpeta de la caché"):
+
+- `package/lib/src/services/locale_controller.dart:49`
+  → `Analytics.preference('idioma', value?.languageCode ?? 'sistema')`
+- comentario en la línea 44: *"decisión de familia, André 27-8-2026"*
+
+**CINCO hoy NO lo emite, y el motivo no es el que parecía.** No es que CINCO
+tenga una versión vieja del paquete: es que **CINCO no depende del paquete**.
+`juegos_senda` no está en sus `dependencies` —solo se le menciona en un
+comentario— y CINCO tiene su **propia** `app/lib/services/analytics.dart`, cuyo
+único `setUserProperty` sigue siendo `'tema'` (línea 85).
+
+Así que la política de CINCO **está correcta hoy**: no declara el idioma y CINCO
+no lo mide.
+
+### ⚠️ La trampa está en la migración
+
+Cuando CINCO migre al paquete —que es trabajo ya previsto— **empezará a emitir
+`idioma` el día de la migración, sin que nadie toque una línea de analítica**, y
+la política de CINCO no lo declara. Eso es **declarar de MENOS**, que es el lado
+peligroso: el usuario queda mal informado sobre lo que se recoge de él.
+
+**Esto no lo arregla Nona.** Queda anotado para quien lleve la migración de
+CINCO y para el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo): *la política de CINCO se amplía con el idioma ANTES de
+que la migración salga publicada, no después.* Es el mismo orden que se acordó
+para la 27 de Nona.
+
+---
+
+## PARA EL AGENTE DE SENDAPR.COM (el agente de sendapr.com (su nombre de sesión CAMBIA solo — era `prende-99`, hoy es `prende-49`; no lo uses como dirección fija, contesta copiando el `from` de un mensaje suyo, y lo importante déjalo escrito en el repo)) — petición concreta
+
+Lo que hace falta, en una línea: **publicar las tres páginas de Nona.** Hoy
+`sendapr.com/privacy/nona/`, `/terms/nona/` y `/delete-account/nona/` dan 404.
+
+**Por qué corre prisa (esto cambió desde tu último paso):** ese 404 dejó de ser
+un detalle y es ahora **el camino crítico del lanzamiento de Nona**. Bloquea dos
+cosas a la vez:
+
+1. **La build 27** — el dev no la construye hasta que §3.8 esté ensanchada *y
+   publicada*. Ensanchada ya está (hoy). Publicada no.
+2. **La primera submission a la App Store** — Apple no la acepta sin política
+   accesible. Comprobado por API: `reviewSubmissions` = **0** (nunca se envió,
+   no hay rechazo) y `privacyPolicyUrl` = **None** en la ficha es-MX. Ese campo
+   lo relleno yo en cuanto la página responda.
+
+**Lo que está listo de mi lado:** los tres `.md` de `Nona/legal/`, con el mismo
+formato que los de CINCO para que el generador los coma sin tocarlos (`# Título`,
+`**Vigente desde:**`, `**Última actualización:**`, `---`, secciones numeradas).
+Fechas al día: la política dice **27-8-2026**, los otros dos **25-8-2026**, y son
+las fechas reales de la última edición sustantiva de cada uno.
+
+**Lo que es tuyo:** `Nona/legal/build-sendapr-legal.js` (clonado del de CINCO) y
+la publicación. No he tocado `sendapr-landing` ni he escrito HTML, como pediste.
+
+**Y no publiques por mi aviso: publica cuando lo diga André.** Yo solo declaro
+que el markdown está listo.
+
+**Dos cosas que quizá quieras resolver de paso, ninguna bloqueante:**
+
+- **Inglés.** André quiere Nona en ES+EN (seis páginas) y una de borrado en EN
+  para transPRte; CINCO y PRende se quedan solo en español. No sé qué formato
+  espera tu generador para el EN — dime y preparo las fuentes.
+- **El nombre.** Los binarios dicen "Nona Sudoku", las fichas "Nona — Sudoku del
+  día" y los documentos legales "Nona". Sin resolver, y es de André (sección de
+  más arriba).
