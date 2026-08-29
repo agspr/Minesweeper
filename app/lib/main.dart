@@ -28,6 +28,7 @@ import 'game/practice_controller.dart';
 import 'l10n/app_localizations.dart';
 import 'nona_config.dart';
 import 'screens/home_screen.dart';
+import 'widgets/puzzle_layout.dart';
 import 'services/progress_controller.dart';
 import 'services/progress_sync.dart';
 import 'services/theme_controller.dart';
@@ -249,7 +250,11 @@ class NonaApp extends StatelessWidget {
           // La marca viaja por el árbol: las pantallas del paquete la leen de
           // aquí en vez de una global, así que olvidarla es un error de
           // compilación y no un color equivocado en producción.
-          home: _OrientationGate(
+          // El corte lo declara Nona y no el paquete: es el MISMO número que
+          // manda su maqueta de tablet, así que la rotación y la maqueta no
+          // pueden separarse.
+          home: SendaOrientationGate(
+            ladoCortoMinimo: kTabletShortestSide,
             child: _AuthGate(
               auth: auth,
               child: HomeScreen(
@@ -346,37 +351,4 @@ class _AuthGate extends StatelessWidget {
       },
     );
   }
-}
-
-/// Móviles en vertical; tablets y plegables abiertos, libres.
-///
-/// Se decide con MediaQuery y no en `main()` porque `physicalSize` puede ser
-/// 0×0 antes del primer fotograma y clasificaría mal el aparato. Mismo criterio
-/// que CINCO.
-class _OrientationGate extends StatefulWidget {
-  const _OrientationGate({required this.child});
-
-  final Widget child;
-
-  @override
-  State<_OrientationGate> createState() => _OrientationGateState();
-}
-
-class _OrientationGateState extends State<_OrientationGate> {
-  bool? _locked;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final locked = MediaQuery.sizeOf(context).shortestSide < 600;
-    if (locked != _locked) {
-      _locked = locked;
-      SystemChrome.setPreferredOrientations(
-        locked ? [DeviceOrientation.portraitUp] : DeviceOrientation.values,
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }

@@ -79,141 +79,168 @@ class _HomeScreenState extends State<HomeScreen> {
     _tab = SendaTab.play;
   });
 
-  /// Se está jugando: ni menú ni otras pestañas.
-  bool get _inGame => _tab == SendaTab.play && _play != _Play.menu;
+  /// Hay tablero delante dentro de Jugar. Suelto porque lo necesita también
+  /// `SendaBackToMenu`, que pone por su cuenta el término de la pestaña:
+  /// contarlo dos veces haría que el mismo argumento significara cosas
+  /// distintas en cada juego.
+  bool get _boardUp => _play != _Play.menu;
+
+  /// Se está jugando: ni menú ni otras pestañas. La barra se va justo aquí.
+  bool get _inGame => _tab == SendaTab.play && _boardUp;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // IndexedStack y no un `switch`: mantiene VIVAS las tres pestañas, así
-      // que ir a Más a mitad de un puzle y volver no reinicia el tablero ni el
-      // cronómetro. Con un switch, cada cambio de pestaña destruiría la partida
-      // en curso.
-      body: IndexedStack(
-        index: SendaTab.values.indexOf(_tab),
-        children: [
-          switch (_play) {
-            _Play.menu => _Menu(
-              daily: widget.daily,
-              locale: widget.locale,
-              progress: widget.progress,
-              onDaily: () => _goPlay(_Play.daily),
-              onPractice: () {
-                // Se carga al entrar, no al arrancar la app: generar un puzle
-                // en el arranque en frío retrasaría la diaria, que es a lo que
-                // viene la gente.
-                if (widget.practice.board == null) widget.practice.load();
-                _goPlay(_Play.practice);
-              },
-            ),
-            _Play.daily => GameScreen(
-              controller: widget.daily,
-              progress: widget.progress,
-              theme: widget.theme,
-              onExit: () => _goPlay(_Play.menu),
-              onPractice: () {
-                if (widget.practice.board == null) widget.practice.load();
-                _goPlay(_Play.practice);
-              },
-            ),
-            _Play.practice => PracticeScreen(
-              controller: widget.practice,
-              theme: widget.theme,
-              onExit: () => _goPlay(_Play.menu),
-            ),
-          },
+    // **El gesto de volver saca del tablero al menú.**
+    //
+    // Lo que se juega es un estado dentro de esta pantalla y no una ruta
+    // empujada —a propósito, para que ir a Social a mitad de puzle no reinicie
+    // el tablero ni el cronómetro—, así que el gesto no tenía nada que cerrar
+    // y en Android sacaba al escritorio. La regla vive en el paquete: es la
+    // misma en todos los juegos.
+    return SendaBackToMenu(
+      pestana: _tab,
+      tableroDelante: _boardUp,
+      onMenu: () => _goPlay(_Play.menu),
+      child: Scaffold(
+        // IndexedStack y no un `switch`: mantiene VIVAS las tres pestañas, así
+        // que ir a Más a mitad de un puzle y volver no reinicia el tablero ni el
+        // cronómetro. Con un switch, cada cambio de pestaña destruiría la partida
+        // en curso.
+        body: IndexedStack(
+          index: SendaTab.values.indexOf(_tab),
+          children: [
+            switch (_play) {
+              _Play.menu => _Menu(
+                daily: widget.daily,
+                locale: widget.locale,
+                progress: widget.progress,
+                onDaily: () => _goPlay(_Play.daily),
+                onPractice: () {
+                  // Se carga al entrar, no al arrancar la app: generar un puzle
+                  // en el arranque en frío retrasaría la diaria, que es a lo que
+                  // viene la gente.
+                  if (widget.practice.board == null) widget.practice.load();
+                  _goPlay(_Play.practice);
+                },
+              ),
+              _Play.daily => GameScreen(
+                controller: widget.daily,
+                progress: widget.progress,
+                theme: widget.theme,
+                onExit: () => _goPlay(_Play.menu),
+                onPractice: () {
+                  if (widget.practice.board == null) widget.practice.load();
+                  _goPlay(_Play.practice);
+                },
+              ),
+              _Play.practice => PracticeScreen(
+                controller: widget.practice,
+                theme: widget.theme,
+                onExit: () => _goPlay(_Play.menu),
+              ),
+            },
 
-          // Lo social es lo único que necesita cuenta: sin ella no hay con
-          // quién compararse.
-          //
-          // Con sesión, la pestaña lleva a Amigos. La CLASIFICACIÓN todavía no
-          // —necesita `LeaderboardService`, que es de la fase B—, pero enseñar
-          // la invitación a entrar a alguien que YA entró sería pedirle que
-          // haga algo que acaba de hacer.
-          //
-          // `onInvite` va nulo a propósito hasta el guardarraíl #3: con un solo
-          // `fcmToken` por persona, una invitación desde Nona llega a la app
-          // que registró el token la última vez — una moneda al aire.
-          // La pestaña Social es el MARCADOR. Las solicitudes y las
-          // invitaciones viven detrás del icono de persona, en Amigos, que se
-          // abre como pantalla completa (§15).
-          ListenableBuilder(
-            listenable: Listenable.merge([widget.auth, widget.progress]),
-            builder: (context, _) =>
-                widget.auth.signedIn && widget.leaderboard != null
-                ? SendaLeaderboardScreen(
-                    friends: widget.friends,
-                    leaderboard: widget.leaderboard!,
-                    gameId: nonaGameId,
-                    myUid: widget.auth.user!.uid,
-                    mySummary: widget.progress.summaryAsOf(DateTime.now()),
-                    // Tu fila sale con tu nombre, como las de tus amigos. La
-                    // identidad la aporta Nona porque ya la tiene en la
-                    // sesión: pedírsela a Firestore sería pagar una lectura
-                    // por algo que está en memoria.
-                    myName: widget.auth.displayName,
-                    myUsername: widget.auth.username,
-                    myAvatar: widget.auth.avatarId,
-                    myCountry: widget.auth.country,
-                    onOpenFriends: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        fullscreenDialog: true,
-                        builder: (_) => SendaFriendsScreen(
-                          friends: widget.friends,
-                          gameId: nonaGameId,
-                          notifications: widget.notifications,
-                          // Las invitaciones cruzadas necesitan la Function y
-                          // las reglas desplegadas. Hasta entonces la sección
-                          // no se pinta: un "+" que no envía nada promete algo
-                          // que no cumple.
-                          invitesEnabled: kInvitesEnabled,
+            // Lo social es lo único que necesita cuenta: sin ella no hay con
+            // quién compararse.
+            //
+            // Con sesión, la pestaña lleva a Amigos. La CLASIFICACIÓN todavía no
+            // —necesita `LeaderboardService`, que es de la fase B—, pero enseñar
+            // la invitación a entrar a alguien que YA entró sería pedirle que
+            // haga algo que acaba de hacer.
+            //
+            // `onInvite` va nulo a propósito hasta el guardarraíl #3: con un solo
+            // `fcmToken` por persona, una invitación desde Nona llega a la app
+            // que registró el token la última vez — una moneda al aire.
+            // La pestaña Social es el MARCADOR. Las solicitudes y las
+            // invitaciones viven detrás del icono de persona, en Amigos, que se
+            // abre como pantalla completa (§15).
+            ListenableBuilder(
+              listenable: Listenable.merge([widget.auth, widget.progress]),
+              builder: (context, _) =>
+                  widget.auth.signedIn && widget.leaderboard != null
+                  ? SendaLeaderboardScreen(
+                      friends: widget.friends,
+                      leaderboard: widget.leaderboard!,
+                      gameId: nonaGameId,
+                      myUid: widget.auth.user!.uid,
+                      mySummary: widget.progress.summaryAsOf(DateTime.now()),
+                      // Tu fila sale con tu nombre, como las de tus amigos. La
+                      // identidad la aporta Nona porque ya la tiene en la
+                      // sesión: pedírsela a Firestore sería pagar una lectura
+                      // por algo que está en memoria.
+                      myName: widget.auth.displayName,
+                      myUsername: widget.auth.username,
+                      myAvatar: widget.auth.avatarId,
+                      myCountry: widget.auth.country,
+                      onOpenFriends: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          fullscreenDialog: true,
+                          builder: (_) => SendaFriendsScreen(
+                            friends: widget.friends,
+                            gameId: nonaGameId,
+                            notifications: widget.notifications,
+                            // Las invitaciones cruzadas necesitan la Function y
+                            // las reglas desplegadas. Hasta entonces la sección
+                            // no se pinta: un "+" que no envía nada promete algo
+                            // que no cumple.
+                            invitesEnabled: kInvitesEnabled,
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
-          ),
-
-          SettingsTab(
-            practice: widget.practice,
-            auth: widget.auth,
-            friends: widget.friends,
-            purchases: widget.purchases,
-            notifications: widget.notifications,
-            prefs: widget.prefs,
-            locale: widget.locale,
-            theme: widget.theme,
-            progress: widget.progress,
-          ),
-        ],
-      ),
-      // Abajo: el banner y, debajo, la barra de pestañas O el hueco del gesto.
-      //
-      // Mientras se juega la barra **se va del árbol**, no se atenúa: es el
-      // alto que le hace falta al tablero, y con `hidden` seguiría ocupándolo.
-      // Que dependa de la vista y no de un gesto es lo que hace que sea seguro:
-      // la vista solo cambia al navegar, así que nada se mueve bajo los dedos a
-      // mitad de una partida.
-      //
-      // Al quitarla hay que devolver a mano el hueco de la barra de gestos, que
-      // hasta ahora cubría ella; si no, el numpad queda debajo de la raya.
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // En pantallas muy bajas el banner se sacrifica: el tablero manda.
-          if (widget.banner != null && MediaQuery.sizeOf(context).height >= 700)
-            widget.banner!,
-          if (_inGame)
-            Container(
-              height: MediaQuery.paddingOf(context).bottom,
-              color: NonaColors.appBg,
-            )
-          else
-            SendaBottomNav(
-              current: _tab,
-              onSelect: (t) => setState(() => _tab = t),
+                    )
+                  : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
             ),
-        ],
+
+            SettingsTab(
+              practice: widget.practice,
+              auth: widget.auth,
+              friends: widget.friends,
+              purchases: widget.purchases,
+              notifications: widget.notifications,
+              prefs: widget.prefs,
+              locale: widget.locale,
+              theme: widget.theme,
+              progress: widget.progress,
+            ),
+          ],
+        ),
+        // Abajo: el banner y, debajo, la barra de pestañas O el hueco del gesto.
+        //
+        // Mientras se juega la barra **se va del árbol**, no se atenúa: es el
+        // alto que le hace falta al tablero, y con `hidden` seguiría ocupándolo.
+        // Que dependa de la vista y no de un gesto es lo que hace que sea seguro:
+        // la vista solo cambia al navegar, así que nada se mueve bajo los dedos a
+        // mitad de una partida.
+        //
+        // Al quitarla hay que devolver a mano el hueco de la barra de gestos, que
+        // hasta ahora cubría ella; si no, el numpad queda debajo de la raya.
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // En pantallas muy bajas el banner se sacrifica: el tablero manda.
+            if (widget.banner != null &&
+                MediaQuery.sizeOf(context).height >= 700)
+              widget.banner!,
+            if (_inGame)
+              Container(
+                height: MediaQuery.paddingOf(context).bottom,
+                color: NonaColors.appBg,
+              )
+            else
+              // Escucha aquí y no en el `build` entero: una solicitud que llega
+              // mientras alguien juega no tiene por qué reconstruir el tablero.
+              ListenableBuilder(
+                listenable: widget.friends,
+                builder: (context, _) => SendaBottomNav(
+                  current: _tab,
+                  onSelect: (t) => setState(() => _tab = t),
+                  // Lo mismo que enciende el punto de la cabecera de Social:
+                  // nacen y mueren juntos, y no se apagan por MIRAR.
+                  alert: widget.friends.hasPendingIncoming,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
