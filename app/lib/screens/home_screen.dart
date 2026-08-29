@@ -265,20 +265,35 @@ class _Menu extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const SizedBox(height: 8),
-                          // Banda de 64 de alto: es el tamaño del logo de
-                          // CINCO. El logo de Nona todavía no existe, así que
-                          // va la palabra dentro de la MISMA banda — así los
-                          // huecos de abajo son los de CINCO hoy y lo seguirán
-                          // siendo cuando llegue el logo de verdad.
+                          // El logo de Nona (Claude Design, 28-8-2026): Figtree
+                          // Light con tracking amplio, no una imagen — así sigue
+                          // coloreado por el acento del tema, igual que antes.
+                          // Banda de 64 de alto: es el tamaño del logo de CINCO;
+                          // se mantiene para que los huecos de alrededor no se
+                          // muevan.
+                          //
+                          // letterSpacing e fontWeight leídos del diseño: la
+                          // fuente y los valores de tracking (32px sobre el
+                          // título, 11px sobre el subtítulo) los dio la propia
+                          // sesión de diseño, a la escala en la que se dibujó el
+                          // logo (~195px de título). Escalados aquí a proporción
+                          // igual sobre el tamaño real de la app (44px/17px):
+                          // 32×44/195≈7.2 y 11×17/52.6≈3.6 — copiar el "32" o el
+                          // "11" tal cual habría quedado con el texto pegado.
                           SizedBox(
                             height: 64,
                             child: Center(
                               child: Text(
-                                l.appName,
+                                // En VERSALES, como el diseño: no es un
+                                // adorno tipográfico — con Figtree Light el
+                                // contraste mayúscula/minúscula queda débil, y
+                                // todo en mayúsculas es lo que sostiene la
+                                // lectura del logo a este tamaño.
+                                l.appName.toUpperCase(),
                                 style: TextStyle(
                                   fontSize: 44,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.w300,
+                                  letterSpacing: 7.2,
                                   color: NonaColors.accent,
                                 ),
                               ),
@@ -292,8 +307,8 @@ class _Menu extends StatelessWidget {
                             l.appTagline.toUpperCase(),
                             style: const TextStyle(
                               fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 4,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 3.6,
                               color: NonaColors.muted,
                             ),
                           ),
