@@ -268,20 +268,19 @@ class _Menu extends StatelessWidget {
                           // El logo de Nona (Claude Design, 28-8-2026): Figtree
                           // Light con tracking amplio, no una imagen — así sigue
                           // coloreado por el acento del tema, igual que antes.
-                          // Banda de 64 de alto: es el tamaño del logo de CINCO;
-                          // se mantiene para que los huecos de alrededor no se
-                          // muevan.
                           //
                           // letterSpacing e fontWeight leídos del diseño: la
                           // fuente y los valores de tracking (32px sobre el
                           // título, 11px sobre el subtítulo) los dio la propia
                           // sesión de diseño, a la escala en la que se dibujó el
-                          // logo (~195px de título). Escalados aquí a proporción
-                          // igual sobre el tamaño real de la app (44px/17px):
-                          // 32×44/195≈7.2 y 11×17/52.6≈3.6 — copiar el "32" o el
-                          // "11" tal cual habría quedado con el texto pegado.
+                          // logo (~195px de título) — proporción
+                          // letterSpacing/fontSize ≈0.1636. Al agrandar el
+                          // título (pedido de André, 28-8-2026) el tracking
+                          // escala CON él para no perder esa proporción; la
+                          // banda de alto crece igual para que el texto no se
+                          // recorte contra el borde.
                           SizedBox(
-                            height: 64,
+                            height: 82,
                             child: Center(
                               child: Text(
                                 // En VERSALES, como el diseño: no es un
@@ -291,9 +290,9 @@ class _Menu extends StatelessWidget {
                                 // lectura del logo a este tamaño.
                                 l.appName.toUpperCase(),
                                 style: TextStyle(
-                                  fontSize: 44,
+                                  fontSize: 56,
                                   fontWeight: FontWeight.w300,
-                                  letterSpacing: 7.2,
+                                  letterSpacing: 9.2,
                                   color: NonaColors.accent,
                                 ),
                               ),
