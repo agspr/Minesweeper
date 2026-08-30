@@ -20,7 +20,7 @@ dependencies:
   juegos_senda:
     git:
       url: https://github.com/agspr/juegos-senda.git
-      ref: package-v0.38.0
+      ref: package-v0.39.0
       path: package
 
   # Firebase Core se declara aquí porque main() lo inicializa; el resto de la
