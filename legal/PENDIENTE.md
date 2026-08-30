@@ -929,3 +929,65 @@ aXIGKu2WqnfcX0OVT0MmgVZ9QJu1`): los tres amigos completos, `rosa_pr`
 **Y la 27 está lista y verificada** en `~/Nona-releases/` (AAB versionCode 27 e
 IPA build 27, con el arreglo del esquema de Google dentro, comprobado). Es la
 que desbloquea la primera submission a Apple.
+
+---
+
+## LANZAMIENTO — 27-8-2026 (noche)
+
+### Apple: ENVIADA ✅
+
+`1.0 (build 27)` en **WAITING_FOR_REVIEW**, enviada 22:59 UTC. Es la **primera**
+submission de Nona; no hay historial de rechazos.
+
+Se desbloqueó resolviendo cuatro cosas que faltaban:
+
+| Qué faltaba | Cómo quedó |
+|---|---|
+| Build sin asignar | build 27 asignada |
+| Cumplimiento de exportación | **exento** (solo TLS estándar vía Firebase y los SDK de acceso) |
+| Clasificación por edad | anuncios **sí**, contenido de usuario **sí** (nombre y @usuario visibles, con bloqueo y reporte), el resto ninguno |
+| Territorios | nunca configurados → aplicada la exclusión UE/RU: **145 disponibles**, 30 fuera, Suiza dentro |
+| **App Privacy** | era el bloqueo real; publicada |
+
+La **etiqueta de privacidad refleja la política publicada**: Nombre, Correo,
+User ID y Contenido de juego **vinculados** a la identidad para funcionamiento;
+Interacción, Fallos y Rendimiento **NO vinculados** (que es justo lo que la
+política promete de la analítica). Declaran **seguimiento** dos: **Device ID
+(IDFA) y Datos de publicidad**, porque la app pide el IDFA para AdMob.
+
+**Códigos promocionales: imposibles todavía.** App Store Connect dice literal
+*"Promo Codes can only be generated for approved versions"*. Se reescribió la
+nota de revisión para no prometerlos y explicar que el IAP se prueba en sandbox.
+Cuando Nona esté aprobada, generar tres es cosa de dos minutos.
+
+**El IAP** quedó `READY_TO_SUBMIT` (le faltaba la captura de revisión, que se
+generó del simulador). Apple lo agrupa con la versión en un primer lanzamiento;
+**conviene verificar que entró de verdad** cuando avance la revisión.
+
+### Play: BLOQUEADA en "Sign in details" ⛔
+
+Progreso: **8 de 11**. Se rellenó la **política de privacidad** ✅.
+
+**El bloqueo es duro y encadena el resto.** Play dice, textual:
+
+> *"You must complete the Sign in details section before starting the Target
+> audience and content questionnaire"*
+
+Y "Sign in details" no se deja guardar sin **usuario y contraseña reales**. Por
+los criterios de Play la respuesta correcta es **Sí, hay parte restringida**,
+porque su propia lista incluye *"Google Account sign in"* y *"payments, such as
+one-time products"*, y Nona tiene las dos.
+
+**No lo puedo completar yo: no tecleo credenciales en ningún formulario.**
+Tampoco sirve decirle al revisor que use su cuenta: Play avisa que los
+revisores **no pueden usar cuentas propias ni contactar al desarrollador**.
+
+**Lo que hace falta de André**, en esa pantalla (Play Console → App content →
+Sign in details):
+1. Una **cuenta de prueba de Google** (usuario y contraseña) para la pestaña
+   Social.
+2. Idealmente, una **cuenta de prueba de licencia** para el IAP.
+
+En cuanto estén, lo demás lo termino yo: Target audience, Data safety (las
+respuestas ya están decididas, son las mismas que la etiqueta de Apple) y la
+promoción de la 27 a producción.

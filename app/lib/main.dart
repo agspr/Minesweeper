@@ -148,7 +148,7 @@ Future<void> main() async {
     theme: ThemeController(prefs),
     progress: progress,
     auth: auth,
-    friends: FriendsService(firebaseReady: firebaseReady),
+    friends: FriendsService(firebaseReady: firebaseReady, gameId: nonaGameId),
     notifications: notifications,
     prefs: prefs,
     // La clasificación necesita Firestore ya en el constructor, así que sin

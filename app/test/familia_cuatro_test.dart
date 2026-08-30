@@ -24,7 +24,7 @@ import 'helpers.dart';
 /// envuelto. Los tres fallan en silencio — `alert` tiene valor por omisión, así
 /// que olvidarlo COMPILA y no rompe ninguna prueba existente.
 class _Amigos extends FriendsService {
-  _Amigos() : super(firebaseReady: false);
+  _Amigos() : super(firebaseReady: false, gameId: nonaGameId);
   void avisar() => notifyListeners();
 }
 
@@ -69,7 +69,7 @@ void main() {
             theme: ThemeController(prefs),
             progress: ProgressController(prefs),
             auth: AuthController(firebaseReady: false, prefs: prefs),
-            friends: friends ?? FriendsService(firebaseReady: false),
+            friends: friends ?? FriendsService(firebaseReady: false, gameId: nonaGameId),
             notifications: NotificationsService(
               firebaseReady: false,
               gameId: nonaGameId,

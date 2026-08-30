@@ -68,7 +68,7 @@ void main() {
           theme: ThemeController(prefs),
           progress: ProgressController(prefs),
           auth: AuthController(firebaseReady: false, prefs: prefs),
-          friends: FriendsService(firebaseReady: false),
+          friends: FriendsService(firebaseReady: false, gameId: nonaGameId),
           purchases: PurchaseService(prefs, const IapConfig(removeAdsId: 'x')),
           notifications: NotificationsService(
             firebaseReady: false,
@@ -99,7 +99,7 @@ void main() {
     await tester.pumpWidget(
       testApp(
         SendaLeaderboardScreen(
-          friends: FriendsService(firebaseReady: false),
+          friends: FriendsService(firebaseReady: false, gameId: nonaGameId),
           leaderboard: _FuenteFalsa(),
           gameId: nonaGameId,
           myUid: 'yo',
@@ -133,7 +133,7 @@ void main() {
     await tester.pumpWidget(
       testApp(
         SendaFriendsScreen(
-          friends: FriendsService(firebaseReady: false),
+          friends: FriendsService(firebaseReady: false, gameId: nonaGameId),
           gameId: nonaGameId,
           notifications: NotificationsService(
             firebaseReady: false,

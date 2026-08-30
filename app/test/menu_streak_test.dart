@@ -56,7 +56,7 @@ void main() {
           theme: ThemeController(prefs),
           progress: ProgressController(prefs),
           auth: AuthController(firebaseReady: false, prefs: prefs),
-          friends: FriendsService(firebaseReady: false),
+          friends: FriendsService(firebaseReady: false, gameId: nonaGameId),
           notifications: NotificationsService(
             firebaseReady: false,
             gameId: nonaGameId,
