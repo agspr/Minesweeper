@@ -545,11 +545,11 @@ packages:
     dependency: "direct main"
     description:
       path: package
-      ref: "package-v0.36.0"
-      resolved-ref: "5360da204d97c4192cb79eec99ef6d5e5b7124e2"
+      ref: "package-v0.37.0"
+      resolved-ref: c2c60128b90746acf92f52c6e64bcfae2fb586de
       url: "https://github.com/agspr/juegos-senda.git"
     source: git
-    version: "0.36.0"
+    version: "0.37.0"
   leak_tracker:
     dependency: transitive
     description:
