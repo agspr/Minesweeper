@@ -26,7 +26,11 @@ void main() {
       testApp(
         SettingsTab(
           practice: PracticeController(prefs),
-          auth: AuthController(firebaseReady: false, prefs: prefs),
+          auth: AuthController(
+            gameId: nonaGameId,
+            firebaseReady: false,
+            prefs: prefs,
+          ),
           friends: FriendsService(firebaseReady: false, gameId: nonaGameId),
           purchases: PurchaseService(prefs, const IapConfig(removeAdsId: 'x')),
           notifications: NotificationsService(

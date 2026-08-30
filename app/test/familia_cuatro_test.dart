@@ -68,8 +68,14 @@ void main() {
             locale: LocaleController(prefs),
             theme: ThemeController(prefs),
             progress: ProgressController(prefs),
-            auth: AuthController(firebaseReady: false, prefs: prefs),
-            friends: friends ?? FriendsService(firebaseReady: false, gameId: nonaGameId),
+            auth: AuthController(
+              gameId: nonaGameId,
+              firebaseReady: false,
+              prefs: prefs,
+            ),
+            friends:
+                friends ??
+                FriendsService(firebaseReady: false, gameId: nonaGameId),
             notifications: NotificationsService(
               firebaseReady: false,
               gameId: nonaGameId,
