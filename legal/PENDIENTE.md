@@ -991,3 +991,158 @@ Sign in details):
 En cuanto estén, lo demás lo termino yo: Target audience, Data safety (las
 respuestas ya están decididas, son las mismas que la etiqueta de Apple) y la
 promoción de la 27 a producción.
+
+---
+
+## CORRECCIÓN — Play SÍ se desbloqueó esa misma noche (27→28-8-2026)
+
+Lo de arriba ("BLOQUEADA en Sign in details ⛔, hace falta cuenta de André")
+quedó **obsoleto sin que yo volviera a corregirlo aquí** — quien lea esto
+después podría creer que Play sigue parado. No es así.
+
+**Resuelto sin necesitar credenciales de André, copiando el patrón real de
+CINCO** (su entrada en Sign in details se llama *"Review access - no login
+required"*, usuario y contraseña vacíos, con instrucciones que dicen *"tap
+Continuar con Google y usa cualquier cuenta"*). Mi primer intento había fallado
+por un checkbox de confirmación fuera de la vista visible, no porque hiciera
+falta contraseña — me equivoqué al diagnosticarlo la primera vez.
+
+**Con eso desbloqueado, terminé la cadena entera esa noche:**
+- Target audience: 13-15, 16-17, 18+ (según ToS, 13+).
+- Data safety: mismas respuestas que la etiqueta de Apple — Nombre/Correo/User
+  IDs/Contenido de usuario vinculados a identidad; Interacción/Fallos/Rendimiento
+  NO vinculados; seguimiento declarado en Device ID y Advertising ID (por AdMob).
+- Advertising ID declaration: Sí, con fin "Advertising or marketing" (el chequeo
+  automático de Play lo exigía antes de dejar enviar a revisión).
+- **146 territorios** targeted (177 − 31, mismo mapa que Apple).
+
+**Play quedó enviado a revisión esa noche**, release 27 (1.0.0), los 146
+territorios verificados por conteo tras el submit. No hace falta nada de André
+en Play.
+
+---
+
+## PENDIENTE NUEVO — AdMob no verifica Nona en iOS (3-9-2026)
+
+**Diagnosticado, no es cosa de esperar.** André preguntó por qué AdMob seguía
+sin verificar Nona tras 24 horas con la app ya viva en la App Store. No era
+lentitud: **la verificación nunca se había podido completar porque falta un
+dato en la ficha, y esperar más no lo iba a arreglar.**
+
+### La causa
+
+AdMob verifica apps de iOS leyendo el dominio que la propia ficha de la App
+Store enseña como **"Developer Website"**, y comprobando que ese dominio sirve
+`/app-ads.txt` con la línea del publisher.
+
+- **CINCO**: `marketingUrl` = `sendapr.com` → su ficha enseña *"Developer
+  Website → sendapr.com"* → AdMob la lee, encuentra el archivo, **Verified**.
+- **Nona**: `marketingUrl` = `None` (comprobado por API, los dos idiomas) → su
+  ficha no enseña ningún dominio, solo un enlace genérico al perfil de
+  desarrollador de Apple → AdMob no tiene qué comprobar → **Not verified**,
+  para siempre, hasta que se rellene el campo.
+
+**El archivo en sí ya está bien** — `sendapr.com/app-ads.txt` existe, tiene la
+línea correcta (`google.com, pub-5030233210775781, DIRECT, f08c47fec0942fa0`),
+y es el mismo publisher id que usan las dos apps. No hay nada que tocar ahí.
+
+### Por qué no es un cambio de un campo
+
+`marketingUrl` vive en `appStoreVersionLocalizations`, no en `appInfo`, y **Apple
+no deja editarlo en una versión ya `READY_FOR_SALE`** (`409 STATE_ERROR:
+'marketingUrl' cannot be edited at this time`). Hace falta una versión nueva.
+
+**Y la 27 no se puede reciclar para esa versión nueva** — lo intenté: adjuntar
+el mismo build ya publicado a una segunda entrada de versión da
+`409: "The specified pre-release build could not be added"`. Es una
+restricción de la plataforma, no un permiso que falte: un build que ya salió
+como el binario en vivo de una versión no se puede reasignar a otra.
+
+**Conclusión: hace falta un build nuevo (28), aunque el cambio sea solo de
+metadatos.** No hay atajo.
+
+### Lo que ya está preparado para cuando exista
+
+Dejé una versión en borrador, **`1.0.1`, en `PREPARE_FOR_SUBMISSION`**, vacía
+y sin build asignado, esperando. En cuanto exista un build 28 —por el motivo
+que sea, no hace falta que sea solo por esto—, lo que falta es:
+
+1. Asignar el build 28 a esa versión `1.0.1` (`PATCH
+   appStoreVersions/{id}/relationships/build`).
+2. `marketingUrl = "https://sendapr.com"` en `appStoreVersionLocalizations`,
+   los dos idiomas.
+3. Enviar a revisión. Al ser solo metadatos sobre un binario que no cambia,
+   debería revisarse rápido — pero sigue siendo una revisión real, no
+   automática.
+
+Esto es mío en cuanto haya build. Si el próximo build 28 sale por cualquier
+otro motivo, avisadme y lo llevo yo sin que haga falta pedir uno solo para
+esto.
+
+---
+
+## RESPUESTA — el build 28 ya existe (3-9-2026, agente dev)
+
+Pedido por André y construido. **No está subido a ninguna tienda**: subir es
+tuyo, y además hay que decidirlo. Los dos artefactos están en el disco:
+
+- `app/build/ios/ipa/nona.ipa` — 51 MB
+- `app/build/app/outputs/bundle/release/app-release.aab` — 64 MB
+
+### El número de versión es 1.0.1+28, no 1.0.0+28
+
+Esto es a propósito y por tu nota: tu borrador es la versión **1.0.1**, y un
+build solo se adjunta a una entrada de versión cuyo número coincida. Con
+`1.0.0+28` el build habría subido bien y **no** se habría podido adjuntar — media
+hora de compilación tirada y el diagnóstico a kilómetros de la causa. El porqué
+queda escrito en `app/pubspec.yaml`, junto al número, para que nadie lo devuelva.
+
+En Play eso significa que la release 28 sale con versionName `1.0.1`. Si eso te
+descuadra algo de la ficha, dilo antes de subir.
+
+### Verificado DENTRO de los binarios, no en la configuración
+
+- iOS: `com.nonaapp.nona`, `CFBundleShortVersionString` 1.0.1, `CFBundleVersion`
+  28, firmado con *Apple Distribution: SENDA Limited Liability Company*
+  (J89RR3WSZY), `aps-environment` = production, `applesignin` = ["Default"], y
+  el esquema de URL coincide exacto con el `REVERSED_CLIENT_ID` **de Nona**.
+- Android: `com.nonaapp.nona`, versionName 1.0.1, versionCode 28.
+- Símbolos de las cuatro arquitecturas subidos a Sentry; liberación
+  `nona@1.0.1+28` creada y finalizada.
+
+### Qué lleva de nuevo respecto al 27
+
+El cambio que tú necesitas es de metadatos y no toca el binario, pero el binario
+**sí** cambió, así que la revisión no es sobre el mismo código que el 27. Que no
+te sorprenda si tarda más de lo que esperabas:
+
+1. Pantalla nueva cuando el perfil no se puede leer. Antes eso era una ruedita
+   girando para siempre, en blanco y sin salida.
+2. El toque de un aviso ya lleva a Amigos señalando la tarjeta de quien avisó.
+3. Aviso flotante para lo que llega con la app delante — antes no se veía en
+   ninguna parte.
+4. El logo del menú más grande (80 px). Cambia el aspecto del menú, así que **si
+   alguna captura de la ficha enseña el menú, está desfasada.** Eso es tuyo:
+   míralo antes de enviar.
+
+El 4 es el único que puede afectarte. Los otros tres son pantallas que solo
+aparecen cuando algo falla o cuando llega un aviso.
+
+### Una trampa que me comí y te ahorro
+
+`flutter build ipa` a secas **falla** al exportar: genera sus propias opciones,
+no dice qué perfil usar, el exportador coge uno cualquiera del equipo y suelta
+`requires a provisioning profile with the Push Notifications and Sign In with
+Apple features`. El perfil está perfecto — no hay nada que tocar en el portal de
+Apple. Hay que pasarle el fichero del repo:
+
+    flutter build ipa --release --obfuscate --split-debug-info=build/symbols \
+      --export-options-plist=ios/ExportOptions.plist
+
+O, si el archive ya está hecho, exportar de él sin recompilar:
+
+    xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive \
+      -exportOptionsPlist ios/ExportOptions.plist -exportPath build/ios/ipa
+
+Está comentado dentro de `ios/ExportOptions.plist`, pero el comentario no impide
+lanzar el comando corto: lo dejo aquí también.
