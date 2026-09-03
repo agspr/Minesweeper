@@ -147,6 +147,91 @@ void main() {
     );
   });
 
+  group('el aviso que llega con la app DELANTE', () {
+    testWidgets('se ve, con su título y su cuerpo', (tester) async {
+      // Esto es lo que no se veía en ninguna parte: el paquete lo publicaba y
+      // Nona no lo pintaba, y el sistema tampoco lo pinta con la app delante.
+      final avisos = await montar(tester);
+      avisos.avisoEnPantalla.value = const AvisoEnPantalla(
+        titulo: '@ana te agregó',
+        cuerpo: 'Ya son amigos en Juegos Senda',
+        tipo: 'friend_accepted',
+        from: 'uid-de-ana',
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('@ana te agregó'), findsOneWidget);
+      expect(find.text('Ya son amigos en Juegos Senda'), findsOneWidget);
+    });
+
+    testWidgets('el icono lo decide el TIPO, no sale siempre el mismo', (
+      tester,
+    ) async {
+      // Un aviso de racha con cara de solicitud de amistad no falla: ENGAÑA. Y
+      // así se aprende a ignorar el aviso.
+      final avisos = await montar(tester);
+      avisos.avisoEnPantalla.value = const AvisoEnPantalla(
+        titulo: 'x',
+        cuerpo: '',
+        tipo: 'streak_danger',
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byIcon(Icons.local_fire_department_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.person_add_alt_1_rounded), findsNothing);
+    });
+
+    testWidgets('se va solo, sin que nadie lo descarte', (tester) async {
+      // Un aviso que hay que quitar a mano es una tarea más, y encima tapando
+      // el tablero.
+      final avisos = await montar(tester);
+      avisos.avisoEnPantalla.value = const AvisoEnPantalla(
+        titulo: 'sigue ahí?',
+        cuerpo: '',
+        tipo: 'friend_request',
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('sigue ahí?'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 7));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(avisos.avisoEnPantalla.value, isNull);
+      expect(find.text('sigue ahí?'), findsNothing);
+    });
+
+    testWidgets('tocarlo lo cierra y pide llevar a Amigos', (tester) async {
+      final avisos = await montar(tester);
+      avisos.avisoEnPantalla.value = const AvisoEnPantalla(
+        titulo: 'tócame',
+        cuerpo: '',
+        tipo: 'friend_request',
+        from: 'uid-de-ana',
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.text('tócame'));
+      await tester.pump();
+      // Cerrado, y la peticion de abrir Amigos ya CONSUMIDA por `_abrirAmigos`
+      // —sin sesion no empuja nada, pero la atiende igual—. Que quede en null
+      // es la prueba de que el toque llego a su sitio y no se perdio.
+      expect(avisos.avisoEnPantalla.value, isNull);
+      expect(avisos.abrirAmigosPara.value, isNull);
+      expect(find.byType(SendaSocialSignedOut), findsOneWidget);
+    });
+
+    testWidgets('sin cuerpo no deja una línea vacía', (tester) async {
+      final avisos = await montar(tester);
+      avisos.avisoEnPantalla.value = const AvisoEnPantalla(
+        titulo: 'solo título',
+        cuerpo: '',
+        tipo: 'friend_request',
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text(''), findsNothing);
+    });
+  });
+
   group('la mitad que necesita sesión, sobre el texto', () {
     String src() => File('lib/screens/home_screen.dart').readAsStringSync();
 
@@ -168,7 +253,12 @@ void main() {
       );
     });
 
-    test('el listener se suelta al desmontar', () {
+    test('los DOS listeners se sueltan al desmontar', () {
+      // Uno lo suelta la pantalla (`abrirAmigosPara`) y el otro el propio
+      // `_AvisoFlotante`, que lo tiene como `widget.aviso`. Y el temporizador
+      // con él: sobrevive seis segundos a la pantalla y escribe al despertarse.
+      expect(src(), contains('widget.aviso.removeListener'));
+      expect(src(), contains('_cierre?.cancel()'));
       // `NotificationsService` sobrevive a la pantalla —lo crea main()—, así que
       // un listener sin soltar mantiene viva la State y llama a `setState` sobre
       // algo desmontado.

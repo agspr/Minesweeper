@@ -1,7 +1,12 @@
 name: nona
 description: "Nona — Sudoku del día. Parte de Juegos Senda."
 publish_to: 'none'
-version: 1.0.0+27
+# 1.0.1 y no 1.0.0: el agente de listings dejó la versión 1.0.1 en borrador en
+# App Store Connect para poder rellenar `marketingUrl` —que Apple no deja editar
+# en una versión ya READY_FOR_SALE—, y un build solo se puede adjuntar a una
+# entrada de versión cuyo número coincida. Con 1.0.0+28 el build subiría bien y
+# NO se podría adjuntar, que es media hora de compilación tirada.
+version: 1.0.1+28
 
 environment:
   sdk: ^3.13.0

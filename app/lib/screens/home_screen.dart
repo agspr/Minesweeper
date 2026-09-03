@@ -4,6 +4,8 @@
 /// mano para quien ya hizo la de hoy o quiere practicar sin que cuente.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../game/daily_controller.dart';
@@ -126,7 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // vacía no explica nada. La Social ya invita a entrar; ahí se queda. Pasa
     // con un aviso viejo en la bandeja después de cerrar sesión.
     if (!widget.auth.signedIn) return;
-    Navigator.of(context).push(_rutaDeAmigos(destacar: uid.isEmpty ? null : uid));
+    Navigator.of(context)
+        .push(_rutaDeAmigos(destacar: uid.isEmpty ? null : uid));
   }
 
   /// La única forma de abrir Amigos. Suelta porque la abren dos sitios —el
@@ -161,94 +164,119 @@ class _HomeScreenState extends State<HomeScreen> {
       tableroDelante: _boardUp,
       onMenu: () => _goPlay(_Play.menu),
       child: Scaffold(
-        // IndexedStack y no un `switch`: mantiene VIVAS las tres pestañas, así
-        // que ir a Más a mitad de un puzle y volver no reinicia el tablero ni el
-        // cronómetro. Con un switch, cada cambio de pestaña destruiría la partida
-        // en curso.
-        body: IndexedStack(
-          index: SendaTab.values.indexOf(_tab),
+        // El aviso flota POR ENCIMA, en un Stack, y no empuja nada. Un banner
+        // que hiciera reflow movería el tablero bajo los dedos de quien está
+        // rellenando una casilla.
+        body: Stack(
           children: [
-            switch (_play) {
-              _Play.menu => _Menu(
-                daily: widget.daily,
-                locale: widget.locale,
-                progress: widget.progress,
-                onDaily: () => _goPlay(_Play.daily),
-                onPractice: () {
-                  // Se carga al entrar, no al arrancar la app: generar un puzle
-                  // en el arranque en frío retrasaría la diaria, que es a lo que
-                  // viene la gente.
-                  if (widget.practice.board == null) widget.practice.load();
-                  _goPlay(_Play.practice);
+            // IndexedStack y no un `switch`: mantiene VIVAS las tres pestañas,
+            // así que ir a Más a mitad de un puzle y volver no reinicia el
+            // tablero ni el cronómetro. Con un switch, cada cambio de pestaña
+            // destruiría la partida en curso.
+            IndexedStack(
+              index: SendaTab.values.indexOf(_tab),
+              children: [
+                switch (_play) {
+                  _Play.menu => _Menu(
+                    daily: widget.daily,
+                    locale: widget.locale,
+                    progress: widget.progress,
+                    onDaily: () => _goPlay(_Play.daily),
+                    onPractice: () {
+                      // Se carga al entrar, no al arrancar la app: generar un puzle
+                      // en el arranque en frío retrasaría la diaria, que es a lo que
+                      // viene la gente.
+                      if (widget.practice.board == null) widget.practice.load();
+                      _goPlay(_Play.practice);
+                    },
+                  ),
+                  _Play.daily => GameScreen(
+                    controller: widget.daily,
+                    progress: widget.progress,
+                    theme: widget.theme,
+                    onExit: () => _goPlay(_Play.menu),
+                    onPractice: () {
+                      if (widget.practice.board == null) widget.practice.load();
+                      _goPlay(_Play.practice);
+                    },
+                  ),
+                  _Play.practice => PracticeScreen(
+                    controller: widget.practice,
+                    theme: widget.theme,
+                    onExit: () => _goPlay(_Play.menu),
+                  ),
                 },
-              ),
-              _Play.daily => GameScreen(
-                controller: widget.daily,
-                progress: widget.progress,
-                theme: widget.theme,
-                onExit: () => _goPlay(_Play.menu),
-                onPractice: () {
-                  if (widget.practice.board == null) widget.practice.load();
-                  _goPlay(_Play.practice);
-                },
-              ),
-              _Play.practice => PracticeScreen(
-                controller: widget.practice,
-                theme: widget.theme,
-                onExit: () => _goPlay(_Play.menu),
-              ),
-            },
 
-            // Lo social es lo único que necesita cuenta: sin ella no hay con
-            // quién compararse.
-            //
-            // Con sesión, la pestaña lleva a Amigos. La CLASIFICACIÓN todavía no
-            // —necesita `LeaderboardService`, que es de la fase B—, pero enseñar
-            // la invitación a entrar a alguien que YA entró sería pedirle que
-            // haga algo que acaba de hacer.
-            //
-            // `onInvite` va nulo a propósito hasta el guardarraíl #3: con un solo
-            // `fcmToken` por persona, una invitación desde Nona llega a la app
-            // que registró el token la última vez — una moneda al aire.
-            // La pestaña Social es el MARCADOR. Las solicitudes y las
-            // invitaciones viven detrás del icono de persona, en Amigos, que se
-            // abre como pantalla completa (§15).
-            ListenableBuilder(
-              listenable: Listenable.merge([widget.auth, widget.progress]),
-              builder: (context, _) =>
-                  widget.auth.signedIn && widget.leaderboard != null
-                  ? SendaLeaderboardScreen(
-                      friends: widget.friends,
-                      leaderboard: widget.leaderboard!,
-                      gameId: nonaGameId,
-                      myUid: widget.auth.user!.uid,
-                      mySummary: widget.progress.summaryAsOf(DateTime.now()),
-                      // Tu fila sale con tu nombre, como las de tus amigos. La
-                      // identidad la aporta Nona porque ya la tiene en la
-                      // sesión: pedírsela a Firestore sería pagar una lectura
-                      // por algo que está en memoria.
-                      myName: widget.auth.displayName,
-                      myUsername: widget.auth.username,
-                      myAvatar: widget.auth.avatarId,
-                      myCountry: widget.auth.country,
-                      // Sin nadie que señalar: aquí se entra a mirar, no
-                      // porque te hayan avisado de algo.
-                      onOpenFriends: () =>
-                          Navigator.of(context).push(_rutaDeAmigos()),
-                    )
-                  : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
+                // Lo social es lo único que necesita cuenta: sin ella no hay con
+                // quién compararse.
+                //
+                // Con sesión, la pestaña lleva a Amigos. La CLASIFICACIÓN todavía no
+                // —necesita `LeaderboardService`, que es de la fase B—, pero enseñar
+                // la invitación a entrar a alguien que YA entró sería pedirle que
+                // haga algo que acaba de hacer.
+                //
+                // `onInvite` va nulo a propósito hasta el guardarraíl #3: con un solo
+                // `fcmToken` por persona, una invitación desde Nona llega a la app
+                // que registró el token la última vez — una moneda al aire.
+                // La pestaña Social es el MARCADOR. Las solicitudes y las
+                // invitaciones viven detrás del icono de persona, en Amigos, que se
+                // abre como pantalla completa (§15).
+                ListenableBuilder(
+                  listenable: Listenable.merge([widget.auth, widget.progress]),
+                  builder: (context, _) =>
+                      widget.auth.signedIn && widget.leaderboard != null
+                      ? SendaLeaderboardScreen(
+                          friends: widget.friends,
+                          leaderboard: widget.leaderboard!,
+                          gameId: nonaGameId,
+                          myUid: widget.auth.user!.uid,
+                          mySummary: widget.progress.summaryAsOf(
+                            DateTime.now(),
+                          ),
+                          // Tu fila sale con tu nombre, como las de tus amigos. La
+                          // identidad la aporta Nona porque ya la tiene en la
+                          // sesión: pedírsela a Firestore sería pagar una lectura
+                          // por algo que está en memoria.
+                          myName: widget.auth.displayName,
+                          myUsername: widget.auth.username,
+                          myAvatar: widget.auth.avatarId,
+                          myCountry: widget.auth.country,
+                          // Sin nadie que señalar: aquí se entra a mirar, no
+                          // porque te hayan avisado de algo.
+                          onOpenFriends: () =>
+                              Navigator.of(context).push(_rutaDeAmigos()),
+                        )
+                      : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
+                ),
+
+                SettingsTab(
+                  practice: widget.practice,
+                  auth: widget.auth,
+                  friends: widget.friends,
+                  purchases: widget.purchases,
+                  notifications: widget.notifications,
+                  prefs: widget.prefs,
+                  locale: widget.locale,
+                  theme: widget.theme,
+                  progress: widget.progress,
+                ),
+              ],
             ),
-
-            SettingsTab(
-              practice: widget.practice,
-              auth: widget.auth,
-              friends: widget.friends,
-              purchases: widget.purchases,
-              notifications: widget.notifications,
-              prefs: widget.prefs,
-              locale: widget.locale,
-              theme: widget.theme,
-              progress: widget.progress,
+            // Nona recogía los toques de aviso pero no lo que llega con la app
+            // DELANTE: el paquete lo publica en `avisoEnPantalla` y nadie lo
+            // pintaba. Y el sistema tampoco —con la app en primer plano iOS no
+            // dibuja el banner por su cuenta—, así que una solicitud de amistad
+            // que llegaba jugando no se veía en ninguna parte.
+            _AvisoFlotante(
+              aviso: widget.notifications.avisoEnPantalla,
+              onTap: (from) {
+                widget.notifications.avisoEnPantalla.value = null;
+                // Cadena vacía y no null: abre Amigos sin señalar a nadie. El
+                // servidor puede no mandar `fromUid` —o mandarlo de un tipo que
+                // no lleva a una tarjeta—, y en ese caso llevar a la lista sigue
+                // siendo mejor que no llevar a ningún sitio.
+                widget.notifications.abrirAmigosPara.value = from ?? '';
+              },
             ),
           ],
         ),
@@ -355,7 +383,10 @@ class _Menu extends StatelessWidget {
                           // banda de alto crece igual para que el texto no se
                           // recorte contra el borde.
                           SizedBox(
-                            height: 82,
+                            // 80 y no 112: el doble del original se probó y se
+                            // descartó por tamaño (André, 3-9-2026). Éste sube
+                            // el logo sin que se coma el menú.
+                            height: 118,
                             child: Center(
                               child: Text(
                                 // En VERSALES, como el diseño: no es un
@@ -365,9 +396,9 @@ class _Menu extends StatelessWidget {
                                 // lectura del logo a este tamaño.
                                 l.appName.toUpperCase(),
                                 style: TextStyle(
-                                  fontSize: 56,
+                                  fontSize: 80,
                                   fontWeight: FontWeight.w300,
-                                  letterSpacing: 9.2,
+                                  letterSpacing: 13.1,
                                   color: NonaColors.accent,
                                 ),
                               ),
@@ -553,6 +584,157 @@ class _ModeCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// El aviso que llega con la app DELANTE.
+///
+/// Nona ya recogía los toques (`wireInviteTaps`) y ya sabía llevar a Amigos,
+/// pero de este canal no leía nada: el paquete publica el aviso en
+/// `avisoEnPantalla` y aquí no había quien lo pintara. Y el sistema tampoco lo
+/// pinta —con la app en primer plano iOS no dibuja el banner por su cuenta, y
+/// el paquete no llama a `setForegroundNotificationPresentationOptions`—, así
+/// que una solicitud de amistad que llegaba jugando **no se veía en ninguna
+/// parte**. Sin error y sin registro, como los otros dos de esta tanda.
+///
+/// Calcado del de CINCO, que es la referencia de la familia. El paquete publica
+/// la clase de datos pero no el widget, a propósito: dónde va el banner lo
+/// decide cada juego.
+class _AvisoFlotante extends StatefulWidget {
+  const _AvisoFlotante({required this.aviso, required this.onTap});
+
+  final ValueNotifier<AvisoEnPantalla?> aviso;
+  final void Function(String? from) onTap;
+
+  @override
+  State<_AvisoFlotante> createState() => _AvisoFlotanteState();
+}
+
+class _AvisoFlotanteState extends State<_AvisoFlotante> {
+  Timer? _cierre;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.aviso.addListener(_programarCierre);
+  }
+
+  @override
+  void dispose() {
+    _cierre?.cancel();
+    widget.aviso.removeListener(_programarCierre);
+    super.dispose();
+  }
+
+  void _programarCierre() {
+    _cierre?.cancel();
+    if (widget.aviso.value == null) return;
+    // Se va solo. Un aviso que hay que descartar a mano es una tarea más, y
+    // encima tapando el tablero.
+    _cierre = Timer(const Duration(seconds: 6), () {
+      if (mounted) widget.aviso.value = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<AvisoEnPantalla?>(
+      valueListenable: widget.aviso,
+      builder: (context, a, _) => AnimatedSwitcher(
+        duration: const Duration(milliseconds: 220),
+        child: a == null
+            ? const SizedBox.shrink()
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () {
+                        Haptics.selection();
+                        widget.onTap(a.from);
+                      },
+                      child: Ink(
+                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                        decoration: BoxDecoration(
+                          color: NonaColors.surface,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: NonaColors.accent.withValues(alpha: .45),
+                          ),
+                          // Sombra, que CINCO no lleva: aquí el banner cae sobre
+                          // el TABLERO, y un borde de 1 px compite con las rayas
+                          // de la rejilla en vez de separarse de ellas.
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x66000000),
+                              blurRadius: 16,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            // El icono lo decide el TIPO. Fijo, un aviso de
+                            // racha se pintaría con cara de solicitud de
+                            // amistad: no falla, engaña — y así se aprende a
+                            // ignorar el aviso.
+                            Icon(
+                              switch (a.tipo) {
+                                'nudge' => Icons.notifications_active_rounded,
+                                'streak_request' ||
+                                'streak_started' ||
+                                'streak_danger' =>
+                                  Icons.local_fire_department_rounded,
+                                _ => Icons.person_add_alt_1_rounded,
+                              },
+                              size: 20,
+                              color: a.tipo.startsWith('streak')
+                                  ? const Color(0xFFFFB454)
+                                  : NonaColors.accent,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    // El texto viene del servidor, ya traducido
+                                    // al idioma de quien lo recibe. Por eso este
+                                    // widget no toca el ARB: escribir aquí un
+                                    // texto fijo sería el ÚNICO sitio de Nona
+                                    // que no respeta el idioma elegido.
+                                    a.titulo,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                      color: NonaColors.text,
+                                    ),
+                                  ),
+                                  if (a.cuerpo.isNotEmpty)
+                                    Text(
+                                      a.cuerpo,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: NonaColors.muted,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
       ),
     );
   }
