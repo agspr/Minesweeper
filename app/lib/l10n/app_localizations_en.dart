@@ -239,4 +239,17 @@ class LEn extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get profileErrorTitle => 'We couldn\'t load your profile';
+
+  @override
+  String get profileErrorBody =>
+      'It may be your connection. Your progress is saved on this phone and hasn\'t been lost.';
+
+  @override
+  String get profileErrorRetry => 'Try again';
+
+  @override
+  String get profileErrorSignOut => 'Sign out';
 }

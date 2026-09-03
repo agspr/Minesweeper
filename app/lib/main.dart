@@ -13,7 +13,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -332,6 +331,20 @@ class _AuthGate extends StatelessWidget {
         }
 
         if (auth.signedIn) {
+          // **Si el perfil no se pudo leer, se DICE.** Antes esto era solo la
+          // ruedita, y un fallo de lectura la dejaba girando para siempre:
+          // pantalla en blanco, sin texto y sin salida. Pasó de verdad —App
+          // Check denegando en un simulador cuyo token de depuración no estaba
+          // registrado— y le pasa igual a quien no supere la atestación en un
+          // aparato real, o con una regla mal desplegada.
+          //
+          // Va ANTES del spinner: `profileReady` se queda en false a propósito
+          // ante el error (si se diera por leído, `needsOnboarding` mandaría a
+          // elegir @usuario a quien ya tiene uno, y es inmutable), así que sin
+          // esta comprobación el error es indistinguible de «aún cargando».
+          if (auth.profileError != null) {
+            return _NoSePudoLeerElPerfil(auth: auth, l: l);
+          }
           if (!auth.profileReady) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
@@ -351,4 +364,93 @@ class _AuthGate extends StatelessWidget {
       },
     );
   }
+}
+
+/// Lo que se enseña cuando la lectura del perfil falla.
+///
+/// Calcada de la de CINCO (`_NoSePudoLeerElPerfil`) salvo en una cosa: **los
+/// textos salen del ARB**, porque Nona es bilingüe de verdad y ahí CINCO puede
+/// permitirse castellano fijo y Nona no.
+///
+/// **Dos salidas, y las dos hacen falta.** Reintentar cubre el caso pasajero
+/// —la conexión—, pero si el fallo es de la cuenta (atestación que no pasa,
+/// una regla que la deja fuera) reintentar no sale nunca del bucle: cerrar
+/// sesión es lo único que devuelve el control. Con una sola, la pantalla sería
+/// otro callejón sin salida, más bonito.
+class _NoSePudoLeerElPerfil extends StatelessWidget {
+  const _NoSePudoLeerElPerfil({required this.auth, required this.l});
+
+  final AuthController auth;
+  final L l;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    body: SafeArea(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l.profileErrorTitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w800,
+                  color: NonaColors.text,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                // Que el progreso local no se ha perdido se dice explícito: es
+                // lo primero que teme quien ve fallar su perfil.
+                l.profileErrorBody,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14.5,
+                  height: 1.5,
+                  color: NonaColors.muted,
+                ),
+              ),
+              const SizedBox(height: 26),
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: auth.reintentarPerfil,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: NonaColors.accent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                  child: Text(
+                    l.profileErrorRetry,
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w800,
+                      color: NonaColors.accentDeep,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              TextButton(
+                onPressed: auth.signOut,
+                child: Text(
+                  l.profileErrorSignOut,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: NonaColors.muted,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

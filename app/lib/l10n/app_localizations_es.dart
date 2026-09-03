@@ -239,4 +239,17 @@ class LEs extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get profileErrorTitle => 'No se pudo cargar tu perfil';
+
+  @override
+  String get profileErrorBody =>
+      'Puede ser la conexión. Tu progreso está guardado en este teléfono y no se ha perdido.';
+
+  @override
+  String get profileErrorRetry => 'Reintentar';
+
+  @override
+  String get profileErrorSignOut => 'Cerrar sesión';
 }

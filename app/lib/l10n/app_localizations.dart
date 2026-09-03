@@ -480,6 +480,30 @@ abstract class L {
   /// In es, this message translates to:
   /// **'{count, plural, one{🔥 1 día de racha} other{🔥 {count} días de racha}}'**
   String menuStreak(int count);
+
+  /// No description provided for @profileErrorTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo cargar tu perfil'**
+  String get profileErrorTitle;
+
+  /// No description provided for @profileErrorBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Puede ser la conexión. Tu progreso está guardado en este teléfono y no se ha perdido.'**
+  String get profileErrorBody;
+
+  /// No description provided for @profileErrorRetry.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get profileErrorRetry;
+
+  /// No description provided for @profileErrorSignOut.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get profileErrorSignOut;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

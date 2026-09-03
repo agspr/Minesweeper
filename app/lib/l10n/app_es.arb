@@ -1,41 +1,51 @@
 {
   "@@locale": "es",
-
   "appName": "Nona",
   "appTagline": "Sudoku del día",
-
   "menuDaily": "Sudoku del día",
   "menuDailyToday": "{difficulty} · hoy",
   "@menuDailyToday": {
-    "placeholders": { "difficulty": { "type": "String" } }
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      }
+    }
   },
   "menuDailyDone": "Hecha · {difficulty}",
   "@menuDailyDone": {
-    "placeholders": { "difficulty": { "type": "String" } }
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      }
+    }
   },
   "menuLoading": "Cargando…",
   "menuPractice": "Modo práctica",
   "menuPracticeSubtitle": "Puzles infinitos · sin puntos ni racha",
-
   "difficultyEasy": "Fácil",
   "difficultyMedium": "Medio",
   "difficultyHard": "Difícil",
-
   "noMistakes": "sin errores",
   "mistakeCount": "{count, plural, one{1 error} other{{count} errores}}",
   "@mistakeCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "mistakeCapSuffix": " (tope)",
   "@mistakeCapSuffix": {
     "description": "Se añade al contador de errores al llegar al tope de 5, donde la penalización deja de crecer."
   },
-
   "hintCount": "{count, plural, one{1 pista} other{{count} pistas}}",
   "@hintCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "undo": "Deshacer",
   "erase": "Borrar",
   "notes": "Notas",
@@ -48,7 +58,6 @@
   "closeGame": "Menú principal",
   "hint": "Pista",
   "newPuzzle": "Otro puzle",
-
   "solved": "¡Resuelto!",
   "unfinished": "Por hoy lo dejamos aquí",
   "streakDays": "días de racha",
@@ -58,26 +67,39 @@
   "breakdownNoMistakes": "Sin errores",
   "breakdownCompleted": "{percent}% completado",
   "@breakdownCompleted": {
-    "placeholders": { "percent": { "type": "int" } }
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
   },
   "breakdownTotal": "Total",
   "streakKept": "🔥 Racha mantenida",
   "streakNeedsFinish": "La racha pide terminarlo",
   "done": "Listo",
-
   "bankGap": "No hay puzle para hoy.\nRevisa la fecha de tu dispositivo.",
   "@bankGap": {
     "description": "Solo debería verse si se agota el horizonte horneado del banco o si el reloj del aparato está en otra era."
   },
-
   "language": "Idioma",
   "languageSystem": "Del sistema",
-
   "share": "Compartir",
   "shareScore": "{points} pts",
-  "@shareScore": {"placeholders": {"points": {"type": "int"}}},
+  "@shareScore": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "shareStreak": "🔥 {days} días de racha",
-  "@shareStreak": {"placeholders": {"days": {"type": "int"}}},
+  "@shareStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "shareChallenge": "¿Puedes con la de hoy?",
   "statsPracticeByLevel": "Práctica por nivel",
   "statsPlayedShort": "Jugadas",
@@ -90,7 +112,6 @@
   "statsBestStreak": "Mejor racha",
   "statsTotalPoints": "Puntos",
   "statsAvgMistakes": "Errores por día",
-
   "more": "Más",
   "aboutNona": "Acerca de Nona",
   "aboutSubtitle": "Quiénes somos, términos, privacidad y contacto",
@@ -98,5 +119,15 @@
   "boardColourOn": "Tablero en color",
   "boardColourOff": "Tablero en gris",
   "menuStreak": "{count, plural, one{🔥 1 día de racha} other{🔥 {count} días de racha}}",
-  "@menuStreak": { "placeholders": { "count": { "type": "int" } } }
+  "@menuStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileErrorTitle": "No se pudo cargar tu perfil",
+  "profileErrorBody": "Puede ser la conexión. Tu progreso está guardado en este teléfono y no se ha perdido.",
+  "profileErrorRetry": "Reintentar",
+  "profileErrorSignOut": "Cerrar sesión"
 }

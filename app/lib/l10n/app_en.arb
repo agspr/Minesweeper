@@ -1,26 +1,20 @@
 {
   "@@locale": "en",
-
   "appName": "Nona",
   "appTagline": "Daily Sudoku",
-
   "menuDaily": "Daily sudoku",
   "menuDailyToday": "{difficulty} · today",
   "menuDailyDone": "Done · {difficulty}",
   "menuLoading": "Loading…",
   "menuPractice": "Practice mode",
   "menuPracticeSubtitle": "Endless puzzles · no points or streak",
-
   "difficultyEasy": "Easy",
   "difficultyMedium": "Medium",
   "difficultyHard": "Hard",
-
   "noMistakes": "no mistakes",
   "mistakeCount": "{count, plural, one{1 mistake} other{{count} mistakes}}",
   "mistakeCapSuffix": " (max)",
-
   "hintCount": "{count, plural, one{1 hint} other{{count} hints}}",
-
   "undo": "Undo",
   "erase": "Erase",
   "notes": "Notes",
@@ -33,7 +27,6 @@
   "closeGame": "Main menu",
   "hint": "Hint",
   "newPuzzle": "New puzzle",
-
   "solved": "Solved!",
   "unfinished": "Let's leave it here for today",
   "streakDays": "day streak",
@@ -46,12 +39,9 @@
   "streakKept": "🔥 Streak kept",
   "streakNeedsFinish": "The streak needs a finish",
   "done": "Done",
-
   "bankGap": "There's no puzzle for today.\nCheck your device's date.",
-
   "language": "Language",
   "languageSystem": "System",
-
   "share": "Share",
   "shareScore": "{points} pts",
   "shareStreak": "🔥 {days}-day streak",
@@ -67,7 +57,6 @@
   "statsBestStreak": "Best streak",
   "statsTotalPoints": "Points",
   "statsAvgMistakes": "Mistakes per day",
-
   "more": "More",
   "aboutNona": "About Nona",
   "aboutSubtitle": "Who we are, terms, privacy and contact",
@@ -75,5 +64,15 @@
   "boardColourOn": "Board in colour",
   "boardColourOff": "Board in grey",
   "menuStreak": "{count, plural, one{🔥 1 day streak} other{🔥 {count} day streak}}",
-  "@menuStreak": { "placeholders": { "count": { "type": "int" } } }
+  "@menuStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileErrorTitle": "We couldn't load your profile",
+  "profileErrorBody": "It may be your connection. Your progress is saved on this phone and hasn't been lost.",
+  "profileErrorRetry": "Try again",
+  "profileErrorSignOut": "Sign out"
 }

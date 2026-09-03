@@ -89,6 +89,65 @@ class _HomeScreenState extends State<HomeScreen> {
   bool get _inGame => _tab == SendaTab.play && _boardUp;
 
   @override
+  void initState() {
+    super.initState();
+    widget.notifications.abrirAmigosPara.addListener(_abrirAmigos);
+    // **Y una vez más al montarse.** Con la app CERRADA, el toque llega por
+    // `getInitialMessage`, que resuelve antes de que esta pantalla exista: el
+    // valor ya está puesto y el listener nunca se dispara. Sin esto se perdería
+    // justo el caso más común —tocar el aviso sin tener la app abierta—, y sin
+    // más síntoma que «no pasa nada».
+    WidgetsBinding.instance.addPostFrameCallback((_) => _abrirAmigos());
+  }
+
+  @override
+  void dispose() {
+    widget.notifications.abrirAmigosPara.removeListener(_abrirAmigos);
+    super.dispose();
+  }
+
+  /// Lleva a Amigos, señalando a quien provocó el aviso.
+  ///
+  /// Nona escuchaba los toques (`wireInviteTaps`) pero no leía el resultado, así
+  /// que tocar «X te agregó» abría la app y ahí se acababa. Ahora aterriza en la
+  /// tarjeta correcta, parpadeando: buscar en una lista qué te habían dicho es
+  /// exactamente lo que el aviso venía a ahorrar.
+  void _abrirAmigos() {
+    final uid = widget.notifications.abrirAmigosPara.value;
+    if (uid == null || !mounted) return;
+    // Se consume ANTES de navegar. Si no, al volver atrás el listener dispara
+    // otra vez y la pantalla se reabre sola.
+    widget.notifications.abrirAmigosPara.value = null;
+    // Amigos cuelga de la Social, así que la pestaña se mueve también: cerrar
+    // la pantalla completa tiene que dejar debajo el sitio del que salió, no
+    // el tablero.
+    setState(() => _tab = SendaTab.social);
+    // Sin sesión no hay Amigos que enseñar —ni amistades cargadas—, y una lista
+    // vacía no explica nada. La Social ya invita a entrar; ahí se queda. Pasa
+    // con un aviso viejo en la bandeja después de cerrar sesión.
+    if (!widget.auth.signedIn) return;
+    Navigator.of(context).push(_rutaDeAmigos(destacar: uid.isEmpty ? null : uid));
+  }
+
+  /// La única forma de abrir Amigos. Suelta porque la abren dos sitios —el
+  /// icono de persona de la Social y el toque de un aviso— y dos copias de esta
+  /// construcción se separan: la que se toca a mano quedaría bien y la del
+  /// aviso llevaría meses abriendo otra cosa sin que nadie lo note.
+  Route<void> _rutaDeAmigos({String? destacar}) => MaterialPageRoute<void>(
+    fullscreenDialog: true,
+    builder: (_) => SendaFriendsScreen(
+      friends: widget.friends,
+      gameId: nonaGameId,
+      notifications: widget.notifications,
+      // Las invitaciones cruzadas necesitan la Function y las reglas
+      // desplegadas. Hasta entonces la sección no se pinta: un "+" que no
+      // envía nada promete algo que no cumple.
+      invitesEnabled: kInvitesEnabled,
+      destacar: destacar,
+    ),
+  );
+
+  @override
   Widget build(BuildContext context) {
     // **El gesto de volver saca del tablero al menú.**
     //
@@ -172,21 +231,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       myUsername: widget.auth.username,
                       myAvatar: widget.auth.avatarId,
                       myCountry: widget.auth.country,
-                      onOpenFriends: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          fullscreenDialog: true,
-                          builder: (_) => SendaFriendsScreen(
-                            friends: widget.friends,
-                            gameId: nonaGameId,
-                            notifications: widget.notifications,
-                            // Las invitaciones cruzadas necesitan la Function y
-                            // las reglas desplegadas. Hasta entonces la sección
-                            // no se pinta: un "+" que no envía nada promete algo
-                            // que no cumple.
-                            invitesEnabled: kInvitesEnabled,
-                          ),
-                        ),
-                      ),
+                      // Sin nadie que señalar: aquí se entra a mirar, no
+                      // porque te hayan avisado de algo.
+                      onOpenFriends: () =>
+                          Navigator.of(context).push(_rutaDeAmigos()),
                     )
                   : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
             ),
