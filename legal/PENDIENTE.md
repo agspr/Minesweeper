@@ -1146,3 +1146,82 @@ O, si el archive ya está hecho, exportar de él sin recompilar:
 
 Está comentado dentro de `ios/ExportOptions.plist`, pero el comentario no impide
 lanzar el comando corto: lo dejo aquí también.
+
+---
+
+## REGLA NUEVA — Nona pasa a auto-release en Apple (4-9-2026)
+
+**Decisión de André.** Hasta ahora cada versión de Nona salía con
+`releaseType: MANUAL` — Apple la aprueba y se queda esperando a que alguien
+pulse "Release" a mano. Las dos veces que pasó (build 27 y build 28) fue André
+quien lo hizo manualmente; **no hay ningún release automático de Apple**, y yo
+me equivoqué una vez asumiendo que sí lo había.
+
+**A partir de ahora, toda versión nueva de Nona se crea con
+`releaseType: "AFTER_APPROVAL"`**, no `MANUAL`. Sale sola en cuanto Apple
+aprueba, sin que nadie tenga que volver a entrar a pulsar nada.
+
+**No es un ajuste de la app ni de la cuenta: es un campo por versión.**
+Comprobado: `releaseType` no se puede tocar en una versión que ya salió
+(`409: cannot be modified`), y no existe un interruptor a nivel de app que lo
+fije de una vez para siempre. Hay que ponerlo explícitamente **cada vez** que
+se crea una `appStoreVersion` nueva —el valor por defecto de la API si no se
+especifica sigue siendo `MANUAL`—.
+
+```json
+{"data":{"type":"appStoreVersions","attributes":{
+  "platform":"IOS","versionString":"…","releaseType":"AFTER_APPROVAL"
+},"relationships":{"app":{"data":{"type":"apps","id":"6802670347"}}}}}
+```
+
+Play no tiene este problema — sus releases a producción ya salen en cuanto se
+comete el `edit`, sin paso manual aparte.
+
+---
+
+## RESPUESTA — build 29 listo, y sube a la versión 1.0.2 (6-9-2026, agente dev)
+
+Pedido por André. **Sin subir a ninguna tienda**: eso es tuyo.
+
+- `app/build/ios/ipa/nona.ipa` — 51 MB
+- `app/build/app/outputs/bundle/release/app-release.aab` — 64 MB
+
+### El número de VERSIÓN sube, no solo el de build
+
+**1.0.2+29**, y esta vez no es por tu borrador sino porque Apple obliga: 1.0.1
+ya salió a la venta con el build 28, y una versión READY_FOR_SALE no se puede
+reenviar. Hace falta una entrada de versión NUEVA, y un build solo se adjunta a
+una cuyo número coincida. En Play, la release 29 sale con versionName 1.0.2.
+
+Tu regla del 4-9-2026 aplica aquí: al crear esa `appStoreVersion` nueva, ponle
+`releaseType: "AFTER_APPROVAL"` explícitamente, que el valor por defecto de la
+API sigue siendo MANUAL.
+
+### Verificado DENTRO de los binarios
+
+- iOS: `com.nonaapp.nona`, versión 1.0.2, build 29, firmado con *Apple
+  Distribution: SENDA Limited Liability Company* (J89RR3WSZY),
+  `aps-environment` = production, `applesignin` = ["Default"].
+- Android: `com.nonaapp.nona`, versionName 1.0.2, versionCode 29.
+- Símbolos subidos; liberación `nona@1.0.2+29` creada y finalizada en Sentry.
+
+### Qué lleva de nuevo respecto al 28 — una sola cosa
+
+La vibración de un dígito equivocado. Ya existía, pero el fichero afirmaba que
+era «la vibración LARGA del sistema» y eso es falso: el framework la documenta
+como «for a short duration», y en Android es un tic único indistinguible del
+golpe de un botón. Ahora el fallo pide además el patrón de error del sistema, y
+en iOS eso va por la MISMA ruta de UIKit por la que ya se sienten las teclas
+—la de antes iba por el motor de alerta, otra distinta, y esa asimetría es la
+explicación candidata de que se vea el rojo y no se sienta nada—.
+
+**Nada que revisar en la ficha ni en las capturas.** No cambia una sola pantalla:
+es solo lo que se siente en la mano. Las capturas del 28 siguen valiendo tal
+cual.
+
+### Un aviso para las notas de la versión
+
+Si escribes notas de novedades, esto se cuenta como «mejoras en la respuesta
+táctil al fallar», no como una función nueva. Y ojo: en un iPad sin motor de
+vibración no hay aviso háptico ninguno, ni antes ni ahora, así que no prometas
+en la ficha algo que ese aparato no entrega.
