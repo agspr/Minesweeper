@@ -129,10 +129,16 @@ void main() {
 
     expect(pulsado, 1);
     expect(golpes(), 1);
+    // Se afirma la lista ENTERA, no la ausencia de una etiqueta concreta.
+    // Antes esto decía «no aparece 'larga'», y eso dependía de que la
+    // vibración de fallo siguiera siendo justo esa primitiva: el día que
+    // `NonaHaptics.mistake` cambie —y ha cambiado—, el guardia se queda verde
+    // sin comprobar nada, que es peor que no tenerlo. Así caza el cableado
+    // equivocado use la primitiva que use.
     expect(
-      vibraciones.where((v) => v == 'larga'),
-      isEmpty,
-      reason: 'una tecla del numpad no puede dar nunca la vibración de fallo',
+      vibraciones,
+      ['HapticFeedbackType.lightImpact'],
+      reason: 'una tecla del numpad da su golpe y NADA más',
     );
   });
 

@@ -9,35 +9,49 @@
 ///
 /// ## Los tres escalones
 ///
-/// Cada uno usa una primitiva DISTINTA del sistema, no la misma con otro
-/// nombre, así que no hay forma de confundirlos con el teléfono en el bolsillo:
-///
-/// | escalón      | primitiva        | cuándo                              |
-/// |--------------|------------------|-------------------------------------|
-/// | [select]     | `selectionClick` | mover la selección por el tablero    |
-/// | [tap]        | `lightImpact`    | cualquier BOTÓN                      |
-/// | [mistake]    | `vibrate`        | escribir un dígito equivocado        |
+/// | escalón   | qué se le pide al sistema        | cuándo                    |
+/// |-----------|----------------------------------|---------------------------|
+/// | [select]  | `selectionClick`                 | mover la selección        |
+/// | [tap]     | `lightImpact`                    | cualquier BOTÓN           |
+/// | [mistake] | `errorNotification` + `vibrate`  | escribir un dígito malo   |
 ///
 /// El de la selección es más tenue que el de los botones a propósito: se
 /// dispara al pasear el dedo por 81 casillas buscando dónde escribir, y con el
 /// golpe de un botón en cada una, barrer el tablero se sentiría como teclear.
 ///
-/// Que solo el fallo sea LARGO es lo que hace legible el resto: deshacer,
-/// borrar, notas, paleta y la X no pueden producirlo ni por error, porque
-/// [mistake] solo se llama desde `tapDigit` cuando `SudokuBoard.place`
-/// devuelve que ha contado un fallo.
+/// Los dos primeros son un golpe suelto; el fallo es lo único que pide un
+/// PATRÓN. Esa es la diferencia que se nota sin mirar, y [mistake] solo se
+/// llama desde `tapDigit` cuando `SudokuBoard.place` devuelve que ha contado un
+/// fallo: deshacer, borrar, notas, paleta y la X no pueden producirlo ni por
+/// error.
 ///
 /// Los botones vibran en `onTapDown` y no al soltar (igual que el teclado de
 /// CINCO): así la vibración acompaña al dedo bajando, y en un dígito
 /// equivocado se siente como PULSACIÓN y luego VEREDICTO en vez de dos
 /// vibraciones encimadas.
 ///
-/// No hace falta interruptor propio: HapticFeedback respeta los ajustes de
-/// vibración del sistema en iOS y en Android. Y `SystemChannels.platform` es un
-/// `OptionalMethodChannel`, así que en una prueba sin simulador de plataforma
-/// esto no falla: simplemente no hace nada.
+/// ## Lo que aquí NO se puede prometer
+///
+/// **No existe la vibración sostenida.** Los ocho métodos de `HapticFeedback`
+/// acaban en el mismo método de canal y ninguno acepta duración; lo sostenido
+/// de verdad es Core Haptics, que el engine no expone. Un comentario anterior
+/// aquí llamaba a `vibrate` «el único patrón sostenido», y era falso: el propio
+/// framework lo documenta como «for a short duration», y en Android es
+/// `HapticFeedbackConstants.LONG_PRESS`, que se llama así por el GESTO y es un
+/// tic único. Alargar el aviso solo se puede haciendo que se REPITA.
+///
+/// **Y puede no existir ninguna.** No es que respetemos el ajuste del sistema:
+/// es que no podemos imponer nada. En Android los cuatro caminos pasan por
+/// `performHapticFeedback`, que obedece el ajuste de retorno táctil. En un iPad
+/// sin motor de vibración no hay absolutamente nada que sentir. Así que la
+/// háptica REFUERZA el aviso de un fallo; no lo sustituye. El fondo rojo de la
+/// casilla tiene que bastar por sí solo.
+///
+/// `SystemChannels.platform` es un `OptionalMethodChannel`, así que en una
+/// prueba sin simulador de plataforma esto no falla: simplemente no hace nada.
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 abstract final class NonaHaptics {
@@ -56,12 +70,50 @@ abstract final class NonaHaptics {
   /// ya seleccionada no mueve nada y no debe vibrar.
   static void select() => HapticFeedback.selectionClick();
 
-  /// Fallo: la vibración LARGA del sistema.
+  /// Fallo: el patrón de error del sistema, y encima el zumbido de alerta.
   ///
-  /// Larga y no un golpe, porque el aviso visual puede no bastar. Con Coral,
-  /// una pista y un dígito equivocado llevan el mismo color y el mismo peso;
-  /// lo que los separa es el fondo rojo de la casilla, y un fondo se puede
-  /// pasar por alto con el dedo encima. Un zumbido largo no. Y es distinta de
-  /// cualquier golpe de acierto: `vibrate` es el único patrón sostenido.
-  static void mistake() => HapticFeedback.vibrate();
+  /// Tiene que notarse porque el aviso visual puede no bastar: con Coral, una
+  /// pista y un dígito equivocado llevan el mismo color y el mismo peso, y lo
+  /// que los separa es el fondo rojo de la casilla — que se tapa con el dedo
+  /// encima.
+  ///
+  /// **Dos llamadas, ninguna diferida, y ese es el diseño entero.** Secuenciar
+  /// pulsos a mano con `Timer` es lo que parece obvio y es justo lo que no se
+  /// puede hacer aquí, por una razón que no se ve hasta que se mide: para no
+  /// encabalgar dos avisos habría que cancelar el anterior, y cancelarlo hace
+  /// que dos fallos seguidos y tres se sientan IGUAL. En Nona el reloj no
+  /// puntúa; el contador de fallos es lo único que puntúa. Un fallo tiene que
+  /// seguir siendo un evento contable con el teléfono en el bolsillo, así que
+  /// el patrón lo secuencia el sistema operativo y nosotros no guardamos
+  /// estado. Sin `Timer` tampoco hay nada que sobreviva al desmontaje de la
+  /// pantalla, ni que caiga dentro de la prueba siguiente.
+  ///
+  /// **`errorNotification` primero, y no por semántica sino por CAMINO.** En
+  /// iOS es `UINotificationFeedbackGenerator` con
+  /// `UINotificationFeedbackTypeError`: varios transitorios seguidos —un
+  /// patrón de verdad, hecho por el sistema— y sobre todo la MISMA ruta de
+  /// UIKit por la que ya se sienten las teclas del numpad. `vibrate` va por
+  /// otra distinta (`AudioServicesPlaySystemSound`, el motor de alerta), y esa
+  /// asimetría es la explicación candidata de que alguien sienta las teclas y
+  /// no el fallo. Si es eso, esto lo cura.
+  ///
+  /// **Y `vibrate` se queda detrás a propósito.** Es lo que Nona lleva dando
+  /// desde que existe, así que conservarlo garantiza que este cambio no puede
+  /// sentirse MENOS que antes en un teléfono donde hoy sí se nota; y como
+  /// cuelga de otra ruta, si una de las dos está muda queda la otra. Quitarlo
+  /// es una línea; recuperar una sensación a la que alguien ya se acostumbró,
+  /// no.
+  ///
+  /// En Android `errorNotification` es `HapticFeedbackConstants.REJECT`, pero
+  /// **solo desde API 30**, y el mínimo de Flutter es 24: por debajo no hace
+  /// nada y no avisa de nada. Por eso no puede ir sola. Ahí el aviso lo sigue
+  /// sosteniendo `vibrate`, exactamente como hasta ahora — cero regresión.
+  static void mistake() {
+    // El orden importa poco entre dos llamadas síncronas, pero se deja el
+    // patrón delante: es el que hay que sentir, y el zumbido es el refuerzo.
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      HapticFeedback.errorNotification();
+    }
+    HapticFeedback.vibrate();
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nona/game/daily_bank.dart';
@@ -47,6 +48,11 @@ void main() {
   /// botones, así que contarlos por separado prueba que no se han mezclado.
   int clics() =>
       vibraciones.where((v) => v == 'HapticFeedbackType.selectionClick').length;
+
+  /// El patrón de error del sistema. Solo se pide en iOS: ver NonaHaptics.mistake.
+  int erroresDeSistema() => vibraciones
+      .where((v) => v == 'HapticFeedbackType.errorNotification')
+      .length;
 
   int primeraVacia(List<int> givens) => givens.indexWhere((v) => v == 0);
   int otro(int right) => right == 9 ? 1 : right + 1;
@@ -204,4 +210,82 @@ void main() {
       expect(fallos(), 0);
     });
   });
+
+  /// El fallo en iOS pide ADEMÁS el patrón de error del sistema.
+  ///
+  /// Va en su propio grupo porque hace falta mentirle a `defaultTargetPlatform`:
+  /// en `flutter_test` vale `android`, así que la rama de iOS no la recorre
+  /// ninguna de las pruebas de arriba. Sin esto, media `mistake()` no se
+  /// ejecutaría nunca en toda la suite y podría borrarse sin poner nada rojo.
+  group('en iOS', () {
+    setUp(() {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    });
+    tearDown(() {
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    test('un dígito equivocado pide el patrón de error Y el zumbido', () async {
+      // Los dos, y por caminos distintos del sistema: `errorNotification` es
+      // UIKit —la misma ruta por la que ya se sienten las teclas— y `vibrate`
+      // es el motor de alerta. Si una está muda, queda la otra.
+      final c = PracticeController(await SharedPreferences.getInstance());
+      await c.load();
+      final cell = primeraVacia(c.board!.givens);
+      c.select(cell);
+      c.tapDigit(otro(c.board!.solution[cell]));
+
+      expect(erroresDeSistema(), 1);
+      expect(fallos(), 1);
+    });
+
+    test('un dígito correcto no pide ninguno de los dos', () async {
+      final c = PracticeController(await SharedPreferences.getInstance());
+      await c.load();
+      final cell = primeraVacia(c.board!.givens);
+      c.select(cell);
+      c.tapDigit(c.board!.solution[cell]);
+
+      expect(erroresDeSistema(), 0);
+      expect(fallos(), 0);
+    });
+
+    test('mover la selección no pide el patrón de error', () async {
+      // El tic de selección se dispara al pasear el dedo por el tablero. Si el
+      // patrón de error se colara ahí, jugar sería insoportable.
+      final c = PracticeController(await SharedPreferences.getInstance());
+      await c.load();
+      final a = primeraVacia(c.board!.givens);
+      final b = c.board!.givens.indexWhere((v) => v == 0, a + 1);
+      c.select(a);
+      c.select(b);
+
+      expect(erroresDeSistema(), 0);
+    });
+  });
+
+  group('en Android', () {
+    setUp(() {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    });
+    tearDown(() {
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    test('NO se pide el patrón de error: por debajo de API 30 es mudo', () async {
+      // `errorNotification` mapea a HapticFeedbackConstants.REJECT y solo
+      // desde API 30; el mínimo de Flutter es 24, y por debajo no hace nada
+      // sin avisar. Pedirlo aquí daría una garantía que la mitad de los
+      // teléfonos no cumple. El aviso lo sostiene `vibrate`, como siempre.
+      final c = PracticeController(await SharedPreferences.getInstance());
+      await c.load();
+      final cell = primeraVacia(c.board!.givens);
+      c.select(cell);
+      c.tapDigit(otro(c.board!.solution[cell]));
+
+      expect(erroresDeSistema(), 0);
+      expect(fallos(), 1, reason: 'el zumbido de siempre no se toca');
+    });
+  });
+
 }
