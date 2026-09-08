@@ -29,8 +29,28 @@ app/          Flutter app (this is the actual game)
 android/, app/ios/    platform projects
 legal/        privacy policy, ToS, account-deletion — ES + EN, plus PENDIENTE.md
 store/        icons, screenshots, store copy, IAP review assets
+docs/         CONSTRUIR.md — how a build is made, archived and pruned
 tools/        sembrar_demo.py, amigos_demo.py — simulator/Firestore seeding for screenshots
+              archivar_build.py — archives a build; refuses to archive half of one
+archivo-de-builds.json   the record of every build that exists, in git
 ```
+
+## Construir y archivar
+
+**Un AAB sin su IPA no es una build.** Both platforms are built together, from
+the same `version:`, and archived to `~/Nona-releases/` with their sha256 by
+`tools/archivar_build.py archivar`, which refuses — loudly, exit 1, writing
+nothing — if either half is missing. Full procedure in `docs/CONSTRUIR.md`.
+Nothing is uploaded to a store from here; that's the listings agent's.
+
+The archive folder is outside the repo, so the repo's memory of it is
+`archivo-de-builds.json`, and `app/test/archivo_de_builds_test.dart` guards it:
+a half-archived build, an unexplained gap in build numbers, or a version that
+lived in `pubspec.yaml` and never got archived all turn it red. That test is
+there because archiving was done from memory and memory failed twice in a row —
+the IPA of build 28 is gone for good, and 29 came within two days of it.
+A build that never shipped must be written down (`saltar`), and a lost binary
+must be written down (`incidencia`); an unexplained absence stays red.
 
 ## Architecture: the shared package model
 

@@ -1,0 +1,282 @@
+{
+  "juego": "nona",
+  "prefijo": "nona",
+  "carpeta": "~/Nona-releases",
+  "desde": {
+    "build": 10,
+    "razon": "El archivado empieza el 23-8-2026 16:09 con la build 10, un día después de 268053c (22-8 21:43), que subía a 1.0.0+9. Las builds 1 a 9 son anteriores a la costumbre: no existen en ninguna parte y no son una pérdida que buscar."
+  },
+  "builds": {
+    "10": {
+      "version": "1.0.0",
+      "fecha": "2026-08-23",
+      "aab": {
+        "fichero": "nona-1.0.0-10.aab",
+        "bytes": 67007898,
+        "sha256": "00767df50375404cc3bacae187a317874734a036bd6cc51115a1d06b1c99c815"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-10.ipa",
+        "bytes": 54080729,
+        "sha256": "dc957beb33e7c5ef5884de8da7fabc6d8db8070d13d25238898e713ba1a8ce74"
+      }
+    },
+    "11": {
+      "version": "1.0.0",
+      "fecha": "2026-08-23",
+      "aab": {
+        "fichero": "nona-1.0.0-11.aab",
+        "bytes": 67008633,
+        "sha256": "262cc6ceba5a55e8f3d872fdc892d6a0696c61db3a9602ece3d8cc2265de3033"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-11.ipa",
+        "bytes": 54080722,
+        "sha256": "6397dc72b11bdfbaf230816af2cebe1c3c6158bed25500275c75e461a1781ed9"
+      }
+    },
+    "12": {
+      "version": "1.0.0",
+      "fecha": "2026-08-23",
+      "aab": {
+        "fichero": "nona-1.0.0-12.aab",
+        "bytes": 66995928,
+        "sha256": "2bbc70e664210942c30eb669bc74998695f3c57fe5324343d85f9b838d048ff0"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-12.ipa",
+        "bytes": 54081596,
+        "sha256": "9a22d143f8256a47234b27eb4471733b431bce4ba29f297fdf63b6acea271505"
+      }
+    },
+    "13": {
+      "version": "1.0.0",
+      "fecha": "2026-08-23",
+      "aab": {
+        "fichero": "nona-1.0.0-13.aab",
+        "bytes": 66999006,
+        "sha256": "598d1217aa987879347c5454feeeebb67a62a73270a4e0baa2beaabe31d0d0d6"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-13.ipa",
+        "bytes": 54081515,
+        "sha256": "14d07db07717c69b50202082fa68838b8469db20349b8dabf70f3795165fe52a"
+      }
+    },
+    "14": {
+      "version": "1.0.0",
+      "fecha": "2026-08-24",
+      "aab": {
+        "fichero": "nona-1.0.0-14.aab",
+        "bytes": 67011490,
+        "sha256": "a26f36b48891f9ba00424b51425578794a20ef98281d771f63bc122df461bb8c"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-14.ipa",
+        "bytes": 54082166,
+        "sha256": "b0dc507975cb816620a77a4d5d3e5e2cac6860e19c0c671e0bac59bf32576291"
+      }
+    },
+    "15": {
+      "version": "1.0.0",
+      "fecha": "2026-08-24",
+      "aab": {
+        "fichero": "nona-1.0.0-15.aab",
+        "bytes": 67029961,
+        "sha256": "b7384e5e9545bb292b96ff00092293d4665b70e431caf3ad534ffdd7e168479b"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-15.ipa",
+        "bytes": 54085236,
+        "sha256": "541071e456f44cd6475226851b8c275ec82b11c3ec61e4a6cff3e0a864534d9b"
+      }
+    },
+    "16": {
+      "version": "1.0.0",
+      "fecha": "2026-08-24",
+      "aab": {
+        "fichero": "nona-1.0.0-16.aab",
+        "bytes": 67082223,
+        "sha256": "04b62bdd8597382bfe4d6867c765e890deff3c5928f3f8e086f434652c005ac3"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-16.ipa",
+        "bytes": 54093768,
+        "sha256": "187ebc8943626c682306c53b80c2c1652903a6d10e53532a2b7d06e1fe6140b9"
+      }
+    },
+    "17": {
+      "version": "1.0.0",
+      "fecha": "2026-08-24",
+      "aab": {
+        "fichero": "nona-1.0.0-17.aab",
+        "bytes": 67085887,
+        "sha256": "f394f468d011f3fa5408357a564603641f73db7c1c6adaae2d4d234a4047ed27"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-17.ipa",
+        "bytes": 54095347,
+        "sha256": "95813e3e5f5ac56be4797b7178aeeb29cf0bc9f0f663cb958c277bd2a8b83322"
+      }
+    },
+    "18": {
+      "saltada": "No llegó a salir entera. El commit 40bbb6d (25-8-2026 06:35) subió a 1.0.0+18 y siete minutos después b83455d lo dice literalmente: «El 18 no llego a salir entera» — fallo en los nombres reservados del paquete, detectado antes de terminar la build. Se saltó a la 19. No hay binario que buscar.",
+      "fecha": "2026-09-08"
+    },
+    "19": {
+      "version": "1.0.0",
+      "fecha": "2026-08-25",
+      "aab": {
+        "fichero": "nona-1.0.0-19.aab",
+        "bytes": 67093974,
+        "sha256": "2d1137c6950482cd892a99dbdf5fd81c1e6eedd0bd2f110a2bdcfefd5af1ccad"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-19.ipa",
+        "bytes": 54096364,
+        "sha256": "5ca7f294b114c4a84e0cddb57c5239eeaf453af5f8b0bc1c41a3b0bd94a6cb9b"
+      }
+    },
+    "20": {
+      "version": "1.0.0",
+      "fecha": "2026-08-25",
+      "aab": {
+        "fichero": "nona-1.0.0-20.aab",
+        "bytes": 67083755,
+        "sha256": "8837595b41e1e4e25367bc9007d1b8f4f8b3f232043072a87b656821a9598589"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-20.ipa",
+        "bytes": 54101183,
+        "sha256": "b99faaff0cbdbae28ae323fe73a69e59937d6a4c25a9fb036ae2ca09590f3320"
+      }
+    },
+    "21": {
+      "version": "1.0.0",
+      "fecha": "2026-08-26",
+      "aab": {
+        "fichero": "nona-1.0.0-21.aab",
+        "bytes": 71097250,
+        "sha256": "f445f2b7fea466edea975f175c9f455dad0248bcf18bdfa520e7e5b76deb8d08"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-21.ipa",
+        "bytes": 53624722,
+        "sha256": "3be022562c67d2092596d64b23d8b336a8c3bf12a7cdf3734ee5882073924102"
+      }
+    },
+    "22": {
+      "version": "1.0.0",
+      "fecha": "2026-08-26",
+      "aab": {
+        "fichero": "nona-1.0.0-22.aab",
+        "bytes": 71128140,
+        "sha256": "354605f42d37b9423e7e9165e4e69ddb8581e46e7c7ff90e2f0388c3954c4725"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-22.ipa",
+        "bytes": 53636419,
+        "sha256": "866070361a2a2bdb5184fdba27d1bebb637224988bc9200bc9dd98434df1480b"
+      }
+    },
+    "23": {
+      "version": "1.0.0",
+      "fecha": "2026-08-26",
+      "aab": {
+        "fichero": "nona-1.0.0-23.aab",
+        "bytes": 71134517,
+        "sha256": "d706a187104880197b5c26b6a56d18300e328ee26bc821644fbfae5dc2609991"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-23.ipa",
+        "bytes": 53634543,
+        "sha256": "8b0cb3e1ea5bf70747e76bb4023bffca2ce4bf5a98ed634793bd236c8d487837"
+      }
+    },
+    "24": {
+      "version": "1.0.0",
+      "fecha": "2026-08-26",
+      "aab": {
+        "fichero": "nona-1.0.0-24.aab",
+        "bytes": 71139831,
+        "sha256": "c0be2716e103eb072947953a5ce526bd903e5301a7dd40d5c3f8400209ce5e12"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-24.ipa",
+        "bytes": 53635831,
+        "sha256": "f10a48fc024221eec0e3420e9b775c6aa6bf238d03b4fddbe031aa7a104ba009"
+      }
+    },
+    "25": {
+      "version": "1.0.0",
+      "fecha": "2026-08-26",
+      "aab": {
+        "fichero": "nona-1.0.0-25.aab",
+        "bytes": 71137491,
+        "sha256": "d885735783ed54fab181f42db989e1dddd3990661d67711b2b35383e2933da7a"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-25.ipa",
+        "bytes": 53639205,
+        "sha256": "f62ae35e39a594c76b7655ce545c03a50fb40e324e0ec6f6ab5e8a9c82b98516"
+      }
+    },
+    "26": {
+      "version": "1.0.0",
+      "fecha": "2026-08-27",
+      "aab": {
+        "fichero": "nona-1.0.0-26.aab",
+        "bytes": 71139319,
+        "sha256": "a659fabfe71ede164271ad16e14b7dd9f5959ffecd457bec9dea8bd14be10236"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-26.ipa",
+        "bytes": 53637997,
+        "sha256": "25763cd1e4ba3c67062201635f7bcbfa5ccaaa5577b5924ccf86044099559fd1"
+      }
+    },
+    "27": {
+      "version": "1.0.0",
+      "fecha": "2026-08-27",
+      "aab": {
+        "fichero": "nona-1.0.0-27.aab",
+        "bytes": 71154084,
+        "sha256": "08117b122f22419992d28189ba993e225dccfc5250a9bc710cc2d5eaf1aae487"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.0-27.ipa",
+        "bytes": 53641362,
+        "sha256": "7e57a7270d23b011d09b5f8543c3729c0a0df18b9903c0ebc2c1f7f0cbef5e82"
+      },
+      "tienda": "primera entrega a las dos tiendas (1.0.0)"
+    },
+    "28": {
+      "version": "1.0.1",
+      "fecha": "2026-09-03",
+      "aab": {
+        "fichero": "nona-1.0.1-28.aab",
+        "bytes": 66912453,
+        "sha256": "23a25a2623a85b1512baabc7bd6e46dc4f330633471fa826d14578d26a78e279"
+      },
+      "ipa": null,
+      "incidencia": "IPA PERDIDO, no recuperable. flutter build ipa escribe siempre en app/build/ios/ipa/nona.ipa, sin número de build; la exportación de la 29 (6-9-2026 10:42) lo pisó antes de que nadie lo copiara. No hay Time Machine en esta máquina (tmutil destinationinfo: sin destinos) ni copia en ~/.Trash, Downloads, DerivedData o Xcode/Archives. Reconstruir NO lo devuelve: ExportOptions.plist declara manageAppVersionAndBuildNumber=true y App Store Connect rechaza un número de build repetido, así que saldría otro binario con la misma etiqueta. Lo que sí se recupera: los dSYMs (uploadSymbols=true → App Store Connect / Xcode Organizer) y el binario en sí, que está READY_FOR_SALE. Del lado Android no se perdió nada: el AAB archivado lleva dentro los nueve .so.sym y el proguard.map.",
+      "tienda": "App Store READY_FOR_SALE (1.0.1) y Play production"
+    },
+    "29": {
+      "version": "1.0.2",
+      "fecha": "2026-09-06",
+      "aab": {
+        "fichero": "nona-1.0.2-29.aab",
+        "bytes": 66912362,
+        "sha256": "9c43815305dd0cd229883462442f25f7bf68c94c11bdb150c4e85721a05d549a"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.2-29.ipa",
+        "bytes": 53072621,
+        "sha256": "298f193ffc1127a7da092176a921676aeb1490e09b557cdb37bd137ef0b933c1"
+      }
+    }
+  },
+  "paquete_android": "com.nonaapp.nona",
+  "paquete_ios": "com.nonaapp.nona"
+}
