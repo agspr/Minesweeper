@@ -1,7 +1,8 @@
 # Nona — Sudoku del día
 
 Daily sudoku app by SENDA LLC, part of the **Juegos Senda** family (alongside
-CINCO, PRende, transPRte). Flutter, iOS + Android. Bundle/package id
+CINCO and Minigrama). PRende and transPRte are standalone non-game apps and are
+NOT in the family; neither is Leo. Flutter, iOS + Android. Bundle/package id
 `com.nonaapp.nona`. Current version at time of writing: `1.0.0+27`, first
 submission in review on both stores.
 
