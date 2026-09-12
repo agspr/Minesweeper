@@ -72,14 +72,37 @@ class HomeScreen extends StatefulWidget {
 /// Qué se ve dentro de la pestaña Jugar.
 enum _Play { menu, daily, practice }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with WidgetsBindingObserver {
   SendaTab _tab = SendaTab.play;
   _Play _play = _Play.menu;
 
-  void _goPlay(_Play v) => setState(() {
-    _play = v;
-    _tab = SendaTab.play;
-  });
+  void _goPlay(_Play v) {
+    setState(() {
+      _play = v;
+      _tab = SendaTab.play;
+    });
+    // Volver al menú relee el día: quien terminó la de ayer pasada la medianoche
+    // vuelve a un menú que ya enseña la de hoy, y no a uno que la da por hecha.
+    if (v == _Play.menu) unawaited(widget.daily.refreshForToday());
+    _vigilarLaMedianocheSiHayMenu();
+  }
+
+  /// El aviso de medianoche, solo mientras se ve el MENÚ.
+  ///
+  /// Con una partida delante, no. Si la de ayer está a medias cuando dan las
+  /// doce, recargar el día se la quitaría y ya no se podría terminar —lo midió
+  /// la revisión—, y antes de este arreglo, con la app delante, sí se podía. Lo
+  /// que el aviso arregla es que el MENÚ siguiera diciendo «Hecha» pasada la
+  /// medianoche; para eso basta con vigilar mientras se ve el menú y releer el
+  /// día al volver a él.
+  void _vigilarLaMedianocheSiHayMenu() {
+    if (_play == _Play.menu) {
+      widget.daily.watchMidnight();
+    } else {
+      widget.daily.stopWatchingMidnight();
+    }
+  }
 
   /// Hay tablero delante dentro de Jugar. Suelto porque lo necesita también
   /// `SendaBackToMenu`, que pone por su cuenta el término de la pestaña:
@@ -100,12 +123,74 @@ class _HomeScreenState extends State<HomeScreen> {
     // justo el caso más común —tocar el aviso sin tener la app abierta—, y sin
     // más síntoma que «no pasa nada».
     WidgetsBinding.instance.addPostFrameCallback((_) => _abrirAmigos());
+
+    WidgetsBinding.instance.addObserver(this);
+    _diaActual = widget.daily.dayKey;
+    widget.daily.addListener(_alCambiarLaDiaria);
+    _vigilarLaMedianocheSiHayMenu();
+    // **Y una recarga al montarse, tras el primer fotograma.** El menú no
+    // siempre está montado: tras borrar la cuenta o quitar Nona, la puerta de
+    // sesión lo desmonta y lo vuelve a montar como invitado, sin estreno de
+    // sesión que avise. Sin esto, el invitado veía como hecha la diaria de la
+    // cuenta borrada, y abrirla la anotaba en un progreso que la siguiente
+    // cuenta subía a su nube (medido en la revisión). Cubre también el menú que
+    // se monta cuando el día ya cambió. La guardia de `reloadFromPrefs` la deja
+    // en nada si lo guardado sigue siendo lo de hoy. Tras el fotograma y no en
+    // el acto porque la carga avisa a sus oyentes en síncrono, y aquí caería en
+    // mitad de una construcción.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(widget.daily.reloadFromPrefs());
+    });
   }
 
   @override
   void dispose() {
     widget.notifications.abrirAmigosPara.removeListener(_abrirAmigos);
+    WidgetsBinding.instance.removeObserver(this);
+    widget.daily.removeListener(_alCambiarLaDiaria);
+    widget.daily.stopWatchingMidnight();
     super.dispose();
+  }
+
+  /// El día se relee al volver a primer plano DESDE EL ARMAZÓN, no solo desde
+  /// la pantalla de juego.
+  ///
+  /// Antes solo lo hacía `GameScreen`, y solo mientras estuviera montada: con
+  /// el menú delante no lo hacía nadie. Un proceso que sobrevive a la noche
+  /// —lo normal en un teléfono— dejaba el menú enseñando la diaria de ayer
+  /// como hecha, y como hecha ya no invitaba a entrar en la pantalla que sí la
+  /// habría recargado. CINCO lo hace así desde su `home_shell`.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    unawaited(widget.daily.refreshForToday());
+    // Y se reprograma el aviso de medianoche: un temporizador que durmió con la
+    // app suspendida no es de fiar.
+    _vigilarLaMedianocheSiHayMenu();
+  }
+
+  String? _diaActual;
+
+  /// Si cambia el día con la diaria de ayer delante, vuelta al menú.
+  ///
+  /// Se escucha al controlador y no a cada llamante, así que da igual quién
+  /// cambie el día: la vuelta de segundo plano o la medianoche con la app
+  /// abierta. Sin esto el tablero se cambiaría por otro puzle bajo los dedos de
+  /// quien lo estaba resolviendo. Mismo criterio que CINCO.
+  void _alCambiarLaDiaria() {
+    final dia = widget.daily.dayKey;
+    // Durante una carga el día pasa por null; eso no es un cambio de día.
+    if (dia == null) return;
+    final antes = _diaActual;
+    _diaActual = dia;
+    if (antes != null && antes != dia && _play == _Play.daily && mounted) {
+      // A la vista de menú SIN tocar la pestaña. Con `_goPlay` saltaría a Jugar:
+      // si la diaria estaba abierta debajo de Social o de Más —pasa al tocar un
+      // aviso de amistad—, la app te sacaría de donde estabas sin que nadie lo
+      // pidiera (lo midió la revisión).
+      setState(() => _play = _Play.menu);
+      _vigilarLaMedianocheSiHayMenu();
+    }
   }
 
   /// Lleva a Amigos, señalando a quien provocó el aviso.
@@ -345,7 +430,17 @@ class _Menu extends StatelessWidget {
         child: ListenableBuilder(
           listenable: Listenable.merge([daily, progress]),
           builder: (context, _) {
-            final done = daily.isComplete;
+            // Hecha si el tablero está terminado, o si la nube dice que ESTA
+            // cuenta ya la terminó hoy aunque este teléfono no guarde el tablero.
+            // Pasa al volver a tu cuenta el mismo día tras entrar con otra: sin
+            // esto el menú la ofrecía sin hacer e invitaba a repetirla, que es
+            // justo lo que la guardia de `ProgressController.record` no deja
+            // anotar. Tras la medianoche no se queda pegada: el día de la marca
+            // ya no es el de la diaria.
+            final done =
+                daily.isComplete ||
+                (daily.dayKey != null &&
+                    progress.lastCompletedDay == daily.dayKey);
             final l = L.of(context);
             // La racha VIGENTE, no el contador guardado: si el último día
             // terminado no es ni hoy ni ayer, ya está rota.

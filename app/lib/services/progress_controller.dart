@@ -271,6 +271,27 @@ class ProgressController extends ChangeNotifier {
       seconds: seconds,
     );
 
+    // **La nube ya lo tiene TERMINADO, y este teléfono no lo sabía.** Pasa al
+    // volver a tu cuenta el mismo día tras entrar con otra: el cambio de cuenta
+    // borró los registros locales, `adoptCloud` trajo `lastPlayedDay` = hoy, y
+    // la diaria sale sin tablero. Sin esta guardia, repetirla sumaba sus puntos
+    // encima de los adoptados —contados dos veces— y la subida pisaba con
+    // `set()` el día de la nube; si la repetición salía peor, el servidor
+    // congelaba el resumen y la diferencia se perdía para siempre (lo midió la
+    // revisión del 12-9-2026: 500 → 455).
+    //
+    // «Marca de hoy sin registro de hoy» solo puede venir de la nube: aquí la
+    // marca se escribe siempre junto a su registro (`_extendStreak`, abajo).
+    //
+    // **Depende de algo que conviene saber.** En el servidor, `lastPlayedDay`
+    // es el último día con CUALQUIER documento, también a medias
+    // (backend/functions/recompute.js). Esta guardia es correcta porque Nona
+    // solo sube días terminados: el único llamador de `record` es la pantalla
+    // de juego, detrás de `isComplete`. Si algún día se suben partidas a
+    // medias, esto impediría terminar una empezada en otra sesión de la misma
+    // cuenta, y hay que revisarlo.
+    if (previous == null && lastCompletedDay == dayKey) return record;
+
     // Solo la DIFERENCIA: si el día ya había dado 20 puntos de crédito parcial
     // y ahora termina con 100, se suman 80, no 100.
     final delta = score.points - (previous?.points ?? 0);

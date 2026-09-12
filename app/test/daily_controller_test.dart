@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nona/nona_config.dart';
+import 'package:juegos_senda/juegos_senda.dart';
 import 'package:nona/game/daily_bank.dart';
 import 'package:nona/game/daily_controller.dart';
 import 'package:nona/game/difficulty.dart';
@@ -202,6 +204,57 @@ void main() {
         Difficulty.medium,
         reason: 'martes es medio en el mapa semanal',
       );
+    });
+
+    // `reloadFromPrefs` la llama el sincronizador en CADA estreno de sesión,
+    // también cuando entra la misma persona. Las dos pruebas fijan las dos
+    // mitades de su guardia: recarga cuando lo guardado ya no es lo que hay en
+    // memoria, y no toca nada cuando sí lo es.
+    test('reloadFromPrefs con la partida de hoy guardada no toca nada', () async {
+      // Al abrir la app la sesión llega un instante DESPUÉS del primer
+      // fotograma. Recargar a ciegas ahí le quitaría la casilla seleccionada a
+      // quien ya estuviera jugando.
+      final c = await make();
+      final vacias = [
+        for (var i = 0; i < cellCount; i++)
+          if (!c.board!.isGiven(i)) i,
+      ];
+      c.select(vacias[0]);
+      c.tapDigit(c.board!.solution[vacias[0]]);
+      c.select(vacias[1]);
+
+      await c.reloadFromPrefs();
+
+      expect(
+        c.selected,
+        vacias[1],
+        reason: 'recargó sin necesidad y perdió la selección de quien juega',
+      );
+      expect(c.board!.correctCount, 1);
+    });
+
+    test('reloadFromPrefs tras vaciar la cuenta vuelve a un tablero limpio', () async {
+      // Lo que vio André el 12-9-2026: la diaria de una cuenta, terminada,
+      // seguía en memoria después de que entrara otra.
+      final c = await make();
+      _solveAll(c);
+      expect(c.isComplete, isTrue);
+
+      // El borrado DE VERDAD —el del paquete al entrar otra cuenta—, no una
+      // clave copiada a mano: si mañana la partida se guarda con otro nombre,
+      // esta prueba tiene que seguir midiendo lo mismo.
+      SessionSync(
+        await SharedPreferences.getInstance(),
+        ownedPrefixes: nonaConfig.ownedPrefKeyPrefixes,
+      ).wipeOwned();
+      await c.reloadFromPrefs();
+
+      expect(
+        c.isComplete,
+        isFalse,
+        reason: 'la partida de la cuenta anterior sigue en memoria como hecha',
+      );
+      expect(c.board!.correctCount, 0);
     });
   });
 

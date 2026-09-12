@@ -45,6 +45,7 @@ class ProgressSync {
     required this.store,
     required this.session,
     required this.prefs,
+    this.onDeviceClaimed,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now;
 
@@ -68,6 +69,16 @@ class ProgressSync {
 
   final ProgressStore store;
   final SessionSync session;
+
+  /// Se llama justo después de reclamar el aparato, antes de leer nada.
+  ///
+  /// `claimDevice` borra lo GUARDADO de la cuenta anterior, pero lo que ya está
+  /// cargado en memoria —la diaria— no se entera. Sin este aviso la cuenta
+  /// nueva veía la partida de la otra marcada como hecha, y al abrirla ese
+  /// resultado se anotaba en SU progreso. Un aviso y no el `DailyController`
+  /// entero para que el sincronizador no dependa de la pantalla de juego. Es
+  /// el mismo punto en que CINCO llama a `game.reloadFromPrefs()` (su main.dart).
+  final void Function()? onDeviceClaimed;
   final DateTime Function() _clock;
 
   bool _attached = false;
@@ -107,6 +118,9 @@ class ProgressSync {
     // progreso local no es de quien acaba de entrar, y sin limpiarlo la
     // reconciliación se lo regalaría.
     session.claimDevice(uid);
+    // En el acto y antes de cualquier `await`: entre el borrado y la recarga
+    // no puede colarse nada que lea o anote la partida de la cuenta anterior.
+    onDeviceClaimed?.call();
 
     _reconciling = true;
     try {

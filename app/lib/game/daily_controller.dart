@@ -257,16 +257,75 @@ class DailyController extends ChangeNotifier {
     );
   }
 
-  /// Vuelve a leer las prefs para el día actual. Se llama tras un cambio de
-  /// cuenta, cuando SessionSync ya ha limpiado el estado del dueño anterior.
+  /// Vuelve a leer las prefs para el día actual, si lo que hay en memoria ya
+  /// no es lo guardado. La llama `ProgressSync` justo después de reclamar el
+  /// aparato al estrenar sesión.
+  ///
+  /// **Estuvo sin llamador desde el primer commit**, con un comentario que
+  /// decía que se llamaba tras un cambio de cuenta. `claimDevice` borraba la
+  /// partida guardada, pero el tablero de la cuenta anterior seguía en memoria:
+  /// la cuenta nueva veía la diaria de la otra marcada como hecha, y al
+  /// abrirla, `GameScreen` anotaba ese resultado EN SU progreso —y tras un reinicio
+  /// del proceso, que en un teléfono es lo normal, podía acabar en su nube—. Lo encontró André el 12-9-2026 al
+  /// cambiar a la cuenta de pruebas y volver.
+  ///
+  /// **No recarga si lo guardado sigue ahí.** `claimDevice` se llama en cada
+  /// estreno de sesión, también cuando entra la MISMA persona —al abrir la app
+  /// la sesión llega un instante después del primer fotograma—, y solo borra
+  /// si el aparato era de otra cuenta. Recargar a ciegas le quitaría la casilla
+  /// seleccionada y le pararía el reloj a quien ya estuviera jugando. Si las
+  /// prefs aún guardan la partida de hoy, lo que hay en memoria ES de este
+  /// dueño: no hay nada que recargar.
   Future<void> reloadFromPrefs() async {
+    final today = dayKeyFor(_clock());
+    if (_ready && _dayKey == today && _readSaved(today) != null) return;
     _ready = false;
     _dayKey = null;
     await load();
   }
 
+  // ── Medianoche ───────────────────────────────────────────
+
+  Timer? _midnight;
+
+  /// Pasa sola al día nuevo a medianoche, con la app delante.
+  ///
+  /// Volver de segundo plano ya relee el día (`refreshForToday`, desde el
+  /// armazón), pero con la app ABIERTA a medianoche no hay vuelta de la que
+  /// enterarse: el menú seguía enseñando la de ayer como hecha hasta cerrar la
+  /// app. Es la otra mitad del fallo que vio André el 12-9-2026.
+  ///
+  /// Se arma a mano y no en el constructor a propósito: el controlador se
+  /// construye en decenas de pruebas, y un temporizador de hasta 24 h armado en
+  /// cada una las dejaría todas con un temporizador colgando. Lo arma el menú
+  /// mientras se ve, y lo suelta al entrar en una partida o al desmontarse.
+  ///
+  /// Volver a llamarlo reprograma, no duplica. Por eso se llama también al
+  /// volver de segundo plano: un temporizador que durmió con la app suspendida
+  /// no es de fiar.
+  void watchMidnight() {
+    _midnight?.cancel();
+    final now = _clock();
+    // Sin margen, y no por descuido: si el temporizador saltara unos
+    // milisegundos antes de la medianoche, `refreshForToday` leería todavía el
+    // día de ayer y no haría nada, pero la reprogramación de abajo calcularía
+    // una espera de esos pocos milisegundos y volvería a saltar ya en el día
+    // nuevo. Se corrige solo; un margen fijo no añadiría nada que medir.
+    final wait = nextLocalMidnight(now).difference(now);
+    _midnight = Timer(wait, () {
+      unawaited(refreshForToday());
+      watchMidnight();
+    });
+  }
+
+  void stopWatchingMidnight() {
+    _midnight?.cancel();
+    _midnight = null;
+  }
+
   @override
   void dispose() {
+    stopWatchingMidnight();
     pauseTimer();
     super.dispose();
   }

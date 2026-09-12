@@ -179,11 +179,18 @@ void main() {
     test('el suelo no se SUMA a lo jugado aquí: se toma el mayor', () {
       // Sumar contaría dos veces un día que estuviera en los dos lados, y en el
       // marcador de amigos eso es mentir hacia arriba.
+      //
+      // Se juega el 19 y no el 18, y no es un parche para que pase: el 18 es el
+      // `lastPlayedDay` de la nube adoptada, o sea un día que esta cuenta YA
+      // terminó en otra sesión, y volver a anotarlo es la repetición que
+      // `record` no deja contar (cambio de cuenta y vuelta el mismo día,
+      // 12-9-2026). Lo que esta prueba mide es otra cosa —que el suelo de la
+      // semana no se sume a un día jugado aquí—, y el 19 es de la misma semana.
       progress.adoptCloud(nube());
-      jugar(DateTime(2026, 8, 18));
-      final unDia = progress.recordFor('2026-08-18')!.points;
+      jugar(DateTime(2026, 8, 19));
+      final unDia = progress.recordFor('2026-08-19')!.points;
 
-      final s = progress.summaryAsOf(DateTime(2026, 8, 18, 10));
+      final s = progress.summaryAsOf(DateTime(2026, 8, 19, 10));
       expect(s.weekPoints, 120);
       expect(s.weekPoints, isNot(120 + unDia));
     });

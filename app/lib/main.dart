@@ -131,6 +131,11 @@ Future<void> main() async {
         prefs,
         ownedPrefixes: nonaConfig.ownedPrefKeyPrefixes,
       ),
+      // La diaria cargada en memoria es de quien la cargó. Al estrenar sesión
+      // con OTRA cuenta, `claimDevice` borra lo guardado pero no el tablero ya
+      // cargado: sin esto la cuenta nueva veía la partida de la anterior como
+      // hecha, y abrirla le anotaba ese resultado. Lo vio André el 12-9-2026.
+      onDeviceClaimed: daily.reloadFromPrefs,
     ).start();
   }
 

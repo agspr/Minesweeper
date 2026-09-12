@@ -17,6 +17,16 @@ String dayKeyFor(DateTime now) =>
     '${now.month.toString().padLeft(2, '0')}-'
     '${now.day.toString().padLeft(2, '0')}';
 
+/// La próxima medianoche LOCAL después de [now].
+///
+/// `DateTime(año, mes, día + 1)` y no `now.add(Duration(days: 1))`: sumar 24 h
+/// mide tiempo transcurrido, y el día del cambio de hora dura 23 o 25, así que
+/// el aviso caería una hora antes o después de la medianoche de verdad. El
+/// constructor con el día desbordado lo normaliza Dart a la fecha local
+/// correcta —también a fin de mes y de año—, que es justo lo que se quiere.
+DateTime nextLocalMidnight(DateTime now) =>
+    DateTime(now.year, now.month, now.day + 1);
+
 /// Días de calendario entre dos fechas, inmune al horario de verano.
 ///
 /// Restar `DateTime` locales y usar `.inDays` mide tiempo transcurrido, no
