@@ -177,17 +177,25 @@ de nada.
 
 ---
 
-## 5. Entregar al agente de ficha
+## 5. Subir
 
-Esta sesión **no sube nada a ninguna tienda**. Se le deja al agente de ficha una
-nota en `legal/PENDIENTE.md` con:
+Desde el 17-9-2026 **las subidas de build son de esta sesión** (André eliminó al
+agente de ficha y consolidó tiendas y marketing en una sola sesión Senda).
 
-- versión y número de build, y **por qué** ese número de versión;
-- lo verificado dentro de los binarios (lo imprime `tools/archivar_build.py`: identificador,
-  versión, perfil, `aps-environment`, arquitecturas);
-- qué cambió respecto a la build anterior, marcando **lo que le afecta a él**
-  (una captura desfasada, un texto de ficha, un permiso nuevo);
-- dónde están los ficheros: `~/Nona-releases/nona-<version>-<build>.{aab,ipa}`.
+```
+python3 ~/.playconsole/nona-upload-internal.py <versionCode>
+```
+
+Sube el AAB a **pruebas internas** de Play y comprueba el `versionCode` DENTRO
+del .aab antes de asignar la pista: `flutter build` escribe siempre
+`app-release.aab`, así que fiarse del nombre es cómo se sube el binario de otra
+build. La llave es la de PRende (`~/.playconsole/prende-publisher.json`), que
+tiene acceso a `com.nonaapp.nona`; Nona no tiene cuenta de servicio propia. Las
+llaves viven fuera de los repos y no entran en git.
+
+**El IPA lo sube André a TestFlight**, no esta sesión.
+
+Los ficheros quedan en `~/Nona-releases/nona-<version>-<build>.{aab,ipa}`.
 
 ---
 
@@ -249,6 +257,6 @@ estaba vacío.
 
 ## Lo que esta sesión no hace
 
-Sube a las tiendas el agente de ficha (Play Console, App Store Connect, AdMob,
-`legal/`, `store/`). Aquí se construye, se verifica y se archiva. Si hace falta
-cruzar esa línea, lo pide André directamente y solo para esa tarea.
+Sube a **App Store Connect**: el IPA lo lleva André a TestFlight. Lo demás de
+tiendas y marketing —fichas, capturas, precios, AdMob— es de la sesión Senda.
+Aquí se construye, se verifica, se archiva y se sube el AAB a pruebas internas.

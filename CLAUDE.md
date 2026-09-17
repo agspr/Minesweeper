@@ -103,13 +103,15 @@ legal page so it doesn't blindside anyone revoking access.
   eliminados/quitados" — André chose to keep it, deliberately, in both CINCO
   and Nona, after the inconsistency was flagged. Ask before "fixing" copy;
   don't just change it.
-- **Ownership split (as of this session): the listings agent owns Play
-  Console, App Store Connect, AdMob, and everything under `legal/` and
-  `store/`. The dev agent owns app code, builds, signing, Firebase config, the
-  Xcode project.** One-off cross-overs happen only when the account owner
-  (André) asks directly, scoped to that one task. Don't assume this split is
-  permanent — it's how this project has been run, not a rule enforced by
-  tooling.
+- **Ownership split (as of 2026-09-17): there is no listings agent.** André
+  consolidated all marketing and store work into a single Senda session, and
+  **build uploads are this session's job**: build, verify, archive, and upload
+  the AAB to Play internal testing with
+  `python3 ~/.playconsole/nona-upload-internal.py <versionCode>`. That script
+  authenticates with **PRende's publisher key** (`~/.playconsole/prende-publisher.json`),
+  which does have access to `com.nonaapp.nona` — Nona has no service account of
+  its own. Keys live outside the repos and never enter git. **The IPA is André's
+  to upload to TestFlight.**
 - **The `legal/` docs describe what the code actually does, not what it's
   aspirational to do.** Before widening what §3.8 of the privacy policy
   declares (or any data-collection claim), verify the event actually fires in
