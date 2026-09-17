@@ -1,15 +1,15 @@
 name: nona
 description: "Nona — Sudoku del día. Parte de Juegos Senda."
 publish_to: 'none'
-# El número de VERSIÓN sube, no solo el de build, y no es opcional: 1.0.1 ya
-# salió a la venta con el build 28, y Apple no deja volver a enviar una versión
+# El número de VERSIÓN sube, no solo el de build, y no es opcional: la 1.0.2 ya
+# salió a la venta con el build 29, y Apple no deja volver a enviar una versión
 # que está READY_FOR_SALE. Un build nuevo necesita una entrada de versión nueva,
-# y solo se puede adjuntar a una cuyo número coincida — así que 1.0.2.
+# y solo se puede adjuntar a una cuyo número coincida — así que 1.0.3.
 #
-# (Historia del 1.0.1, que explica por qué el salto empezó: el agente de
-# listings lo dejó en borrador para poder rellenar `marketingUrl`, que Apple no
-# deja editar en una versión ya publicada.)
-version: 1.0.2+29
+# Qué lleva respecto al 29: la diaria que se quedaba como hecha al cambiar de
+# cuenta o pasada la medianoche (el fallo que dejó a André sin jugar), la
+# pantalla del perfil ilegible con desplazamiento, y el paquete al día (0.64.2).
+version: 1.0.3+30
 
 environment:
   sdk: ^3.13.0
