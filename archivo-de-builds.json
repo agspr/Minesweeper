@@ -275,6 +275,27 @@
         "bytes": 53072621,
         "sha256": "298f193ffc1127a7da092176a921676aeb1490e09b557cdb37bd137ef0b933c1"
       }
+    },
+    "30": {
+      "version": "1.0.3",
+      "fecha": "2026-09-17",
+      "commit": "c23e1624144b7dca08d2021bfa0a8cf019f226fa",
+      "arbol_limpio": true,
+      "aab": {
+        "fichero": "nona-1.0.3-30.aab",
+        "bytes": 66935280,
+        "sha256": "f7087f7148093bc33058225edbca51a75367817bec333417a563b158b9b2e361"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.3-30.ipa",
+        "bytes": 53077605,
+        "sha256": "67aeffc502c1f9ad350393838af2e241a76ce7a9ef75f68f9122b382e0216a3d"
+      },
+      "simbolos": {
+        "fichero": "nona-1.0.3-30-simbolos.zip",
+        "bytes": 5092423,
+        "sha256": "61ab1bf07601e4a16cce016855cd3118a3eb7de19889e2dc79e6804ab17c6e15"
+      }
     }
   },
   "paquete_android": "com.nonaapp.nona",
