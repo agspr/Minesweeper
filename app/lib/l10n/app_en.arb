@@ -70,9 +70,5 @@
         "type": "int"
       }
     }
-  },
-  "profileErrorTitle": "We couldn't load your profile",
-  "profileErrorBody": "It may be your connection. Your progress is saved on this phone and hasn't been lost.",
-  "profileErrorRetry": "Try again",
-  "profileErrorSignOut": "Sign out"
+  }
 }

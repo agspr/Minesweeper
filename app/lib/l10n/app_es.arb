@@ -125,9 +125,5 @@
         "type": "int"
       }
     }
-  },
-  "profileErrorTitle": "No se pudo cargar tu perfil",
-  "profileErrorBody": "Puede ser la conexión. Tu progreso está guardado en este teléfono y no se ha perdido.",
-  "profileErrorRetry": "Reintentar",
-  "profileErrorSignOut": "Cerrar sesión"
+  }
 }
