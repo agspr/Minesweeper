@@ -197,6 +197,29 @@ llaves viven fuera de los repos y no entran en git.
 
 Los ficheros quedan en `~/Nona-releases/nona-<version>-<build>.{aab,ipa}`.
 
+### Cuando ya está a la venta: publicar su número
+
+El aviso «Hay una versión nueva» compara la build del teléfono con la de
+`public/versiones`. Ese número se publica **cuando la versión YA se puede
+descargar de la tienda**, nunca al subirla a pruebas: avisar antes manda a la
+gente a una ficha que todavía enseña la versión vieja. Lo hace esta sesión
+cuando André dice que ya está a la venta, una vez por plataforma y con el mismo
+número (Nona usa el mismo en las dos):
+
+```
+cd ~/Documents/Coding/"Juegos Senda"/backend
+NODE_PATH=functions/node_modules node tools/publicar-version.js nona android <build>
+NODE_PATH=functions/node_modules node tools/publicar-version.js nona ios <build>
+```
+
+El `NODE_PATH` hace falta: `firebase-admin` vive en `functions/node_modules` y
+el script no lo encuentra solo (medido el 19-9-2026). Escribe en producción con
+permisos de servidor, y se niega a bajar un número.
+
+Solo leen el aviso las builds que lo llevan, de la 31 en adelante. Con la
+primera que sale a la venta no hay nadie a quien avisar; sirve a partir de la
+segunda.
+
 ---
 
 ## 6. Limpiar
@@ -259,4 +282,5 @@ estaba vacío.
 
 Sube a **App Store Connect**: el IPA lo lleva André a TestFlight. Lo demás de
 tiendas y marketing —fichas, capturas, precios, AdMob— es de la sesión Senda.
-Aquí se construye, se verifica, se archiva y se sube el AAB a pruebas internas.
+Aquí se construye, se verifica, se archiva y se sube el AAB a pruebas internas;
+y cuando una versión ya está a la venta, se publica su número (ver §5).

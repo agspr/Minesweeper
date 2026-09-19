@@ -86,6 +86,17 @@ final GameConfig nonaConfig = GameConfig(
   // también dentro de CINCO.
   reservedHandles: const {'nona', 'nonaapp'},
 
+  // A dónde manda «Actualizar» cuando hay una versión nueva publicada. Sin
+  // ellas el aviso no sale. La de Apple, por el id numérico y SIN país, como la
+  // de CINCO: un país fijo en el enlace no es el de quien lo toca, y Nona no
+  // está en todas las tiendas (la ficha en `/es/` da 404, medido el
+  // 19-9-2026). Y las dos son las de NONA: copiadas de CINCO, «Actualizar»
+  // mandaría a instalar el otro juego.
+  tiendaAndroid: Uri.parse(
+    'https://play.google.com/store/apps/details?id=com.nonaapp.nona',
+  ),
+  tiendaIos: Uri.parse('https://apps.apple.com/app/id6802670347'),
+
   // Claves locales que pertenecen a UNA cuenta. Si una se queda fuera, el
   // progreso de una persona se le atribuiría a quien entre después en el mismo
   // teléfono — y eso no se ve en desarrollo, hace falta cambiar de cuenta.

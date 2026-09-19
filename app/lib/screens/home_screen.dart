@@ -14,6 +14,7 @@ import '../l10n/app_localizations.dart';
 
 import 'package:juegos_senda/juegos_senda.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../nona_config.dart';
 import 'settings_tab.dart';
@@ -39,6 +40,7 @@ class HomeScreen extends StatefulWidget {
     required this.prefs,
     required this.leaderboard,
     this.banner,
+    this.versiones,
   });
 
   final DailyController daily;
@@ -64,6 +66,10 @@ class HomeScreen extends StatefulWidget {
   /// y montarlo dentro reventaría cualquier prueba que monte el menú. Quien lo
   /// construye es `main.dart`, una sola vez; las pruebas pasan `null`.
   final Widget? banner;
+
+  /// Si hay una versión nueva publicada. Se inyecta solo en las pruebas, para
+  /// darle una fuente y una versión propias; en la app se construye aquí.
+  final SendaVersiones? versiones;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -141,6 +147,31 @@ class _HomeScreenState extends State<HomeScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(widget.daily.reloadFromPrefs());
     });
+    // Una vez por arranque, como CINCO. Nunca revienta: sin red, sin Firebase o
+    // con el documento raro, el aviso simplemente no sale.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_versiones.comprobar());
+    });
+  }
+
+  /// Del APARATO, no de la cuenta: la X se guarda en `prefs` fuera de los
+  /// prefijos de Nona, así que quien entra con otra cuenta en el mismo teléfono
+  /// no vuelve a ver un aviso que ya se descartó.
+  late final SendaVersiones _versiones =
+      widget.versiones ??
+      SendaVersiones(
+        gameId: nonaGameId,
+        firebaseReady: widget.auth.firebaseReady,
+        prefs: widget.prefs,
+        tiendaAndroid: nonaConfig.tiendaAndroid,
+        tiendaIos: nonaConfig.tiendaIos,
+      );
+
+  /// «Actualizar»: la ficha de Nona en la tienda de esta plataforma.
+  Future<void> _actualizar() async {
+    final tienda = _versiones.tienda;
+    if (tienda == null) return;
+    await launchUrl(tienda, mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -149,6 +180,8 @@ class _HomeScreenState extends State<HomeScreen>
     WidgetsBinding.instance.removeObserver(this);
     widget.daily.removeListener(_alCambiarLaDiaria);
     widget.daily.stopWatchingMidnight();
+    // Solo el que es suyo: el de una prueba lo cierra quien lo creó.
+    if (widget.versiones == null) _versiones.dispose();
     super.dispose();
   }
 
@@ -266,6 +299,8 @@ class _HomeScreenState extends State<HomeScreen>
                     daily: widget.daily,
                     locale: widget.locale,
                     progress: widget.progress,
+                    versiones: _versiones,
+                    onActualizar: _actualizar,
                     onDaily: () => _goPlay(_Play.daily),
                     onPractice: () {
                       // Se carga al entrar, no al arrancar la app: generar un puzle
@@ -412,6 +447,8 @@ class _Menu extends StatelessWidget {
     required this.daily,
     required this.locale,
     required this.progress,
+    required this.versiones,
+    required this.onActualizar,
     required this.onDaily,
     required this.onPractice,
   });
@@ -419,6 +456,8 @@ class _Menu extends StatelessWidget {
   final DailyController daily;
   final LocaleController locale;
   final ProgressController progress;
+  final SendaVersiones versiones;
+  final VoidCallback onActualizar;
   final VoidCallback onDaily;
   final VoidCallback onPractice;
 
@@ -428,7 +467,7 @@ class _Menu extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListenableBuilder(
-          listenable: Listenable.merge([daily, progress]),
+          listenable: Listenable.merge([daily, progress, versiones]),
           builder: (context, _) {
             // Hecha si el tablero está terminado, o si la nube dice que ESTA
             // cuenta ya la terminó hoy aunque este teléfono no guarde el tablero.
@@ -534,6 +573,16 @@ class _Menu extends StatelessWidget {
                             ),
                           ],
                           const SizedBox(height: 40),
+                          // Sin tienda no sale: decir que hay algo nuevo sin
+                          // decir dónde está es peor que callarse.
+                          if (versiones.hayNueva &&
+                              versiones.tienda != null) ...[
+                            _AvisoDeVersion(
+                              onActualizar: onActualizar,
+                              onDescartar: () => versiones.descartar(),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
                           _ModeCard(
                             title: l.menuDaily,
                             subtitle: daily.difficulty == null
@@ -581,6 +630,89 @@ class _Menu extends StatelessWidget {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// «Hay una versión nueva», encima de las dos tarjetas. Copiado de CINCO con
+/// sus medidas (André, 17-9-2026).
+///
+/// Ni diálogo ni bloqueo: quien abre la app viene a jugar. Con su X, que lo
+/// calla hasta que se publique otra más nueva todavía. Solo vive en el menú,
+/// nunca encima del tablero.
+class _AvisoDeVersion extends StatelessWidget {
+  const _AvisoDeVersion({
+    required this.onActualizar,
+    required this.onDescartar,
+  });
+
+  final VoidCallback onActualizar;
+  final VoidCallback onDescartar;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = SendaL.of(context);
+    return Material(
+      color: NonaColors.surface,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onActualizar,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+          child: Row(
+            children: [
+              Icon(
+                Icons.system_update_rounded,
+                size: 22,
+                color: NonaColors.accent,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                // En una fila si cabe, como en CINCO —así queda en un iPhone
+                // actual con la letra normal—; si no, «Actualizar» baja debajo
+                // del texto. La fila de CINCO tal cual, con la letra del
+                // sistema al máximo, se salía 46 px en un 320, y donde no se
+                // salía «Actualizar» se comía la fila (208 de 225 px en un 375)
+                // y el aviso quedaba en unos puntos suspensivos. Medido con
+                // Figtree el 19-9-2026. Nona no topa la escala en el menú.
+                child: OverflowBar(
+                  alignment: MainAxisAlignment.spaceBetween,
+                  spacing: 8,
+                  overflowSpacing: 2,
+                  children: [
+                    Text(
+                      l.updateAvailable,
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: NonaColors.text,
+                      ),
+                    ),
+                    Text(
+                      l.updateNow,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: NonaColors.accent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: onDescartar,
+                icon: const Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: NonaColors.muted,
+                ),
+                tooltip: l.close,
+              ),
+            ],
+          ),
         ),
       ),
     );

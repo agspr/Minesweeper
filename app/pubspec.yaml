@@ -35,6 +35,10 @@ dependencies:
   # identidad (auth, amistades, avisos) llega por juegos_senda.
   firebase_core: ^4.13.0
 
+  # «Actualizar» abre la ficha de la tienda. Ya venía con el paquete; se
+  # declara porque Nona la importa ella misma.
+  url_launcher: ^6.3.2
+
   # Telemetría (regla de familia, igual que CINCO): las tres se declaran e
   # inicializan en CADA juego. Ya viajan por transitividad con el paquete, así
   # que el coste de no declararlas no es que falte una función: es que los
