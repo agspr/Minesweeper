@@ -143,7 +143,16 @@ Future<void> main() async {
   // carga la primera vez que se entra, para no meter una generación de puzle en
   // el arranque en frío.
   await daily.load();
+  // La versión instalada, leída ANTES de pintar: con ella y con la última
+  // publicada que se vio, el aviso de versión nueva ya se sabe en el primer
+  // fotograma y no entra después empujando las tarjetas. Si no se puede leer,
+  // el aviso simplemente no sale en este arranque.
+  SendaVersionActual? versionActual;
+  try {
+    versionActual = await SendaVersionActual.leer();
+  } catch (_) {}
   final app = NonaApp(
+    versionActual: versionActual,
     daily: daily,
     practice: PracticeController(prefs),
     locale: LocaleController(prefs),
@@ -204,6 +213,7 @@ class NonaApp extends StatelessWidget {
     required this.notifications,
     required this.leaderboard,
     required this.prefs,
+    required this.versionActual,
   });
 
   final DailyController daily;
@@ -220,6 +230,9 @@ class NonaApp extends StatelessWidget {
   /// Para poder limpiar lo que Nona guarda al salirse de la cuenta.
   final SharedPreferences prefs;
   final LeaderboardService? leaderboard;
+
+  /// La de este binario, o null si no se pudo leer.
+  final SendaVersionActual? versionActual;
 
   @override
   Widget build(BuildContext context) {
@@ -278,6 +291,7 @@ class NonaApp extends StatelessWidget {
                 notifications: notifications,
                 prefs: prefs,
                 leaderboard: leaderboard,
+                versionActual: versionActual,
                 // Se construye AQUÍ, una sola vez y arriba del todo: el banner
                 // reserva su alto desde el primer fotograma, y rehacerlo en
                 // cada reconstrucción del armazón lo haría recargar. Las

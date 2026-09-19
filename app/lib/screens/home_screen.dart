@@ -41,6 +41,7 @@ class HomeScreen extends StatefulWidget {
     required this.leaderboard,
     this.banner,
     this.versiones,
+    this.versionActual,
   });
 
   final DailyController daily;
@@ -70,6 +71,10 @@ class HomeScreen extends StatefulWidget {
   /// Si hay una versión nueva publicada. Se inyecta solo en las pruebas, para
   /// darle una fuente y una versión propias; en la app se construye aquí.
   final SendaVersiones? versiones;
+
+  /// La versión de este binario, leída en `main` antes de pintar. Es lo que
+  /// deja decidir el aviso de versión nueva en el primer fotograma.
+  final SendaVersionActual? versionActual;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -165,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen>
         prefs: widget.prefs,
         tiendaAndroid: nonaConfig.tiendaAndroid,
         tiendaIos: nonaConfig.tiendaIos,
+        actualConocida: widget.versionActual,
       );
 
   /// «Actualizar»: la ficha de Nona en la tienda de esta plataforma.
@@ -467,7 +473,7 @@ class _Menu extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListenableBuilder(
-          listenable: Listenable.merge([daily, progress, versiones]),
+          listenable: Listenable.merge([daily, progress]),
           builder: (context, _) {
             // Hecha si el tablero está terminado, o si la nube dice que ESTA
             // cuenta ya la terminó hoy aunque este teléfono no guarde el tablero.
@@ -573,16 +579,10 @@ class _Menu extends StatelessWidget {
                             ),
                           ],
                           const SizedBox(height: 40),
-                          // Sin tienda no sale: decir que hay algo nuevo sin
-                          // decir dónde está es peor que callarse.
-                          if (versiones.hayNueva &&
-                              versiones.tienda != null) ...[
-                            _AvisoDeVersion(
-                              onActualizar: onActualizar,
-                              onDescartar: () => versiones.descartar(),
-                            ),
-                            const SizedBox(height: 12),
-                          ],
+                          _AvisoSiYaEstaba(
+                            versiones: versiones,
+                            onActualizar: onActualizar,
+                          ),
                           _ModeCard(
                             title: l.menuDaily,
                             subtitle: daily.difficulty == null
@@ -631,6 +631,49 @@ class _Menu extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+/// El aviso de versión nueva, **decidido al pintarse el menú**.
+///
+/// La comprobación va por red y contesta con el menú ya en pantalla. Si el
+/// aviso entrara entonces, empujaría las dos tarjetas —el menú va centrado—
+/// justo cuando alguien va a tocarlas, y el toque podría acabar en el aviso,
+/// que abre la tienda. Así que sale si ya se sabía al pintarse (lo guarda el
+/// paquete de la vez anterior) y, mientras está en pantalla, solo lo cambia
+/// la X. Tampoco se retira solo: quitarlo movería las tarjetas igual que
+/// meterlo. Si se entera tarde, sale la próxima vez que se pinte el menú.
+/// Mismo arreglo que CINCO (`_AvisoSiYaEstaba`, 19-9-2026).
+class _AvisoSiYaEstaba extends StatefulWidget {
+  const _AvisoSiYaEstaba({required this.versiones, required this.onActualizar});
+
+  final SendaVersiones versiones;
+  final VoidCallback onActualizar;
+
+  @override
+  State<_AvisoSiYaEstaba> createState() => _AvisoSiYaEstabaState();
+}
+
+class _AvisoSiYaEstabaState extends State<_AvisoSiYaEstaba> {
+  // Sin tienda no sale: decir que hay algo nuevo sin decir dónde está es peor
+  // que callarse.
+  late final bool _yaEstaba =
+      widget.versiones.hayNueva && widget.versiones.tienda != null;
+  bool _cerrado = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_yaEstaba || _cerrado) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: _AvisoDeVersion(
+        onActualizar: widget.onActualizar,
+        onDescartar: () {
+          setState(() => _cerrado = true);
+          widget.versiones.descartar();
+        },
       ),
     );
   }

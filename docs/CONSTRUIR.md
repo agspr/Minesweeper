@@ -208,13 +208,11 @@ número (Nona usa el mismo en las dos):
 
 ```
 cd ~/Documents/Coding/"Juegos Senda"/backend
-NODE_PATH=functions/node_modules node tools/publicar-version.js nona android <build>
-NODE_PATH=functions/node_modules node tools/publicar-version.js nona ios <build>
+node tools/publicar-version.js nona android <build>
+node tools/publicar-version.js nona ios <build>
 ```
 
-El `NODE_PATH` hace falta: `firebase-admin` vive en `functions/node_modules` y
-el script no lo encuentra solo (medido el 19-9-2026). Escribe en producción con
-permisos de servidor, y se niega a bajar un número.
+Escribe en producción con permisos de servidor, y se niega a bajar un número.
 
 Solo leen el aviso las builds que lo llevan, de la 31 en adelante. Con la
 primera que sale a la venta no hay nadie a quien avisar; sirve a partir de la
