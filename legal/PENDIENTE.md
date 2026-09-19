@@ -1331,3 +1331,83 @@ Al investigar esto, agentes nuestros escribieron sin permiso en `Juegos Senda`:
 un `tools/archivar.py` y un `docs/CONSTRUIR-Y-ARCHIVAR.md`. Los retiramos en
 cuanto lo vimos. Vuestro trabajo del backend sobre batallas en `firestore.rules`
 y `test-rules.py` estaba ahí y no lo tocamos.
+
+---
+
+## HECHO — 1.0.3 (31) en revisión de Apple, CON «Quitar anuncios» (19-9-2026, agente dev)
+
+Pedido por André («arréglalo tú todo»), después de ver que en Más no salía la
+opción de quitar anuncios.
+
+### La causa: el producto nunca se envió a Apple
+
+`com.nonaapp.nona.removeads` seguía en `READY_TO_SUBMIT` desde el primer envío
+(ver «LANZAMIENTO», arriba: «conviene verificar que entró de verdad»; nadie lo
+verificó). Un producto sin aprobar no se le devuelve a quien instala desde el
+App Store, y el paquete esconde la tarjeta cuando la tienda no lo devuelve: en
+**iPhone y iPad nadie ha podido comprarlo desde el lanzamiento**. En TestFlight
+sí sale —el sandbox da los productos en ese estado—, que es por qué no se vio.
+En Play el producto está `ACTIVE` y con precio en 173 regiones: ahí no pasa.
+
+### Y una corrección a la entrada del 6-9: la 1.0.2 no salió nunca
+
+Las dos tiendas siguen en **1.0.1+28** (comprobado por API). La 29 está subida
+a App Store Connect sin versión adjunta y en Play no llegó a producción. El
+comentario de `pubspec.yaml` que decía lo contrario está corregido
+(`5849bd3`), y el archivo lo registra (`65e936b`).
+
+### Lo que se hizo
+
+- **Build 31** (1.0.3) desde `5849bd3`: paquete 0.67.3 (anuncios que ya no se
+  pierden si Google falla el consentimiento, Sentry sin los iPhone de revisión,
+  cambio de @usuario, 24 avatares) y el aviso de versión nueva. Archivada con su
+  sha256, símbolos en Sentry (`nona@1.0.3+31`), AAB en **pruebas internas** de
+  Play, IPA subido a App Store Connect con
+  `~/.appstoreconnect/nona-upload-testflight.sh 31` (nuevo; sube desde
+  `~/Nona-releases` y comprueba bundle id y build dentro del IPA).
+- Cumplimiento de exportación: sin cifrado no exento, como la 28.
+- **Versión 1.0.3** con la 31, `releaseType: AFTER_APPROVAL` (regla del 4-9).
+  Novedades:
+  - es-MX: «Ahora puedes quitar los anuncios desde Más, con una sola compra.
+    También puedes cambiar tu @usuario y elegir entre más avatares, y el
+    teléfono vibra al poner un número equivocado. Se corrigió que el sudoku del
+    día siguiera marcado como hecho al cambiar de cuenta o pasada la
+    medianoche.»
+  - en-US: la misma, en inglés.
+  - **Un fallo mío en ese texto**: la entrada del 6-9 pedía contar la
+    vibración como mejora, no como novedad, y el texto la presenta como nueva.
+    Es cierto —el teléfono vibra—, pero impreciso. Con la versión en revisión
+    no se puede editar sin sacarla; se dejó así.
+- **Nota para la revisión corregida**: decía que la compra quita «banner and
+  interstitial ads», y Nona no enseña intersticiales (nada crea el `AdManager`
+  del paquete). Ahora dice solo el banner, dónde está la opción (pestaña More)
+  y que se prueba con sandbox; fuera la frase de los códigos promocionales, que
+  solo valía antes de la primera aprobación.
+
+### Cómo entra el PRIMER producto por API (no está documentado)
+
+- `POST /v1/inAppPurchaseSubmissions` → 409
+  `FIRST_NON_CONSUMABLE_MUST_BE_SUBMITTED_ON_VERSION`, incluso con la versión ya
+  en `WAITING_FOR_REVIEW`.
+- `reviewSubmissionItems` no acepta `inAppPurchaseV2` ni `inAppPurchase`.
+- **Lo que funciona**: el producto tiene un objeto `inAppPurchaseVersions`
+  (`GET /v2/inAppPurchases/{id}/versions`), y ese sí es un elemento de envío
+  (`relationships.inAppPurchaseVersion`). Producto y versión de la app, dos
+  elementos del MISMO `reviewSubmission`, y se envía una vez.
+
+André había abierto desde la web el borrador con el producto dentro; se le
+añadió la 1.0.3 y se envió a las 18:58 UTC. Antes hubo un envío de la versión
+sola a las 18:31, retirado a los pocos segundos al rechazar Apple el producto
+(por eso la 1.0.3 pasó un momento por `DEVELOPER_REJECTED`).
+
+**Estado: versión 1.0.3 y «Quitar anuncios», los dos `WAITING_FOR_REVIEW`.**
+
+### Lo que queda
+
+1. Cuando Apple apruebe (sale sola): comprobar que el producto quedó aprobado
+   con ella y que la tarjeta sale en un iPhone instalado desde el App Store.
+2. Con la 1.0.3 a la venta en iOS: `publicar-version.js nona ios 31`
+   (`docs/CONSTRUIR.md` §5).
+3. **Play sigue en 1.0.1+28 en producción**; la 31 está solo en pruebas
+   internas. El arreglo de los anuncios también le hace falta a Android, pero
+   pasarla a producción no se ha pedido.

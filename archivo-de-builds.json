@@ -318,7 +318,8 @@
         "fichero": "nona-1.0.3-31-simbolos.zip",
         "bytes": 7561305,
         "sha256": "5fd4f4d18c8583a7223b97cdb898312a577234e1c88645cdd17fc11cb6a84ffc"
-      }
+      },
+      "tienda": "App Store: 1.0.3 enviada a revisión junto con «Quitar anuncios» el 19-9-2026, sale sola al aprobarse; Play: pruebas internas"
     }
   },
   "paquete_android": "com.nonaapp.nona",
