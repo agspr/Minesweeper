@@ -274,7 +274,8 @@
         "fichero": "nona-1.0.2-29.ipa",
         "bytes": 53072621,
         "sha256": "298f193ffc1127a7da092176a921676aeb1490e09b557cdb37bd137ef0b933c1"
-      }
+      },
+      "tienda": "Nunca publicada: App Store Connect la tiene subida sin versión adjunta, y Play no la llevó a producción (las dos tiendas seguían en 1.0.1+28, comprobado por API el 19-9-2026)"
     },
     "30": {
       "version": "1.0.3",
@@ -295,6 +296,28 @@
         "fichero": "nona-1.0.3-30-simbolos.zip",
         "bytes": 5092423,
         "sha256": "61ab1bf07601e4a16cce016855cd3118a3eb7de19889e2dc79e6804ab17c6e15"
+      },
+      "tienda": "Play pruebas internas; nunca se subió a App Store Connect"
+    },
+    "31": {
+      "version": "1.0.3",
+      "fecha": "2026-09-19",
+      "commit": "5849bd31107c4122b8e4735d1d1981502719a565",
+      "arbol_limpio": true,
+      "aab": {
+        "fichero": "nona-1.0.3-31.aab",
+        "bytes": 67037328,
+        "sha256": "906fb7a52d1964a9d148bf682411712b92fb36934d40efa714033f2e9343122e"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.3-31.ipa",
+        "bytes": 53104538,
+        "sha256": "9b326a94416196cc8510641ce4f8ee3423da85700a049f1da8395799af1b5573"
+      },
+      "simbolos": {
+        "fichero": "nona-1.0.3-31-simbolos.zip",
+        "bytes": 7561305,
+        "sha256": "5fd4f4d18c8583a7223b97cdb898312a577234e1c88645cdd17fc11cb6a84ffc"
       }
     }
   },
