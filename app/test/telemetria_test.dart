@@ -60,6 +60,30 @@ void main() {
     );
   });
 
+  test('Sentry lleva el filtro de la familia, y nada lo pisa después', () {
+    // Sin él, cada revisión de Apple vuelve a mandar su ráfaga de «fallos» de
+    // entrada —265 de 266 en CINCO— y el correo de prioridad alta con ella.
+    // Se mira DENTRO del init: fuera no configuraría nada.
+    final init = RegExp(
+      r'SentryFlutter\.init\(\(options\) \{([\s\S]*?)\}, appRunner',
+    ).firstMatch(main_)?.group(1);
+    expect(init, isNotNull, reason: 'no encuentro el cuerpo del init');
+    final filtro = init!.indexOf('configurarSentryDeLaFamilia(options);');
+    expect(filtro, isNonNegative, reason: 'el init no llama al filtro');
+    expect(
+      filtro,
+      greaterThan(init.indexOf('options.dsn = ')),
+      reason: 'el filtro va después del DSN, como pide NUEVO-JUEGO.md',
+    );
+    // El filtro envuelve el `beforeSend` que ya hubiera; uno puesto después
+    // lo sustituye entero y el filtro deja de correr, sin error ninguno.
+    expect(
+      init.substring(filtro),
+      isNot(contains('beforeSend')),
+      reason: 'un beforeSend después del filtro lo desengancha',
+    );
+  });
+
   test('el DSN tiene un default REAL', () {
     // La trampa (agente de CINCO): los builds no pasan --dart-define, así que
     // `String.fromEnvironment` sin default deja Sentry apagado en TODAS las

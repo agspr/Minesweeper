@@ -178,6 +178,11 @@ Future<void> main() async {
       options.dsn = sentryDsn;
       options.environment = kDebugMode ? 'debug' : 'production';
       options.tracesSampleRate = 0.2;
+      // Los iPhone de revisión de Apple y las 5xx de Google que iOS apunta
+      // solo: ruido de la familia entera, medido en CINCO. Envuelve el
+      // `beforeSend` que haya, así que un `beforeSend =` puesto DESPUÉS de
+      // esta línea lo pisaría y el filtro dejaría de correr sin avisar.
+      configurarSentryDeLaFamilia(options);
     }, appRunner: () => runApp(app));
   } else {
     runApp(app);
