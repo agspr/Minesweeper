@@ -1,20 +1,14 @@
 name: nona
 description: "Nona — Sudoku del día. Parte de Juegos Senda."
 publish_to: 'none'
-# Por qué 1.0.3. **La 1.0.2 (build 29) no salió a ninguna tienda**: en App
-# Store Connect se subió pero nunca se adjuntó a una versión, y en Play no llegó
-# a producción. Las dos tiendas siguen en 1.0.1+28 (comprobado por API el
-# 19-9-2026). Este comentario decía lo contrario —que la 1.0.2 estaba a la
-# venta y obligaba a subir— y era falso. Se sigue en 1.0.3 porque la 30 ya está
-# en pruebas internas de Play como 1.0.3; volver a 1.0.2 solo confundiría.
+# 1.0.4 porque la 1.0.3 (31) está a la venta en el App Store desde el
+# 21-9-2026, y Apple no deja volver a enviar una versión READY_FOR_SALE.
 #
-# Qué lleva la 31 respecto a la 30: el paquete 0.64.2 → 0.67.3 (los anuncios ya
-# no se pierden una sesión si Google falla el consentimiento, Sentry sin los
-# iPhone de revisión de Apple, el @usuario se puede cambiar, 24 avatares) y el
-# aviso de versión nueva. Y es la primera que va a revisión de Apple con el
-# producto «Quitar anuncios», que nunca se había enviado: sin él, en iPhone y
-# iPad la opción no sale en Más.
-version: 1.0.3+31
+# Qué lleva la 32 respecto a la 31: la tarjeta del resultado de la diaria deja
+# llegar siempre a «Menú principal». En un iPhone 16 Pro con la letra del
+# sistema algo más grande, el botón se salía por abajo y no se podía tocar: no
+# había forma de salir del resultado (24-9-2026).
+version: 1.0.4+32
 
 environment:
   sdk: ^3.13.0
