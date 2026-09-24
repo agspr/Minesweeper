@@ -1411,3 +1411,54 @@ sola a las 18:31, retirado a los pocos segundos al rechazar Apple el producto
 3. **Play sigue en 1.0.1+28 en producción**; la 31 está solo en pruebas
    internas. El arreglo de los anuncios también le hace falta a Android, pero
    pasarla a producción no se ha pedido.
+
+---
+
+## HECHO — 1.0.4 (32) en revisión de Apple: el resultado deja salir (24-9-2026, agente dev)
+
+**La 1.0.3 (31) salió a la venta el 21-9, y «Quitar anuncios» quedó APROBADO
+con ella.** Lo que quedaba abierto en la entrada del 19-9 está hecho salvo
+publicar su número (ver abajo).
+
+### El fallo
+
+La mujer de André terminó la diaria en un iPhone 16 Pro y no podía salir del
+resultado: «Menú principal» se salía por abajo de la tarjeta y no recibía el
+toque. La tarjeta vive en el área de juego —pantalla menos el banner grande,
+que reserva su alto aunque no haya anuncio, y menos la franja del gesto: 651
+puntos en ese teléfono— y no se desplazaba. A letra 1 cabía por poco; con la
+letra del sistema unos pasos por encima, no. Así desde el 23-8. Arreglo y
+prueba en `2d21a2e`.
+
+Mientras no se actualice: «Seguir jugando (Práctica)» y la X de arriba llevan
+al menú.
+
+### Lo que se hizo
+
+- Build 32 (1.0.4) desde `a045ae5`: archivada con su sha256, símbolos en
+  Sentry (`nona@1.0.4+32`), AAB en pruebas internas de Play, IPA en App Store
+  Connect.
+- Versión 1.0.4, `AFTER_APPROVAL`, sin cifrado no exento. Novedades:
+  - es-MX: «Se corrigió la pantalla de resultado del sudoku del día: con la
+    letra del teléfono más grande, el botón «Menú principal» quedaba fuera de
+    la pantalla y no se podía salir. Ahora los botones se ven siempre.»
+  - en-US: la misma, en inglés.
+- Nota de revisión nueva: la de la 1.0.3 decía que esa versión enviaba el
+  producto por primera vez; ahora dice que ya está aprobado.
+- Enviada el 24-9-2026 a las 20:25 UTC. **Estado: `WAITING_FOR_REVIEW`.**
+
+### Los anuncios que no le salían a ella
+
+Los anuncios de iOS funcionan: en AdMob, la app de iOS está Ready y en los
+últimos 7 días hubo 155 peticiones y 136 impresiones (100 % de relleno). Si
+en su teléfono no sale ninguno, lo más probable es que siga en la 1.0.1, que
+tiene el fallo del consentimiento arreglado en la 1.0.3. Sin confirmar: no se
+sabe qué versión lleva.
+
+### Lo que queda
+
+1. Con la 1.0.4 a la venta en iOS: `node tools/publicar-version.js nona ios 32`
+   (`docs/CONSTRUIR.md` §5). Así el aviso de versión nueva les sale a quienes
+   tengan la 1.0.3.
+2. **Play sigue en 1.0.1+28 en producción**; la 32 está solo en pruebas
+   internas. Android tiene el mismo fallo del resultado y el de los anuncios.

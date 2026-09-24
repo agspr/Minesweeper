@@ -319,7 +319,29 @@
         "bytes": 7561305,
         "sha256": "5fd4f4d18c8583a7223b97cdb898312a577234e1c88645cdd17fc11cb6a84ffc"
       },
-      "tienda": "App Store: 1.0.3 enviada a revisión junto con «Quitar anuncios» el 19-9-2026, sale sola al aprobarse; Play: pruebas internas"
+      "tienda": "App Store READY_FOR_SALE 1.0.3 desde el 21-9-2026, con «Quitar anuncios» aprobado; Play: pruebas internas"
+    },
+    "32": {
+      "version": "1.0.4",
+      "fecha": "2026-09-24",
+      "commit": "a045ae551fe2fe3e2898612f3cdf0948d27fcf87",
+      "arbol_limpio": true,
+      "aab": {
+        "fichero": "nona-1.0.4-32.aab",
+        "bytes": 67036488,
+        "sha256": "14226a3a76b5872e6352d8a6885471214c02baa06bab363d3a66fb3dde5583fe"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.4-32.ipa",
+        "bytes": 53105091,
+        "sha256": "82ff90da25ce8062c4849879432f0b216c52479ccfee0fa92d618f2de0bfe3f6"
+      },
+      "simbolos": {
+        "fichero": "nona-1.0.4-32-simbolos.zip",
+        "bytes": 7561407,
+        "sha256": "b5933439fc88e1a74b89305c879eead825071afae7f82b2550b043bf6230ac3d"
+      },
+      "tienda": "App Store: 1.0.4 enviada a revisión el 24-9-2026, sale sola al aprobarse; Play: pruebas internas"
     }
   },
   "paquete_android": "com.nonaapp.nona",
