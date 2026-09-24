@@ -66,6 +66,13 @@ class ResultOverlay extends StatelessWidget {
       100 => l.difficultyMedium,
       _ => l.difficultyHard,
     };
+    // **Las tres salidas se ven siempre, sin desplazar nada.** La tarjeta vive
+    // en el área de juego, que es la pantalla menos el banner grande y la
+    // franja del gesto: en un iPhone 16 Pro, 651 puntos. Con la letra del
+    // sistema un par de pasos por encima de la normal, «Menú principal» se
+    // salía por abajo, cortado y sin recibir el toque (captura del 24-9-2026).
+    // Así que lo de arriba se desplaza cuando no cabe, y los botones quedan
+    // fijos al pie de la tarjeta.
     return Container(
       color: Colors.black.withValues(alpha: 0.72),
       child: Center(
@@ -80,110 +87,9 @@ class ResultOverlay extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                score.completed ? l.solved : l.unfinished,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: NonaColors.text,
-                ),
+              Flexible(
+                child: SingleChildScrollView(child: _resumen(l, difficulty)),
               ),
-              const SizedBox(height: 4),
-              Text(
-                '$difficulty · ${_clock(elapsed)}',
-                style: const TextStyle(fontSize: 13, color: NonaColors.muted),
-              ),
-              const SizedBox(height: 20),
-              SendaWeekStreak(done: weekDone, todayIndex: todayIndex),
-              const SizedBox(height: 18),
-              // El protagonista.
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text('🔥', style: TextStyle(fontSize: 34)),
-                  const SizedBox(width: 10),
-                  Text(
-                    '$streak',
-                    style: const TextStyle(
-                      fontSize: 46,
-                      height: 1,
-                      fontWeight: FontWeight.w800,
-                      color: NonaColors.text,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                l.streakDays,
-                style: const TextStyle(fontSize: 14, color: NonaColors.muted),
-              ),
-              const SizedBox(height: 20),
-              // Los puntos bajan a una pastilla: siguen a la vista y siguen
-              // teniendo su desglose debajo, pero ya no mandan.
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 7,
-                ),
-                decoration: BoxDecoration(
-                  color: NonaColors.accentChip,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(
-                  '+${score.points} ${l.points}',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: NonaColors.accent,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // El desglose. Suma exactamente lo de arriba, a la vista.
-              _Line(label: l.breakdownBase, value: '${score.base}'),
-              if (score.completed) ...[
-                if (score.countedMistakes > 0)
-                  _Line(
-                    label:
-                        l.mistakeCount(score.countedMistakes) +
-                        (score.countedMistakes == 5 ? l.mistakeCapSuffix : ''),
-                    value: '−${score.mistakePenalty}',
-                    negative: true,
-                  )
-                else
-                  _Line(label: l.breakdownNoMistakes, value: '−0'),
-              ] else
-                _Line(
-                  label: l.breakdownCompleted(score.completionPercent),
-                  value: '×${(score.partialFraction ?? 0) * 100 ~/ 1}%',
-                ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Divider(height: 1, color: NonaColors.surface),
-              ),
-              _Line(
-                label: l.breakdownTotal,
-                value: '${score.points}',
-                strong: true,
-              ),
-              // Un día a medias da puntos pero NO racha (§1). Decirlo aquí evita
-              // que alguien crea que el crédito parcial se la mantiene, ahora
-              // que la racha es lo primero que se lee.
-              if (!score.extendsStreak) ...[
-                const SizedBox(height: 14),
-                Text(
-                  l.streakNeedsFinish,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    color: NonaColors.muted,
-                  ),
-                ),
-              ],
               const SizedBox(height: 20),
               _Boton(texto: l.share, onTap: onShare, principal: false),
               const SizedBox(height: 10),
@@ -200,6 +106,110 @@ class ResultOverlay extends StatelessWidget {
       ),
     );
   }
+
+  /// Todo lo de encima de los botones: lo que se desplaza si no cabe.
+  Widget _resumen(L l, String difficulty) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        score.completed ? l.solved : l.unfinished,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: NonaColors.text,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        '$difficulty · ${_clock(elapsed)}',
+        style: const TextStyle(fontSize: 13, color: NonaColors.muted),
+      ),
+      const SizedBox(height: 20),
+      SendaWeekStreak(done: weekDone, todayIndex: todayIndex),
+      const SizedBox(height: 18),
+      // El protagonista.
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text('🔥', style: TextStyle(fontSize: 34)),
+          const SizedBox(width: 10),
+          Text(
+            '$streak',
+            style: const TextStyle(
+              fontSize: 46,
+              height: 1,
+              fontWeight: FontWeight.w800,
+              color: NonaColors.text,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 2),
+      Text(
+        l.streakDays,
+        style: const TextStyle(fontSize: 14, color: NonaColors.muted),
+      ),
+      const SizedBox(height: 20),
+      // Los puntos bajan a una pastilla: siguen a la vista y siguen
+      // teniendo su desglose debajo, pero ya no mandan.
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        decoration: BoxDecoration(
+          color: NonaColors.accentChip,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Text(
+          '+${score.points} ${l.points}',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: NonaColors.accent,
+          ),
+        ),
+      ),
+      const SizedBox(height: 20),
+      // El desglose. Suma exactamente lo de arriba, a la vista.
+      _Line(label: l.breakdownBase, value: '${score.base}'),
+      if (score.completed) ...[
+        if (score.countedMistakes > 0)
+          _Line(
+            label:
+                l.mistakeCount(score.countedMistakes) +
+                (score.countedMistakes == 5 ? l.mistakeCapSuffix : ''),
+            value: '−${score.mistakePenalty}',
+            negative: true,
+          )
+        else
+          _Line(label: l.breakdownNoMistakes, value: '−0'),
+      ] else
+        _Line(
+          label: l.breakdownCompleted(score.completionPercent),
+          value: '×${(score.partialFraction ?? 0) * 100 ~/ 1}%',
+        ),
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        child: Divider(height: 1, color: NonaColors.surface),
+      ),
+      _Line(label: l.breakdownTotal, value: '${score.points}', strong: true),
+      // Un día a medias da puntos pero NO racha (§1). Decirlo aquí evita
+      // que alguien crea que el crédito parcial se la mantiene, ahora
+      // que la racha es lo primero que se lee.
+      if (!score.extendsStreak) ...[
+        const SizedBox(height: 14),
+        Text(
+          l.streakNeedsFinish,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+            color: NonaColors.muted,
+          ),
+        ),
+      ],
+    ],
+  );
 }
 
 class _Line extends StatelessWidget {
@@ -222,14 +232,20 @@ class _Line extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: strong ? FontWeight.w800 : FontWeight.w500,
-              color: strong ? NonaColors.text : NonaColors.muted,
+          // La etiqueta se parte en líneas y el número se queda entero: con la
+          // letra grande, «Completaste el 60 %…» empujaba la cifra fuera de la
+          // tarjeta.
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: strong ? FontWeight.w800 : FontWeight.w500,
+                color: strong ? NonaColors.text : NonaColors.muted,
+              ),
             ),
           ),
+          const SizedBox(width: 12),
           Text(
             value,
             style: TextStyle(
@@ -292,12 +308,19 @@ class _Boton extends StatelessWidget {
         backgroundColor: principal ? NonaColors.accent : NonaColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
       ),
-      child: Text(
-        texto,
-        style: TextStyle(
-          fontSize: 15.5,
-          fontWeight: FontWeight.w800,
-          color: principal ? NonaColors.accentDeep : NonaColors.text,
+      // Con la letra grande el texto se encoge hasta caber en el alto fijo, en
+      // vez de partirse en dos líneas y cortarse: el alto es lo que garantiza
+      // que las tres salidas quepan siempre al pie de la tarjeta.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          texto,
+          maxLines: 1,
+          style: TextStyle(
+            fontSize: 15.5,
+            fontWeight: FontWeight.w800,
+            color: principal ? NonaColors.accentDeep : NonaColors.text,
+          ),
         ),
       ),
     ),
