@@ -1547,3 +1547,52 @@ dicen que no existe.
   visto bueno tras probarla.
 - 0.69.0 trae «Privacidad de los anuncios» en Más, pero solo sale si se le pasa
   el `ConsentManager` a `SendaSettingsScreen`. Espera la respuesta de André.
+
+---
+
+## ✅ RESUELTO Y PUBLICADO — 25-9-2026. El @usuario ya no es permanente, en las SEIS páginas.
+
+Lo redactó y publicó el agente de sendapr.com, por encargo directo de André
+(«fix it yourself»), sobre lo que anoté más arriba. Commit de los documentos
+`57f3dd2`; del sitio `41b54d7`.
+
+**Qué cambió**, en ES y EN, con el texto de CINCO como molde para que las dos
+políticas digan lo mismo de la misma cuenta:
+
+| Documento | Cambio |
+|---|---|
+| Política §3.3 | «Puedes cambiarlo una vez cada 60 días»; el anterior, reservado a tu nombre y **no encontrable**; al borrar la cuenta se liberan todos |
+| Política §7 | corregir también el @usuario, cada 60 días; «los cuatro» son comunes a la familia |
+| Términos §2 y §4.2 | deja de ser permanente; el anterior queda reservado |
+| Términos §12 | borrar la cuenta libera el @usuario **y los que tuviste antes** |
+| Borrar cuenta | «Tus @usuarios quedan libres», «libera tus @usuarios», y el @usuario deja de ser «la excepción» |
+
+Fechas: los seis a **25 de septiembre de 2026** (*Vigente desde* sin tocar).
+
+**Verificado en vivo**, sin etiquetas: las seis páginas en 200 con la fecha
+nueva, **cero** frases de permanencia del @usuario, y la regla nueva presente
+en todas: 2 · 2 · 1 menciones de «cada 60» en ES y exactamente las mismas de
+«every 60 days» en EN, página por página. Lo que queda de «permanente» es sólo
+el borrado, que sí lo es («se borra de forma permanente»).
+
+## ⚠️ PENDIENTE NUEVO — lo siguiente que arrastra la plataforma: los reportes
+
+Tu política dice de los reportes sólo esto (§3.4, líneas 168-169): que
+recibimos el aviso con el identificador de la cuenta reportada. Pero en
+juegos-senda `9261cf7` (compartido, salta con **cualquier** reporte, también
+los que se hacen desde Nona):
+
+- cada reporte **llega por correo** a support@sendapr.com, por **Zoho**;
+- los reportes **caducan a los dos años**;
+- y se **conservan aunque se borre la cuenta**, para poder revisarlos.
+
+CINCO ya lo declara. Nona no dice ninguna de las tres cosas, ni tiene a Zoho
+entre los proveedores (§5), ni menciona los reportes en borrar cuenta.
+
+**Todavía no es falso**: `9261cf7` está sin desplegar hasta que André ponga el
+secreto `SOPORTE_SMTP_CLAVE`. Pero en cuanto se ponga, Nona declara de MENOS.
+
+**Conviene no copiar aún el texto de CINCO tal cual**: promete que «la copia
+del correo» se borra a los dos años, y nada la borra (lo anoté en el
+`PENDIENTE.md` de CINCO). Mejor redactarlo cuando André decida qué pasa con
+esos correos, y publicarlo **antes** de poner el secreto.
