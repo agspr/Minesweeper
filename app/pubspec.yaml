@@ -1,14 +1,14 @@
 name: nona
 description: "Nona — Sudoku del día. Parte de Juegos Senda."
 publish_to: 'none'
-# 1.0.4 porque la 1.0.3 (31) está a la venta en el App Store desde el
-# 21-9-2026, y Apple no deja volver a enviar una versión READY_FOR_SALE.
+# 1.0.5 y no otra build de la 1.0.4: la 1.0.4 (32) está en revisión de Apple
+# con el arreglo del resultado, que es urgente, y esto es mucho más grande. Así
+# la 1.0.4 sale sola y esto se prueba antes de enviarlo.
 #
-# Qué lleva la 32 respecto a la 31: la tarjeta del resultado de la diaria deja
-# llegar siempre a «Menú principal». En un iPhone 16 Pro con la letra del
-# sistema algo más grande, el botón se salía por abajo y no se podía tocar: no
-# había forma de salir del resultado (24-9-2026).
-version: 1.0.4+32
+# Qué lleva la 33 respecto a la 32: el final de la diaria en escenas y «Quitar
+# anuncios» fuera de Más, los dos copiados de CINCO 1.9 (24-9-2026), y el
+# paquete 0.68.0.
+version: 1.0.5+33
 
 environment:
   sdk: ^3.13.0
