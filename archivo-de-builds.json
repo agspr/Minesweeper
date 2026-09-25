@@ -341,7 +341,7 @@
         "bytes": 7561407,
         "sha256": "b5933439fc88e1a74b89305c879eead825071afae7f82b2550b043bf6230ac3d"
       },
-      "tienda": "App Store: 1.0.4 enviada a revisión el 24-9-2026, sale sola al aprobarse; Play: pruebas internas"
+      "tienda": "App Store READY_FOR_SALE 1.0.4 desde el 25-9-2026; Play: pruebas internas"
     },
     "33": {
       "version": "1.0.5",
@@ -363,7 +363,29 @@
         "bytes": 7600244,
         "sha256": "9820bdc395fa828f6073a7bfb28cfe6ef53cae6be428f13601b78fdd81e7cfb4"
       },
-      "tienda": "TestFlight interno y Play pruebas internas, 24-9-2026; sin enviar a revisión"
+      "tienda": "TestFlight interno y Play pruebas internas; la sustituye la 34 (misma 1.0.5, con «Recordar»)"
+    },
+    "34": {
+      "version": "1.0.5",
+      "fecha": "2026-09-25",
+      "commit": "fed0d694b01a17399ae5c8c32c8d0745375c6b61",
+      "arbol_limpio": true,
+      "aab": {
+        "fichero": "nona-1.0.5-34.aab",
+        "bytes": 67211860,
+        "sha256": "b23d97178cc0cfc545f1c35c4d1a10e4a942b0a29c6a3eb012e7334d32796e9e"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.5-34.ipa",
+        "bytes": 53148050,
+        "sha256": "415e1d64d8e974ed69f0b0c5c3aceaa234ef98d20037a1fa2ce4b2df07ede4a7"
+      },
+      "simbolos": {
+        "fichero": "nona-1.0.5-34-simbolos.zip",
+        "bytes": 7610361,
+        "sha256": "973ac1dabc3e72208dd977c02711817c4d6d6a2a0c40ce11c65faff09982e938"
+      },
+      "tienda": "TestFlight interno y Play pruebas internas, 25-9-2026; sin enviar a revisión"
     }
   },
   "paquete_android": "com.nonaapp.nona",

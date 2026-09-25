@@ -1529,3 +1529,20 @@ cosas distintas de la misma cuenta. En `CINCO/legal/`:
 cambien, y avisarme para publicar las seis páginas. Va en los **términos**, así
 que conviene no dejarlo mucho: hoy la app de Nona ofrece algo que sus términos
 dicen que no existe.
+
+---
+
+## HECHO — 1.0.4 a la venta; 1.0.5 (34) en pruebas, ya con «Recordar» (25-9-2026, agente dev)
+
+- **1.0.4 (32) aprobada y a la venta** en el App Store (25-9-2026). Su número
+  se publica en `public/versiones` en cuanto la ficha de EE. UU. la enseñe
+  (México ya la enseñaba; EE. UU. todavía no).
+- **«Recordar» en las rachas de amigos** (`595fefc`): el servidor ya entiende
+  empujones por juego (paquete 0.70.0, agente de CINCO, 25-9-2026). Sin
+  `origen`, porque la política de Nona no lo declara.
+- **Build 34 (1.0.5)**: la 33 más «Recordar». Archivada, símbolos en Sentry,
+  en pruebas internas de Play y lista en TestFlight interno. **Sin enviar a
+  revisión**; la 1.0.4 ya salió, así que puede enviarse cuando André dé el
+  visto bueno tras probarla.
+- 0.69.0 trae «Privacidad de los anuncios» en Más, pero solo sale si se le pasa
+  el `ConsentManager` a `SendaSettingsScreen`. Espera la respuesta de André.
