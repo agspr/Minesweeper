@@ -1486,3 +1486,46 @@ Pedido por André: copiar de CINCO 1.9 el final de la diaria en escenas y
 Para enviarla a revisión hace falta una versión 1.0.5 en App Store Connect con
 sus novedades; y la 1.0.4 tiene que haber salido antes (o retirarse), porque
 Apple solo revisa una versión a la vez.
+
+---
+
+## ⚠️ PENDIENTE NUEVO — 25-9-2026, del agente de sendapr.com. El @usuario ya NO es permanente, y los documentos de Nona dicen que sí.
+
+**Esto no es un error de Nona: lo arrastra la plataforma.** El 24-9 y 25-9 se
+desplegó en juegos-senda que el @usuario **se puede cambiar una vez cada 60
+días** (regla `cambioDeUsernamePermitido` en `firestore.rules`), que el anterior
+queda reservado pero **no se encuentra** al buscarlo, y que **al borrar la
+cuenta se liberan todos**, el de ahora y los anteriores. CINCO publicó hoy sus
+tres documentos con eso.
+
+**Y Nona ya lo ofrece:** fija `package-v0.68.0`, y `changeUsername` («Cambiar
+@usuario») está en el paquete desde `package-v0.65.0`. Aunque no fuera así, la
+cuenta es la misma en toda la familia: quien lo cambia en CINCO lo cambia en
+Nona.
+
+**Lo que dicen hoy los documentos de Nona, y ya no es cierto:**
+
+| Fichero | Línea | Dice |
+|---|---|---|
+| `privacy-policy.md` | 139 | «Es permanente: una vez fijado no se puede cambiar» |
+| `terms-of-service.md` | 33 | «**Tu @usuario es permanente.**» |
+| `terms-of-service.md` | 86 | «un **@usuario** único y permanente» |
+| `account-deletion.md` | 114 | «**solo el borrado total libera tu @usuario**» (ahora libera todos, también los anteriores) |
+| `account-deletion.md` | 183-184 | «Tu **@usuario es la excepción**: es permanente por diseño… no se puede cambiar» |
+| `*.en.md` | 141 · 34-35 · 88 · 114 · 183-184 | lo mismo en inglés |
+
+En vivo: `/terms/nona/` y `/terms/nona/en/` con 2 menciones cada uno,
+`/privacy/nona/` con 1 y `/delete-account/nona/` con 3.
+
+**El texto de CINCO sirve de molde**, porque las dos políticas no pueden decir
+cosas distintas de la misma cuenta. En `CINCO/legal/`:
+- política §3.2: «**Puedes cambiarlo una vez cada 60 días.** El anterior se queda
+  reservado a tu nombre —nadie más puede usarlo, para que nadie se haga pasar por
+  ti—, pero **nadie puede encontrarte por él**… Al eliminar tu cuenta se liberan
+  todos, el de ahora y los anteriores.»
+- términos §2 y §4.2, y borrar cuenta «Tus @usuarios quedan libres».
+
+**Lo que hace falta:** los seis ficheros (ES y EN), con la fecha al día en que se
+cambien, y avisarme para publicar las seis páginas. Va en los **términos**, así
+que conviene no dejarlo mucho: hoy la app de Nona ofrece algo que sus términos
+dicen que no existe.
