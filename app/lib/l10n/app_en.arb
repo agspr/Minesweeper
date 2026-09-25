@@ -128,5 +128,7 @@
     }
   },
   "noAdsDone": "Done: no more ads",
-  "noAdsNothingToRestore": "We couldn't find a purchase to restore."
+  "noAdsNothingToRestore": "We couldn't find a purchase to restore.",
+  "sceneRemind": "Remind",
+  "sceneReminded": "Reminded"
 }

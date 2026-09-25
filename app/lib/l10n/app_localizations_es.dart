@@ -306,4 +306,10 @@ class LEs extends L {
   @override
   String get noAdsNothingToRestore =>
       'No encontramos ninguna compra que restaurar.';
+
+  @override
+  String get sceneRemind => 'Recordar';
+
+  @override
+  String get sceneReminded => 'Recordado';
 }

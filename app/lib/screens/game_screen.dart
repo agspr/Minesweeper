@@ -159,6 +159,18 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     );
   }
 
+  /// «Recordar» desde el final de la diaria: el empujón de Nona a ese amigo.
+  /// Sin `origen`: la política de Nona declara el empujón, no desde dónde se
+  /// manda.
+  Future<void> _recordar(String pairId) async {
+    for (final f in widget.friends.friendships) {
+      if (f.id == pairId) {
+        await widget.friends.nudge(f);
+        return;
+      }
+    }
+  }
+
   /// El final de la diaria: la celebración al terminarla, o su repetición al
   /// abrir una ya hecha.
   Future<void> _abrirElFinal({required bool repeticion}) async {
@@ -186,6 +198,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       ),
       amigos: _amigosDeLaEscena(),
       recargarAmigos: _recargarAmigos,
+      onRecordar: _recordar,
       repeticion: repeticion,
     );
     if (!mounted) return;

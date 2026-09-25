@@ -576,6 +576,18 @@ abstract class L {
   /// In es, this message translates to:
   /// **'No encontramos ninguna compra que restaurar.'**
   String get noAdsNothingToRestore;
+
+  /// Botón de la escena de rachas de amigos: manda el empujón a quien aún no ha jugado hoy.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordar'**
+  String get sceneRemind;
+
+  /// El mismo botón, ya enviado el empujón de hoy.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordado'**
+  String get sceneReminded;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

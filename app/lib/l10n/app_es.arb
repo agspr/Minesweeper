@@ -219,5 +219,13 @@
   "noAdsNothingToRestore": "No encontramos ninguna compra que restaurar.",
   "@noAdsNothingToRestore": {
     "description": "Restaurar terminó sin error y sin compra."
+  },
+  "sceneRemind": "Recordar",
+  "sceneReminded": "Recordado",
+  "@sceneRemind": {
+    "description": "Botón de la escena de rachas de amigos: manda el empujón a quien aún no ha jugado hoy."
+  },
+  "@sceneReminded": {
+    "description": "El mismo botón, ya enviado el empujón de hoy."
   }
 }

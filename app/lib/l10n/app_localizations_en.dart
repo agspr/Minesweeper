@@ -306,4 +306,10 @@ class LEn extends L {
   @override
   String get noAdsNothingToRestore =>
       'We couldn\'t find a purchase to restore.';
+
+  @override
+  String get sceneRemind => 'Remind';
+
+  @override
+  String get sceneReminded => 'Reminded';
 }

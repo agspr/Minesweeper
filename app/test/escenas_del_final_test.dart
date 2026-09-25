@@ -53,6 +53,7 @@ Future<Salida> abrir(
   int? hito,
   List<RachaEnLaEscena> amigos = const [],
   Future<List<RachaEnLaEscena>> Function()? recargarAmigos,
+  Future<void> Function(String pairId)? onRecordar,
   bool repeticion = false,
   PurchaseService? compras,
   Future<void> Function()? onShare,
@@ -81,6 +82,7 @@ Future<Salida> abrir(
             hito: hito,
             amigos: amigos,
             recargarAmigos: recargarAmigos,
+            onRecordar: onRecordar,
             repeticion: repeticion,
           );
           salida.cerrada = true;
@@ -136,6 +138,7 @@ RachaEnLaEscena amigo(
   int n = 5,
   bool falta = false,
   bool subio = false,
+  bool recordado = false,
 }) => RachaEnLaEscena(
   pairId: 'par-$u',
   nombre: 'Nombre de $u',
@@ -144,6 +147,7 @@ RachaEnLaEscena amigo(
   n: n,
   subioHoy: subio,
   falta: falta,
+  recordado: recordado,
 );
 
 /// Una tienda de mentira: lo que la de verdad cuenta por `notifyListeners`,
@@ -461,22 +465,48 @@ void main() {
       );
     });
 
-    testWidgets('amigos: quién falta, y sin «Recordar»', (tester) async {
-      // El servidor solo manda el empujón si quien lo envía terminó la diaria
-      // de CINCO: desde Nona sería un botón que no hace nada.
+    testWidgets('amigos: quién falta, y «Recordar» solo para ese', (
+      tester,
+    ) async {
+      final recordados = <String>[];
       await abrir(
         tester,
-        amigos: [amigo('ana', subio: true), amigo('leo', falta: true)],
+        amigos: [
+          amigo('ana', subio: true),
+          amigo('leo', falta: true),
+          amigo('mar', falta: true, recordado: true),
+        ],
+        onRecordar: (par) async => recordados.add(par),
       );
       await continuar(tester);
       await continuar(tester);
       await tester.pump(const Duration(seconds: 2));
       expect(find.text('Rachas de amigos'), findsOneWidget);
-      expect(find.text('Nombre de leo aún no ha jugado hoy.'), findsOneWidget);
-      expect(find.text('@ana'), findsOneWidget);
-      expect(find.textContaining('Record'), findsNothing);
-      // Solo el principal: ningún otro botón relleno en la escena.
-      expect(find.byType(FilledButton), findsOneWidget);
+      expect(find.text('2 amigos aún no han jugado hoy.'), findsOneWidget);
+      // Quien ya jugó no tiene nada que recordar.
+      expect(find.byKey(const ValueKey('recordar-par-ana')), findsNothing);
+      // A quien ya se le recordó hoy, sale hecho y no se puede repetir.
+      final mar = find.byKey(const ValueKey('recordar-par-mar'));
+      expect(tester.widget<FilledButton>(mar).onPressed, isNull);
+
+      final leo = find.byKey(const ValueKey('recordar-par-leo'));
+      final ancho = tester.getSize(leo).width;
+      expect(
+        find.descendant(of: leo, matching: find.text('Recordar')),
+        findsOneWidget,
+      );
+      await tester.tap(leo);
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(recordados, ['par-leo']);
+      expect(
+        find.descendant(of: leo, matching: find.text('Recordado')),
+        findsOneWidget,
+      );
+      expect(tester.getSize(leo).width, ancho, reason: 'no cambia de ancho');
+      // Uno por amigo y día: el segundo toque no manda otro.
+      await tester.tap(leo);
+      await tester.pump();
+      expect(recordados, ['par-leo']);
     });
 
     testWidgets('amigos: espera a la relectura del servidor, un rato', (
@@ -683,8 +713,9 @@ void main() {
 
     Future<(DailyController, List<String>)> montar(
       WidgetTester tester,
-      SharedPreferences prefs,
-    ) async {
+      SharedPreferences prefs, {
+      FriendsService? amistades,
+    }) async {
       DailyBank.debugClear();
       DailyBank.debugSeedYear(2026, {
         '2026-08-18': {
@@ -707,7 +738,9 @@ void main() {
               controller: daily,
               progress: ProgressController(prefs),
               theme: ThemeController(prefs),
-              friends: FriendsService(firebaseReady: false, gameId: nonaGameId),
+              friends:
+                  amistades ??
+                  FriendsService(firebaseReady: false, gameId: nonaGameId),
               purchases: PurchaseService(prefs, nonaConfig.iap),
               onExit: () => salidas.add('menú'),
               onPractice: () => salidas.add('práctica'),
@@ -748,6 +781,48 @@ void main() {
       expect(salidas, ['menú']);
     });
 
+    testWidgets('«Recordar» manda el empujón de Nona a ese amigo, sin origen', (
+      tester,
+    ) async {
+      // Sin origen porque la política de Nona declara el empujón, no desde
+      // dónde se manda: con él, el evento llevaría un campo no declarado.
+      final amistades = _Amistades()
+        ..friendships = [
+          Friendship(
+            id: 'par-leo',
+            otherUid: 'uid-leo',
+            status: 'active',
+            requestedByMe: true,
+          ),
+        ]
+        ..ready = true;
+      amistades.profiles['uid-leo'] = FriendProfile.from('uid-leo', {
+        'username': 'leo',
+        'displayName': 'Leo',
+      });
+      // Leo jugó ayer, no hoy: falta.
+      amistades.sembrarRacha(
+        'par-leo',
+        const RachaDeAmigo(
+          n: 4,
+          ultimoDia: '2026-08-17',
+          ultimoDiaDe: {'uid-leo': '2026-08-17'},
+        ),
+      );
+      final prefs = await SharedPreferences.getInstance();
+      final (daily, _) = await montar(tester, prefs, amistades: amistades);
+      resolver(daily);
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await continuar(tester);
+      await continuar(tester);
+      await tester.pump(const Duration(seconds: 2));
+      await tester.tap(find.byKey(const ValueKey('recordar-par-leo')));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(amistades.empujones, [('par-leo', null)]);
+    });
+
     testWidgets('abrir una ya hecha enseña la repetición, y cerrarla deja el '
         'tablero', (tester) async {
       final prefs = await SharedPreferences.getInstance();
@@ -765,4 +840,16 @@ void main() {
       expect(salidas, isEmpty, reason: 'cerrar la repetición no se va');
     });
   });
+}
+
+/// Un servicio de amistades que apunta los empujones en vez de mandarlos.
+class _Amistades extends FriendsService {
+  _Amistades() : super(gameId: nonaGameId, firebaseReady: false);
+
+  final empujones = <(String, OrigenDeEmpujon?)>[];
+
+  @override
+  Future<void> nudge(Friendship f, {OrigenDeEmpujon? origen}) async {
+    empujones.add((f.id, origen));
+  }
 }

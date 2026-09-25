@@ -10,7 +10,7 @@
 /// 2. **La racha**: la llama que prende, el número que sube y la semana.
 /// 3. **El hito**, el día que toca (10, 25, 50…).
 /// 4. **Las rachas de amigos**, si tienes alguna: quién ya jugó —y sube
-///    contigo— y quién falta.
+///    contigo— y quién falta, con «Recordar».
 ///
 /// **Lo que cambia respecto a CINCO, y por qué:**
 ///
@@ -20,11 +20,11 @@
 /// - **Un día a medias no alarga la racha** (§1), cuando en CINCO jugar ya la
 ///   mantiene. Así que la llama no prende y el pie dice por qué, en vez de
 ///   «tu racha sigue viva», que aquí sería falso.
-/// - **Sin «Recordar»** en la escena de amigos. El servidor solo manda el
-///   empujón si quien lo envía terminó la diaria de CINCO ese día
-///   (`onNudge`, que lee el resumen de CINCO), así que desde Nona sería un
-///   botón que no hace nada. Nona no manda empujones en ningún sitio; cuando el
-///   servidor los entienda por juego, se añade aquí.
+/// - **«Recordar» manda el empujón de NONA**, sin el `origen` que CINCO pone al
+///   evento: la política de Nona declara el empujón, no ese campo. Llegó un día
+///   después que el resto: hasta el 25-9-2026 el servidor solo sabía de
+///   empujones de CINCO —miraba si quien empuja había jugado a CINCO—, y aquí
+///   habría sido un botón que no hace nada (paquete 0.70.0).
 /// - Los textos salen del ARB: Nona es bilingüe y CINCO no.
 ///
 /// **El botón principal está en el mismo sitio en todas**, y se enciende a
@@ -67,6 +67,7 @@ class RachaEnLaEscena {
     required this.subioHoy,
     required this.falta,
     this.contada = true,
+    this.recordado = false,
   });
 
   final String pairId;
@@ -86,6 +87,9 @@ class RachaEnLaEscena {
   /// El servidor ya apuntó MI partida de hoy en esta racha. Mientras no, [n]
   /// es el de antes y la escena no lo sube por su cuenta.
   final bool contada;
+
+  /// Ya le mandaste el empujón hoy.
+  final bool recordado;
 }
 
 /// Las rachas de amigos de este juego, listas para la escena. **Pura**: todo
@@ -121,6 +125,7 @@ List<RachaEnLaEscena> rachasParaLaEscena(
         subioHoy: miDia && suDia && r.ultimoDia == hoy,
         falta: !suDia,
         contada: miDia,
+        recordado: friends.nudgedToday(f.otherUid),
       ),
     );
   }
@@ -171,6 +176,7 @@ enum EscenaDelFinal { resultado, racha, hito, amigos }
 /// acento del tema: la racha es la misma en todos los temas y en los dos
 /// juegos.
 const kColorDeRacha = Color(0xFFFFB454);
+const _tintaSobreRacha = Color(0xFF2A1A04);
 
 // ── El movimiento: muelles de M3 Expressive ────────────────────────────
 
@@ -246,6 +252,9 @@ Future<AccionDelFinal?> mostrarEscenasDelFinal(
   /// las rachas un segundo después de guardarse la partida.
   Future<List<RachaEnLaEscena>> Function()? recargarAmigos,
 
+  /// «Recordar»: el empujón a un amigo que aún no ha jugado hoy.
+  Future<void> Function(String pairId)? onRecordar,
+
   /// Volver a verlas al abrir una diaria ya terminada: con una X para irse en
   /// cualquier momento, y sin el hito ni vibraciones.
   bool repeticion = false,
@@ -271,6 +280,7 @@ Future<AccionDelFinal?> mostrarEscenasDelFinal(
         hito: repeticion ? null : hito,
         amigos: amigos,
         recargarAmigos: recargarAmigos,
+        onRecordar: onRecordar,
         repeticion: repeticion,
       ),
       transitionsBuilder: (_, a, _, hijo) =>
@@ -293,6 +303,7 @@ class EscenasDelFinal extends StatefulWidget {
     this.hito,
     this.amigos = const [],
     this.recargarAmigos,
+    this.onRecordar,
     this.repeticion = false,
   });
 
@@ -307,6 +318,7 @@ class EscenasDelFinal extends StatefulWidget {
   final int? hito;
   final List<RachaEnLaEscena> amigos;
   final Future<List<RachaEnLaEscena>> Function()? recargarAmigos;
+  final Future<void> Function(String pairId)? onRecordar;
   final bool repeticion;
 
   /// Lo que espera la escena de amigos a la relectura antes de enseñar lo que
@@ -412,7 +424,11 @@ class _EscenasDelFinalState extends State<EscenasDelFinal>
         titulo: l.sceneMilestoneTitle(widget.hito!),
         rotulo: l.sceneMilestoneLabel.toUpperCase(),
       ),
-      EscenaDelFinal.amigos => _Amigos(c: _c, amigos: _amigos),
+      EscenaDelFinal.amigos => _Amigos(
+        c: _c,
+        amigos: _amigos,
+        onRecordar: widget.onRecordar,
+      ),
     };
 
     // Se comparte el resultado, que ya lleva la racha: en el hito es el
@@ -1628,10 +1644,15 @@ class _Rayos extends CustomPainter {
 // ── 4. Las rachas de amigos ────────────────────────────────────────────
 
 class _Amigos extends StatelessWidget {
-  const _Amigos({required this.c, required this.amigos});
+  const _Amigos({
+    required this.c,
+    required this.amigos,
+    required this.onRecordar,
+  });
 
   final AnimationController c;
   final List<RachaEnLaEscena> amigos;
+  final Future<void> Function(String pairId)? onRecordar;
 
   @override
   Widget build(BuildContext context) {
@@ -1692,6 +1713,7 @@ class _Amigos extends StatelessWidget {
             ),
             entra: _tramo(c, .12 + i * .07, .5 + i * .07, Resorte.normal),
             sube: _tramo(c, .5 + i * .07, .75 + i * .07, Resorte.rapido),
+            onRecordar: onRecordar,
           ),
         ],
       ],
@@ -1706,12 +1728,14 @@ class _FilaDeRacha extends StatelessWidget {
     required this.forma,
     required this.entra,
     required this.sube,
+    required this.onRecordar,
   });
 
   final RachaEnLaEscena amigo;
   final BorderRadius forma;
   final Animation<double> entra;
   final Animation<double> sube;
+  final Future<void> Function(String pairId)? onRecordar;
 
   @override
   Widget build(BuildContext context) {
@@ -1780,6 +1804,10 @@ class _FilaDeRacha extends StatelessWidget {
                   ],
                 ),
               ),
+              if (amigo.falta) ...[
+                const SizedBox(width: 10),
+                _Recordar(amigo: amigo, onRecordar: onRecordar),
+              ],
             ],
           ),
         ),
@@ -1797,4 +1825,88 @@ class _Tope extends Animation<double> with AnimationWithParentMixin<double> {
 
   @override
   double get value => parent.value.clamp(0.0, 1.0);
+}
+
+/// «Recordar»: el empujón de siempre, uno por amigo y día. Es un botón de
+/// alternar de M3E: al tocarlo **cambia de forma y de color** —de píldora
+/// naranja a tonal y más cuadrado, con su marca— y **no cambia de ancho**.
+class _Recordar extends StatefulWidget {
+  const _Recordar({required this.amigo, required this.onRecordar});
+
+  final RachaEnLaEscena amigo;
+  final Future<void> Function(String pairId)? onRecordar;
+
+  static const ancho = 112.0;
+
+  @override
+  State<_Recordar> createState() => _RecordarState();
+}
+
+class _RecordarState extends State<_Recordar> {
+  late bool _hecho = widget.amigo.recordado;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = L.of(context);
+    final recordar = widget.onRecordar;
+    return SizedBox(
+      width: _Recordar.ancho,
+      height: 40,
+      child: FilledButton(
+        key: ValueKey('recordar-${widget.amigo.pairId}'),
+        onPressed: _hecho || recordar == null
+            ? null
+            : () {
+                Haptics.nudged();
+                setState(() => _hecho = true);
+                unawaited(recordar(widget.amigo.pairId));
+              },
+        style: ButtonStyle(
+          padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 10),
+          ),
+          animationDuration: const Duration(milliseconds: 220),
+          backgroundColor: WidgetStatePropertyAll(
+            _hecho ? kColorDeRacha.withValues(alpha: .16) : kColorDeRacha,
+          ),
+          shape: WidgetStateProperty.resolveWith(
+            (s) => RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                _hecho || s.contains(WidgetState.pressed) ? 12 : 20,
+              ),
+            ),
+          ),
+        ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: _hecho
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_rounded,
+                      size: 17,
+                      color: kColorDeRacha,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      l.sceneReminded,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: kColorDeRacha,
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  l.sceneRemind,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: _tintaSobreRacha,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
 }
