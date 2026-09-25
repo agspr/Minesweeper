@@ -1535,8 +1535,9 @@ dicen que no existe.
 ## HECHO — 1.0.4 a la venta; 1.0.5 (34) en pruebas, ya con «Recordar» (25-9-2026, agente dev)
 
 - **1.0.4 (32) aprobada y a la venta** en el App Store (25-9-2026). Su número
-  se publica en `public/versiones` en cuanto la ficha de EE. UU. la enseñe
-  (México ya la enseñaba; EE. UU. todavía no).
+  se publicó en `public/versiones` (`nona/ios: 32`) en cuanto la ficha de
+  EE. UU. la enseñó: desde ahí, quien tenga la 1.0.3 ve el aviso de versión
+  nueva. Android no se publicó: Play sigue en 1.0.1 en producción.
 - **«Recordar» en las rachas de amigos** (`595fefc`): el servidor ya entiende
   empujones por juego (paquete 0.70.0, agente de CINCO, 25-9-2026). Sin
   `origen`, porque la política de Nona no lo declara.
