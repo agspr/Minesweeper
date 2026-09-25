@@ -1,7 +1,7 @@
 # Nona Privacy Policy
 
 **Effective:** August 25, 2026
-**Last updated:** August 27, 2026
+**Last updated:** September 25, 2026
 
 ---
 
@@ -138,8 +138,11 @@ We store two different things in Firestore, and the difference matters:
 **Your Juegos Senda profile**, shared across every game:
 
 - **@username**: the unique identifier you choose the first time you sign in.
-  It is permanent: once set it cannot be changed, because other players find
-  you by it.
+  **You can change it once every 60 days.** The previous one stays reserved to
+  you — nobody else can use it, so that nobody can pass themselves off as you —
+  but **nobody can find you by it**: searching for it returns no one. When you
+  delete your account, all of them are released, the current one and the
+  earlier ones.
 - **Display name**, **avatar** (one of those the App offers) and **country**,
   if you choose to give it.
 - **The date** your account was created.
@@ -468,8 +471,9 @@ name: it is editable at any time from your profile.
 At any time, you can:
 
 - **Access** the information we hold about you.
-- **Correct** your display name, avatar and country from within the App.
-  Remember that those three are shared across every game in the family.
+- **Correct** your display name, avatar and country from within the App, and
+  your @username once every 60 days. Remember that all four are shared across
+  every game in the family.
 - **Leave Nona only**, keeping your account, your @username and your friends.
 - **Delete your Juegos Senda account** and all associated data, across every
   game in the family. Both options are in the App and are explained in

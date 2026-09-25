@@ -1,7 +1,7 @@
 # Nona Terms of Service
 
 **Effective:** August 25, 2026
-**Last updated:** August 25, 2026
+**Last updated:** September 25, 2026
 
 ---
 
@@ -31,8 +31,8 @@ on your behalf.
 - **Your account belongs to Juegos Senda, not just to Nona.** The same profile,
   the same @username and the same friends apply across every game in the
   family. See Section 4.
-- **Your @username is permanent.** If you create an account, the @username you
-  choose cannot be changed afterwards, because it is how your friends find you.
+- **Your @username can be changed once every 60 days.** The previous one stays
+  reserved to you, so that nobody can pass themselves off as you.
 - **The App shows ads.** They are what pays for its development.
 - **These Terms include a limitation of liability** (Section 9) and an
   agreement on governing law and venue (Section 13).
@@ -85,8 +85,10 @@ Senda account. See Section 12.
 
 ### 4.2 Your @username
 
-When you create your account you choose a unique and permanent **@username**,
-valid across the whole family of games. We reserve the right to reclaim or
+When you create your account you choose a unique **@username**, valid across
+the whole family of games. **You can change it once every 60 days**; the
+previous one stays reserved to you and nobody else can use it. We reserve the
+right to reclaim or
 reassign an @username that impersonates a person or a brand, that is offensive,
 or that has been registered solely to resell it or to hold it unused.
 
@@ -252,8 +254,8 @@ options**, and it is worth not confusing them:
   other games.
 - **Delete your Juegos Senda account**: everything is deleted, across **every**
   game in the family, including those you do not have installed on that phone.
-  It is immediate, irreversible, and it **releases your @username** for someone
-  else.
+  It is immediate, irreversible, and it **releases your @username and any you
+  had before** for someone else.
 
 The full procedure is at
 [How to delete your account](https://sendapr.com/delete-account/nona/en/).

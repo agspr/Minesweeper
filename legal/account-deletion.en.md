@@ -1,7 +1,7 @@
 # How to Delete Your Nona Account
 
 **Effective:** August 25, 2026
-**Last updated:** August 25, 2026
+**Last updated:** September 25, 2026
 
 Nona is part of **Juegos Senda**, a family of games by SENDA LLC that share a
 single account. That is why deleting has **two distinct meanings**, and the App
@@ -105,14 +105,15 @@ the family**:
   When the account is deleted we ask Apple to **revoke the permission** you
   granted.
 
-### Your @username is released
+### Your @usernames are released
 
 When you delete the account, your **@username becomes available again** to
-anybody else. If you later create a new account and that name has already been
+anybody else, **and so do any you had before**, if you ever changed it. If you
+later create a new account and that name has already been
 claimed, you will have to choose another one: we do not reserve it.
 
 That is the main difference from option 1: **only full deletion releases your
-@username**.
+@usernames**.
 
 ### About the Apple permission: it appears as "CINCO"
 
@@ -180,9 +181,9 @@ A good deal can be done without permanently deleting anything:
 - **Notifications**: they are turned off in your operating system's settings,
   without touching the account.
 
-Your **@username is the exception**: it is permanent by design, because it is
-how your friends find you, and it cannot be changed without deleting the whole
-account.
+Your **@username** can be changed without deleting anything: from your
+profile, once every 60 days. The previous one stays reserved to you until you
+delete the account.
 
 If you want to delete something specific that is not listed here, write to us
 at **support@sendapr.com** telling us which data; the same 30-day period

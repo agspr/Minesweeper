@@ -1,7 +1,7 @@
 # Términos de Servicio de Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 25 de agosto de 2026
+**Última actualización:** 25 de septiembre de 2026
 
 ---
 
@@ -30,8 +30,8 @@ declaras que tu madre, padre o tutor ha revisado y aceptado estos Términos.
 - **Tu cuenta es de Juegos Senda, no solo de Nona.** El mismo perfil, el mismo
   @usuario y los mismos amigos valen para todos los juegos de la familia. Ver
   Sección 4.
-- **Tu @usuario es permanente.** Si creas cuenta, una vez lo eliges no se
-  puede cambiar, porque es la forma en que tus amigos te encuentran.
+- **Tu @usuario se puede cambiar una vez cada 60 días.** El anterior se
+  queda reservado a tu nombre, para que nadie se haga pasar por ti.
 - **La App muestra anuncios.** Es lo que financia su desarrollo.
 - **Estos Términos incluyen una limitación de responsabilidad** (Sección 9) y
   un acuerdo sobre la ley aplicable y el foro competente (Sección 13).
@@ -83,8 +83,10 @@ Juegos Senda entera. Ver Sección 12.
 
 ### 4.2 Tu @usuario
 
-Al crear tu cuenta eliges un **@usuario** único y permanente, válido en toda la
-familia de juegos. Nos reservamos el derecho de recuperar o reasignar un
+Al crear tu cuenta eliges un **@usuario** único, válido en toda la familia de
+juegos. **Puedes cambiarlo una vez cada 60 días**; el anterior se queda
+reservado a tu nombre y nadie más puede usarlo. Nos reservamos el derecho de
+recuperar o reasignar un
 @usuario que suplante a una persona o marca, que resulte ofensivo, o que se
 haya registrado con el único fin de revenderlo o retenerlo sin uso.
 
@@ -253,8 +255,8 @@ distintas**, y conviene no confundirlas:
   juegos.
 - **Eliminar tu cuenta de Juegos Senda**: se borra todo, en **todos** los
   juegos de la familia, incluidos aquellos que no tengas instalados en ese
-  teléfono. Es inmediato, irreversible y **libera tu @usuario** para otra
-  persona.
+  teléfono. Es inmediato, irreversible y **libera tu @usuario y los que
+  tuviste antes** para otra persona.
 
 El procedimiento completo está en
 [Cómo borrar tu cuenta](https://sendapr.com/delete-account/nona/).

@@ -1,7 +1,7 @@
 # Política de Privacidad de Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 27 de agosto de 2026
+**Última actualización:** 25 de septiembre de 2026
 
 ---
 
@@ -136,8 +136,10 @@ Guardamos en Firestore dos cosas distintas, y la diferencia importa:
 **Tu perfil de Juegos Senda**, que es común a todos los juegos:
 
 - **@usuario**: el identificador único que eliges al entrar por primera vez.
-  Es permanente: una vez fijado no se puede cambiar, porque otros jugadores
-  te encuentran por él.
+  **Puedes cambiarlo una vez cada 60 días.** El anterior se queda reservado a
+  tu nombre —nadie más puede usarlo, para que nadie se haga pasar por ti—,
+  pero **nadie puede encontrarte por él**: al buscarlo, no aparece nadie. Al
+  eliminar tu cuenta se liberan todos, el de ahora y los anteriores.
 - **Nombre visible**, **avatar** (uno de los que ofrece la App) y **país**, si
   decides indicarlo.
 - **Fecha** de creación de la cuenta.
@@ -468,8 +470,9 @@ es editable en cualquier momento desde tu perfil.
 Puedes, en cualquier momento:
 
 - **Acceder** a la información que tenemos sobre ti.
-- **Corregir** tu nombre visible, avatar y país desde la propia App. Recuerda
-  que esos tres son comunes a todos los juegos de la familia.
+- **Corregir** tu nombre visible, avatar y país desde la propia App, y tu
+  @usuario una vez cada 60 días. Recuerda que los cuatro son comunes a todos
+  los juegos de la familia.
 - **Salir solo de Nona**, conservando tu cuenta, tu @usuario y tus amigos.
 - **Eliminar tu cuenta de Juegos Senda** y todos los datos asociados, en todos
   los juegos de la familia. Ambas opciones están en la App y se explican en

@@ -1,7 +1,7 @@
 # Cómo Borrar tu Cuenta en Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 25 de agosto de 2026
+**Última actualización:** 25 de septiembre de 2026
 
 Nona forma parte de **Juegos Senda**, una familia de juegos de SENDA LLC que
 comparten una misma cuenta. Por eso borrar tiene **dos significados distintos**,
@@ -105,14 +105,15 @@ la familia**:
 - **Tu autorización de "Iniciar sesión con Apple"**, si entraste por ahí. Al
   borrar la cuenta le pedimos a Apple que **revoque el permiso** que le diste.
 
-### Tu @usuario queda libre
+### Tus @usuarios quedan libres
 
 Al eliminar la cuenta, tu **@usuario vuelve a estar disponible** para cualquier
-otra persona. Si más adelante creas una cuenta nueva y ese nombre ya fue
+otra persona, **y también los que tuviste antes**, si lo cambiaste alguna vez.
+Si más adelante creas una cuenta nueva y ese nombre ya fue
 reclamado, tendrás que elegir otro: no lo reservamos.
 
-Es la diferencia principal con la opción 1: **solo el borrado total libera tu
-@usuario**.
+Es la diferencia principal con la opción 1: **solo el borrado total libera tus
+@usuarios**.
 
 ### Sobre el permiso de Apple: aparece como "CINCO"
 
@@ -180,8 +181,8 @@ Buena parte se puede hacer sin borrar nada de forma permanente:
 - **Notificaciones**: se desactivan en los ajustes de tu sistema operativo, sin
   tocar la cuenta.
 
-Tu **@usuario es la excepción**: es permanente por diseño, porque es como te
-encuentran tus amigos, y no se puede cambiar sin eliminar la cuenta entera.
+Tu **@usuario** se cambia sin borrar nada: desde tu perfil, una vez cada 60
+días. El anterior se queda reservado a tu nombre hasta que borres la cuenta.
 
 Si quieres eliminar algo concreto que no aparezca aquí, escríbenos a
 **support@sendapr.com** indicando qué datos son; aplicamos el mismo plazo de 30
