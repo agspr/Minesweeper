@@ -342,6 +342,28 @@
         "sha256": "b5933439fc88e1a74b89305c879eead825071afae7f82b2550b043bf6230ac3d"
       },
       "tienda": "App Store: 1.0.4 enviada a revisión el 24-9-2026, sale sola al aprobarse; Play: pruebas internas"
+    },
+    "33": {
+      "version": "1.0.5",
+      "fecha": "2026-09-24",
+      "commit": "d7950469eca218d622d4749593c6f1584466bbbe",
+      "arbol_limpio": true,
+      "aab": {
+        "fichero": "nona-1.0.5-33.aab",
+        "bytes": 67196097,
+        "sha256": "5ed4cea030db0e76f8d4b1d31256851f0b31978b302c1e97a10d4907241cf748"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.5-33.ipa",
+        "bytes": 53145141,
+        "sha256": "3f8e2adc7850918eb6dc43b73d048315cef3428203904d50d0a377ec7f862ef9"
+      },
+      "simbolos": {
+        "fichero": "nona-1.0.5-33-simbolos.zip",
+        "bytes": 7600244,
+        "sha256": "9820bdc395fa828f6073a7bfb28cfe6ef53cae6be428f13601b78fdd81e7cfb4"
+      },
+      "tienda": "TestFlight interno y Play pruebas internas, 24-9-2026; sin enviar a revisión"
     }
   },
   "paquete_android": "com.nonaapp.nona",

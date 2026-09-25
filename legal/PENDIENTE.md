@@ -1462,3 +1462,27 @@ sabe qué versión lleva.
    tengan la 1.0.3.
 2. **Play sigue en 1.0.1+28 en producción**; la 32 está solo en pruebas
    internas. Android tiene el mismo fallo del resultado y el de los anuncios.
+
+---
+
+## HECHO — 1.0.5 (33) en pruebas: las escenas del final y «Quitar anuncios» de CINCO 1.9 (24-9-2026, agente dev)
+
+Pedido por André: copiar de CINCO 1.9 el final de la diaria en escenas y
+«Quitar anuncios» fuera de Más, y hacer build. Código en `939f88c`.
+
+- **Build 33 (1.0.5)**: archivada, símbolos en Sentry (`nona@1.0.5+33`), AAB en
+  pruebas internas de Play, IPA en App Store Connect **lista para TestFlight
+  interno**. **No se ha enviado a revisión**: la 1.0.4 (32) sigue en
+  `WAITING_FOR_REVIEW` con el arreglo urgente del resultado, y esto es más
+  grande; conviene probarlo antes.
+- **Diferencias deliberadas con CINCO**, todas escritas en
+  `escenas_del_final.dart`: el desglose se queda; un día a medias no alarga la
+  racha (la llama no prende); **sin «Recordar»**, porque `onNudge` solo sirve a
+  CINCO —confirmado por su agente, apuntado en su `docs/V2.md` como trabajo de
+  servidor de la 2.0—; sin el evento `quitar_anuncios_tocado`, que la política
+  de Nona no declara.
+- De paso: abrir una diaria ya hecha volvía a mandar `diaria_terminada`. Ya no.
+
+Para enviarla a revisión hace falta una versión 1.0.5 en App Store Connect con
+sus novedades; y la 1.0.4 tiene que haber salido antes (o retirarse), porque
+Apple solo revisa una versión a la vez.
