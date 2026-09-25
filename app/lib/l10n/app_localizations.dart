@@ -480,6 +480,102 @@ abstract class L {
   /// In es, this message translates to:
   /// **'{count, plural, one{🔥 1 día de racha} other{🔥 {count} días de racha}}'**
   String menuStreak(int count);
+
+  /// Rótulo de la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget.
+  ///
+  /// In es, this message translates to:
+  /// **'El sudoku de hoy'**
+  String get sceneTodaysSudoku;
+
+  /// Rótulo del dato de errores en la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget.
+  ///
+  /// In es, this message translates to:
+  /// **'Errores'**
+  String get sceneMistakes;
+
+  /// Rótulo del dato de puntos en la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntos'**
+  String get scenePoints;
+
+  /// Debajo del número grande de la racha.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, one{día de racha} other{días de racha}}'**
+  String sceneStreakDays(int count);
+
+  /// Pie de la escena de la racha cuando hoy la alargó.
+  ///
+  /// In es, this message translates to:
+  /// **'Juega mañana y serán {next}.'**
+  String sceneStreakTomorrow(int next);
+
+  /// Frase de la escena del hito de racha.
+  ///
+  /// In es, this message translates to:
+  /// **'¡{count} días seguidos!'**
+  String sceneMilestoneTitle(int count);
+
+  /// Rótulo de la escena del hito. Se escribe en caja normal: las mayúsculas las pone el widget.
+  ///
+  /// In es, this message translates to:
+  /// **'Un hito de racha'**
+  String get sceneMilestoneLabel;
+
+  /// Título de la escena de rachas de amigos.
+  ///
+  /// In es, this message translates to:
+  /// **'Rachas de amigos'**
+  String get sceneFriendsTitle;
+
+  /// Subtítulo cuando todos los amigos con racha ya jugaron.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoy jugaron todos.'**
+  String get sceneFriendsAllPlayed;
+
+  /// Subtítulo cuando falta un amigo.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} aún no ha jugado hoy.'**
+  String sceneFriendsOneMissing(String name);
+
+  /// Subtítulo cuando faltan varios (siempre 2 o más).
+  ///
+  /// In es, this message translates to:
+  /// **'{count} amigos aún no han jugado hoy.'**
+  String sceneFriendsManyMissing(int count);
+
+  /// Botón principal de las escenas del final, salvo la última.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar'**
+  String get sceneContinue;
+
+  /// Título de la hoja de Quitar anuncios.
+  ///
+  /// In es, this message translates to:
+  /// **'Jugar sin anuncios'**
+  String get noAdsTitle;
+
+  /// Enlace a la hoja, debajo del botón principal del resultado. {price} es el de la tienda.
+  ///
+  /// In es, this message translates to:
+  /// **'Jugar sin anuncios · {price}'**
+  String noAdsLink(String price);
+
+  /// Lo que dice el enlace si la compra llega con el final abierto.
+  ///
+  /// In es, this message translates to:
+  /// **'Listo: ya no verás anuncios'**
+  String get noAdsDone;
+
+  /// Restaurar terminó sin error y sin compra.
+  ///
+  /// In es, this message translates to:
+  /// **'No encontramos ninguna compra que restaurar.'**
+  String get noAdsNothingToRestore;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

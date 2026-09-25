@@ -21,7 +21,8 @@ import 'settings_tab.dart';
 import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
 import '../theme.dart';
-import '../widgets/result_overlay.dart' show difficultyLabel;
+import '../widgets/difficulty_label.dart';
+import '../widgets/sin_anuncios.dart';
 import 'game_screen.dart';
 import 'practice_screen.dart';
 
@@ -320,6 +321,8 @@ class _HomeScreenState extends State<HomeScreen>
                     controller: widget.daily,
                     progress: widget.progress,
                     theme: widget.theme,
+                    friends: widget.friends,
+                    purchases: widget.purchases,
                     onExit: () => _goPlay(_Play.menu),
                     onPractice: () {
                       if (widget.practice.board == null) widget.practice.load();
@@ -422,7 +425,25 @@ class _HomeScreenState extends State<HomeScreen>
             // En pantallas muy bajas el banner se sacrifica: el tablero manda.
             if (widget.banner != null &&
                 MediaQuery.sizeOf(context).height >= 700)
-              widget.banner!,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // «Quitar anuncios», encima del banner, **solo fuera de la
+                  // partida**: en el menú y las pestañas, no debajo de un
+                  // tablero, que ya comparte el alto con el banner grande.
+                  //
+                  // Siempre montada, y siempre el primer hijo, con alto 0
+                  // cuando no toca: así el banner no cambia de sitio en la
+                  // columna al entrar en una partida. Cambiar de sitio lo
+                  // montaría de nuevo, sin hueco reservado, y el anuncio se
+                  // volvería a pedir (lo mismo en CINCO, `pie_de_modo.dart`).
+                  FranjaSinAnuncios(
+                    compras: widget.purchases,
+                    visible: !_inGame,
+                  ),
+                  widget.banner!,
+                ],
+              ),
             if (_inGame)
               Container(
                 height: MediaQuery.paddingOf(context).bottom,

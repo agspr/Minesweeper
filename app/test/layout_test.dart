@@ -116,6 +116,14 @@ void main() {
                     await SharedPreferences.getInstance(),
                   ),
                   theme: ThemeController(await SharedPreferences.getInstance()),
+                  friends: FriendsService(
+                    firebaseReady: false,
+                    gameId: nonaGameId,
+                  ),
+                  purchases: PurchaseService(
+                    await SharedPreferences.getInstance(),
+                    nonaConfig.iap,
+                  ),
                   onExit: () {},
                   onPractice: () {},
                 ),

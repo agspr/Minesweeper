@@ -18,7 +18,8 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:juegos_senda/juegos_senda.dart' show Analytics;
+import 'package:juegos_senda/juegos_senda.dart'
+    show Analytics, FriendsService, PurchaseService;
 
 import '../game/daily_controller.dart';
 import '../game/scoring.dart';
@@ -30,7 +31,9 @@ import '../theme.dart';
 import '../widgets/game_header.dart';
 import '../widgets/numpad.dart';
 import '../widgets/puzzle_layout.dart';
-import '../widgets/result_overlay.dart';
+import '../nona_config.dart';
+import '../widgets/difficulty_label.dart';
+import '../widgets/escenas_del_final.dart';
 import '../widgets/sudoku_board_view.dart';
 
 class GameScreen extends StatefulWidget {
@@ -41,11 +44,19 @@ class GameScreen extends StatefulWidget {
     required this.theme,
     required this.onExit,
     required this.onPractice,
+    required this.friends,
+    required this.purchases,
   });
 
   final DailyController controller;
   final ProgressController progress;
   final ThemeController theme;
+
+  /// De aquí salen las rachas de amigos de la última escena del final.
+  final FriendsService friends;
+
+  /// «Jugar sin anuncios», en la primera escena del final.
+  final PurchaseService purchases;
 
   /// Volver al menú. No es `Navigator.pop`: la pantalla no es una ruta, vive
   /// dentro de la pestaña Jugar (ver `home_screen.dart`).
@@ -61,8 +72,17 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
-  bool _resultDismissed = false;
   bool _wasComplete = false;
+
+  /// Si la diaria ya estaba terminada al verla por primera vez en esta
+  /// pantalla, o se terminó delante. Null hasta que hay tablero.
+  ///
+  /// Es lo que separa CELEBRAR de ENSEÑAR: quien acaba de terminar ve la
+  /// celebración entera —con su hito, sus vibraciones y el evento de partida
+  /// terminada—; quien abre una diaria que ya hizo ve una repetición, con su X.
+  /// Antes no se distinguía, y cada vez que se abría una diaria hecha salía
+  /// otra vez `diaria_terminada`.
+  bool? _completaAlVer;
 
   @override
   void initState() {
@@ -91,7 +111,13 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     } else if (state == AppLifecycleState.resumed) {
       c.refreshForToday().then((changed) {
         if (!mounted) return;
-        if (changed) setState(() => _resultDismissed = false);
+        // Otro día: lo que se sabía de la diaria de ayer ya no vale.
+        if (changed) {
+          setState(() {
+            _wasComplete = false;
+            _completaAlVer = null;
+          });
+        }
         if (!c.isComplete) c.startTimer();
       });
     }
@@ -114,6 +140,66 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         streak: widget.progress.streakAsOf(date),
       ),
     );
+  }
+
+  /// Las rachas de amigos tal como están leídas.
+  List<RachaEnLaEscena> _amigosDeLaEscena() => rachasParaLaEscena(
+    widget.friends,
+    yo: widget.friends.miUid,
+    hoy: widget.controller.dayKey ?? '',
+  );
+
+  /// Las mismas, releídas hasta que el servidor haya contado la partida de hoy
+  /// en todas. Sin sesión no hay nada que releer.
+  Future<List<RachaEnLaEscena>> _recargarAmigos() async {
+    if (widget.friends.miUid == null) return _amigosDeLaEscena();
+    return releerHastaQueCuente(
+      recargar: widget.friends.recargarRachas,
+      leer: _amigosDeLaEscena,
+    );
+  }
+
+  /// El final de la diaria: la celebración al terminarla, o su repetición al
+  /// abrir una ya hecha.
+  Future<void> _abrirElFinal({required bool repeticion}) async {
+    final c = widget.controller;
+    if (!mounted || !c.isComplete || c.outcome == null) return;
+    final score = scoreDaily(c.outcome!);
+    final ahora = DateTime.now();
+    // La racha YA está registrada: la partida se guarda al completarse, así
+    // que este número incluye el día de hoy.
+    final racha = widget.progress.streakAsOf(ahora);
+    final accion = await mostrarEscenasDelFinal(
+      context,
+      score: score,
+      difficulty: c.difficulty!,
+      elapsed: c.elapsed,
+      racha: racha,
+      weekDone: widget.progress.weekDoneAsOf(ahora),
+      todayIndex: ahora.weekday - 1,
+      purchases: widget.purchases,
+      onShare: () async => _share(context, c),
+      hito: hitoDeHoy(
+        score: score,
+        racha: racha,
+        hitos: nonaConfig.streakMilestones,
+      ),
+      amigos: _amigosDeLaEscena(),
+      recargarAmigos: _recargarAmigos,
+      repeticion: repeticion,
+    );
+    if (!mounted) return;
+    switch (accion) {
+      case AccionDelFinal.practica:
+        widget.onPractice();
+      case AccionDelFinal.menu:
+        widget.onExit();
+      // Cerrar la repetición deja la pantalla como estaba: el tablero
+      // resuelto, con su X arriba. Cerrar la celebración con el gesto de
+      // volver es irse, como en CINCO.
+      case null:
+        if (!repeticion) widget.onExit();
+    }
   }
 
   @override
@@ -177,69 +263,62 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               );
             }
 
+            _completaAlVer ??= c.isComplete;
+
             // Al completarse, el reloj se para, se registra el día y sale el
-            // resultado. El registro es idempotente, así que que esto viva en
-            // un `build` no duplica puntos aunque la pantalla se reconstruya.
+            // final. El registro es idempotente, así que que esto viva en un
+            // `build` no duplica puntos aunque la pantalla se reconstruya, y
+            // se hace también al abrir una diaria ya hecha: si la app murió
+            // justo al terminar, es aquí donde el día acaba apuntado.
             if (c.isComplete && !_wasComplete) {
               _wasComplete = true;
-              _resultDismissed = false;
               final score = scoreDaily(c.outcome!);
               widget.progress.record(
                 score,
                 DateTime.parse(c.dayKey!),
                 seconds: c.elapsed.inSeconds,
               );
+              final repeticion = _completaAlVer!;
               // El evento de juego de Nona, hermano del diaria_terminada de
               // CINCO. Solo agregados de la partida — dificultad y fallos —
-              // nunca nada que identifique a la persona. GATE: la política
-              // §3.8 dice "estas y ninguna más", así que el build que lleve
-              // esto NO SALE hasta que la política lo declare (orden acordado
-              // con André: la política se ensancha primero).
-              Analytics.gameEvent('diaria_terminada', {
-                'dificultad': c.difficulty!.name,
-                'fallos': score.countedMistakes,
-              });
+              // nunca nada que identifique a la persona. Y solo al TERMINARLA
+              // delante: abrir una diaria ya hecha no es terminarla otra vez.
+              // GATE: la política §3.8 dice "estas y ninguna más" (orden
+              // acordado con André: la política se ensancha primero).
+              if (!repeticion) {
+                Analytics.gameEvent('diaria_terminada', {
+                  'dificultad': c.difficulty!.name,
+                  'fallos': score.countedMistakes,
+                });
+              }
+              // Tras el fotograma: abrir una ruta en mitad de un `build` no se
+              // puede.
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => _abrirElFinal(repeticion: repeticion),
+              );
             }
 
             final board = c.board!;
-            return Stack(
-              children: [
-                PuzzleLayout(
-                  header: header,
-                  board: SudokuBoardView(
-                    board: board,
-                    selected: c.selected,
-                    onTapCell: c.select,
-                  ),
-                  numpad: Numpad(
-                    board: board,
-                    notesMode: c.notesMode,
-                    enabled: !c.isComplete,
-                    onDigit: c.tapDigit,
-                    onErase: c.erase,
-                    onToggleNotes: c.toggleNotesMode,
-                    onUndo: c.undo,
-                    boardColourOn: widget.theme.boardColour,
-                    onToggleBoardColour: widget.theme.toggleBoardColour,
-                  ),
-                ),
-                if (c.isComplete && !_resultDismissed)
-                  Positioned.fill(
-                    child: ResultOverlay(
-                      score: scoreDaily(c.outcome!),
-                      elapsed: c.elapsed,
-                      // La racha YA está registrada cuando esto se pinta: la
-                      // partida se guarda al completarse, así que este número
-                      // incluye el día de hoy.
-                      streak: widget.progress.streakAsOf(DateTime.now()),
-                      weekDone: widget.progress.weekDoneAsOf(DateTime.now()),
-                      todayIndex: DateTime.now().weekday - 1,
-                      onShare: () => _share(context, c),
-                      onPractice: widget.onPractice,
-                      onMenu: widget.onExit,
-                    ),
-                  ),
-              ],
+            // El final ya no se pinta encima: va en su propia ruta, a
+            // pantalla completa (`escenas_del_final.dart`).
+            return PuzzleLayout(
+              header: header,
+              board: SudokuBoardView(
+                board: board,
+                selected: c.selected,
+                onTapCell: c.select,
+              ),
+              numpad: Numpad(
+                board: board,
+                notesMode: c.notesMode,
+                enabled: !c.isComplete,
+                onDigit: c.tapDigit,
+                onErase: c.erase,
+                onToggleNotes: c.toggleNotesMode,
+                onUndo: c.undo,
+                boardColourOn: widget.theme.boardColour,
+                onToggleBoardColour: widget.theme.toggleBoardColour,
+              ),
             );
           },
         ),

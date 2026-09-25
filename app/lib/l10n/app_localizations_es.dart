@@ -239,4 +239,71 @@ class LEs extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get sceneTodaysSudoku => 'El sudoku de hoy';
+
+  @override
+  String get sceneMistakes => 'Errores';
+
+  @override
+  String get scenePoints => 'Puntos';
+
+  @override
+  String sceneStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'días de racha',
+      one: 'día de racha',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sceneStreakTomorrow(int next) {
+    return 'Juega mañana y serán $next.';
+  }
+
+  @override
+  String sceneMilestoneTitle(int count) {
+    return '¡$count días seguidos!';
+  }
+
+  @override
+  String get sceneMilestoneLabel => 'Un hito de racha';
+
+  @override
+  String get sceneFriendsTitle => 'Rachas de amigos';
+
+  @override
+  String get sceneFriendsAllPlayed => 'Hoy jugaron todos.';
+
+  @override
+  String sceneFriendsOneMissing(String name) {
+    return '$name aún no ha jugado hoy.';
+  }
+
+  @override
+  String sceneFriendsManyMissing(int count) {
+    return '$count amigos aún no han jugado hoy.';
+  }
+
+  @override
+  String get sceneContinue => 'Continuar';
+
+  @override
+  String get noAdsTitle => 'Jugar sin anuncios';
+
+  @override
+  String noAdsLink(String price) {
+    return 'Jugar sin anuncios · $price';
+  }
+
+  @override
+  String get noAdsDone => 'Listo: ya no verás anuncios';
+
+  @override
+  String get noAdsNothingToRestore =>
+      'No encontramos ninguna compra que restaurar.';
 }

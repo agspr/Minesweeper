@@ -70,5 +70,63 @@
         "type": "int"
       }
     }
-  }
+  },
+  "sceneTodaysSudoku": "Today's sudoku",
+  "sceneMistakes": "Mistakes",
+  "scenePoints": "Points",
+  "sceneStreakDays": "{count, plural, one{day streak} other{day streak}}",
+  "@sceneStreakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneStreakTomorrow": "Play tomorrow to make it {next}.",
+  "@sceneStreakTomorrow": {
+    "placeholders": {
+      "next": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneMilestoneTitle": "{count} days in a row!",
+  "@sceneMilestoneTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneMilestoneLabel": "A streak milestone",
+  "sceneFriendsTitle": "Friend streaks",
+  "sceneFriendsAllPlayed": "Everyone played today.",
+  "sceneFriendsOneMissing": "{name} hasn't played today yet.",
+  "@sceneFriendsOneMissing": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sceneFriendsManyMissing": "{count} friends haven't played today yet.",
+  "@sceneFriendsManyMissing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneContinue": "Continue",
+  "noAdsTitle": "Play without ads",
+  "noAdsLink": "Play without ads · {price}",
+  "@noAdsLink": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "noAdsDone": "Done: no more ads",
+  "noAdsNothingToRestore": "We couldn't find a purchase to restore."
 }

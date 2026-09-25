@@ -239,4 +239,71 @@ class LEn extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get sceneTodaysSudoku => 'Today\'s sudoku';
+
+  @override
+  String get sceneMistakes => 'Mistakes';
+
+  @override
+  String get scenePoints => 'Points';
+
+  @override
+  String sceneStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'day streak',
+      one: 'day streak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sceneStreakTomorrow(int next) {
+    return 'Play tomorrow to make it $next.';
+  }
+
+  @override
+  String sceneMilestoneTitle(int count) {
+    return '$count days in a row!';
+  }
+
+  @override
+  String get sceneMilestoneLabel => 'A streak milestone';
+
+  @override
+  String get sceneFriendsTitle => 'Friend streaks';
+
+  @override
+  String get sceneFriendsAllPlayed => 'Everyone played today.';
+
+  @override
+  String sceneFriendsOneMissing(String name) {
+    return '$name hasn\'t played today yet.';
+  }
+
+  @override
+  String sceneFriendsManyMissing(int count) {
+    return '$count friends haven\'t played today yet.';
+  }
+
+  @override
+  String get sceneContinue => 'Continue';
+
+  @override
+  String get noAdsTitle => 'Play without ads';
+
+  @override
+  String noAdsLink(String price) {
+    return 'Play without ads · $price';
+  }
+
+  @override
+  String get noAdsDone => 'Done: no more ads';
+
+  @override
+  String get noAdsNothingToRestore =>
+      'We couldn\'t find a purchase to restore.';
 }

@@ -16,7 +16,7 @@ import '../theme.dart';
 import '../game/difficulty.dart';
 import '../game/practice_controller.dart';
 import '../services/progress_controller.dart';
-import '../widgets/result_overlay.dart' show difficultyLabel;
+import '../widgets/difficulty_label.dart';
 import '../services/theme_controller.dart';
 
 class SettingsTab extends StatefulWidget {

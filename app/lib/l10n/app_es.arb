@@ -125,5 +125,99 @@
         "type": "int"
       }
     }
+  },
+  "sceneTodaysSudoku": "El sudoku de hoy",
+  "@sceneTodaysSudoku": {
+    "description": "Rótulo de la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget."
+  },
+  "sceneMistakes": "Errores",
+  "@sceneMistakes": {
+    "description": "Rótulo del dato de errores en la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget."
+  },
+  "scenePoints": "Puntos",
+  "@scenePoints": {
+    "description": "Rótulo del dato de puntos en la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget."
+  },
+  "sceneStreakDays": "{count, plural, one{día de racha} other{días de racha}}",
+  "@sceneStreakDays": {
+    "description": "Debajo del número grande de la racha.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneStreakTomorrow": "Juega mañana y serán {next}.",
+  "@sceneStreakTomorrow": {
+    "description": "Pie de la escena de la racha cuando hoy la alargó.",
+    "placeholders": {
+      "next": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneMilestoneTitle": "¡{count} días seguidos!",
+  "@sceneMilestoneTitle": {
+    "description": "Frase de la escena del hito de racha.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneMilestoneLabel": "Un hito de racha",
+  "@sceneMilestoneLabel": {
+    "description": "Rótulo de la escena del hito. Se escribe en caja normal: las mayúsculas las pone el widget."
+  },
+  "sceneFriendsTitle": "Rachas de amigos",
+  "@sceneFriendsTitle": {
+    "description": "Título de la escena de rachas de amigos."
+  },
+  "sceneFriendsAllPlayed": "Hoy jugaron todos.",
+  "@sceneFriendsAllPlayed": {
+    "description": "Subtítulo cuando todos los amigos con racha ya jugaron."
+  },
+  "sceneFriendsOneMissing": "{name} aún no ha jugado hoy.",
+  "@sceneFriendsOneMissing": {
+    "description": "Subtítulo cuando falta un amigo.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sceneFriendsManyMissing": "{count} amigos aún no han jugado hoy.",
+  "@sceneFriendsManyMissing": {
+    "description": "Subtítulo cuando faltan varios (siempre 2 o más).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneContinue": "Continuar",
+  "@sceneContinue": {
+    "description": "Botón principal de las escenas del final, salvo la última."
+  },
+  "noAdsTitle": "Jugar sin anuncios",
+  "@noAdsTitle": {
+    "description": "Título de la hoja de Quitar anuncios."
+  },
+  "noAdsLink": "Jugar sin anuncios · {price}",
+  "@noAdsLink": {
+    "description": "Enlace a la hoja, debajo del botón principal del resultado. {price} es el de la tienda.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "noAdsDone": "Listo: ya no verás anuncios",
+  "@noAdsDone": {
+    "description": "Lo que dice el enlace si la compra llega con el final abierto."
+  },
+  "noAdsNothingToRestore": "No encontramos ninguna compra que restaurar.",
+  "@noAdsNothingToRestore": {
+    "description": "Restaurar terminó sin error y sin compra."
   }
 }

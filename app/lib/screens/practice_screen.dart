@@ -36,7 +36,7 @@ import '../theme.dart';
 import '../widgets/game_header.dart';
 import '../widgets/numpad.dart';
 import '../widgets/puzzle_layout.dart';
-import '../widgets/result_overlay.dart' show difficultyLabel;
+import '../widgets/difficulty_label.dart';
 import '../widgets/sudoku_board_view.dart';
 
 class PracticeScreen extends StatefulWidget {
