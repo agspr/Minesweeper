@@ -1575,7 +1575,7 @@ en todas: 2 · 2 · 1 menciones de «cada 60» en ES y exactamente las mismas de
 «every 60 days» en EN, página por página. Lo que queda de «permanente» es sólo
 el borrado, que sí lo es («se borra de forma permanente»).
 
-## ⚠️ PENDIENTE NUEVO — lo siguiente que arrastra la plataforma: los reportes
+## ✅ RESUELTO el 28-9 (ver abajo) — lo siguiente que arrastra la plataforma: los reportes
 
 Tu política dice de los reportes sólo esto (§3.4, líneas 168-169): que
 recibimos el aviso con el identificador de la cuenta reportada. Pero en
@@ -1596,3 +1596,37 @@ secreto `SOPORTE_SMTP_CLAVE`. Pero en cuanto se ponga, Nona declara de MENOS.
 del correo» se borra a los dos años, y nada la borra (lo anoté en el
 `PENDIENTE.md` de CINCO). Mejor redactarlo cuando André decida qué pasa con
 esos correos, y publicarlo **antes** de poner el secreto.
+
+---
+
+## ✅ RESUELTO Y PUBLICADO — 28-9-2026. Los reportes, en privacidad y en borrar cuenta (ES+EN).
+
+**Esto ya era falso**: el correo de los reportes está desplegado desde el 25-9 (André tiene en support@ el de
+la sonda de ese día), y Nona está a la venta. Así que lo escribí y lo publiqué yo, del mismo modo que el
+@usuario. Nona `533e1c6`, sitio `ed3c686`. Cambian cuatro páginas, fechadas el **28 de septiembre de
+2026**; los términos no cambian, porque ya dicen que los reportes se revisan.
+
+Lo que dice ahora, repasado contra el código (paquete `package-v0.70.0`, `FriendsService.report`, y
+juegos-senda `reportes.js` y `onReportCreated`):
+- **§3.4**: se guarda quién, a quién, el motivo **con las palabras de la App** («Nombre o avatar ofensivo»,
+  «Spam o acoso», «Otro motivo») y la fecha. Llega por correo a support@ **con el @usuario y el nombre
+  visible de los dos**, que es lo que lleva el correo. La persona reportada no recibe aviso ni ve quién la
+  reportó. Los reportes se borran solos a los dos años, y **la copia del correo la borramos nosotros** en el
+  mismo plazo (André, a mano, a los 18 meses). Y se conservan aunque se borre una de las dos cuentas.
+- **§4 y §4.1**: «revisar los reportes», y una fila de base legal (interés legítimo) para revisarlos y
+  guardarlos dos años aunque se borre la cuenta.
+- **§5**: **Zoho Mail**, puesto encima de Apple y Google porque el texto de debajo habla de «las dos
+  últimas filas».
+- **§6**: «Visible solo para nosotros: los reportes».
+- **§9**: la fila de los reportes.
+- **Borrar cuenta**: los reportes entre lo que NO se borra. Y fuera el «Nada de lo anterior te identifica
+  como jugador de Nona», **que dejaba de ser verdad**: la copia por correo conserva el @usuario y el nombre
+  que tenías. Ahora lo dice con esa salvedad.
+
+Comprobado en el HTML servido: las seis páginas dan 200 y lo servido es idéntico a lo generado. Las frases
+nuevas están, y las viejas ya no.
+
+**Si algún día Nona reporta desde una partida** (como CINCO desde una batalla, con `battleId`), el correo
+copia lo que escribió el reportado, y la política habría que ampliarla. Hoy el paquete no manda `battleId`.
+
+Nota: al dejar esto sólo commiteé `legal/PENDIENTE.md`.
