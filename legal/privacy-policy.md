@@ -1,7 +1,7 @@
 # Política de Privacidad de Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 25 de septiembre de 2026
+**Última actualización:** 28 de septiembre de 2026
 
 ---
 
@@ -156,7 +156,7 @@ Guardamos en Firestore dos cosas distintas, y la diferencia importa:
 Guardamos además, en una zona **privada que sólo tú puedes leer**, tu **última
 actividad** y tu **token de notificaciones** (ver 3.5).
 
-### 3.4 Amistades, invitaciones cruzadas y bloqueos
+### 3.4 Amistades, invitaciones cruzadas, bloqueos y reportes
 
 Si usas las funciones sociales guardamos:
 
@@ -165,8 +165,15 @@ Si usas las funciones sociales guardamos:
 - **Empujones** ("nudges"): el aviso que envías a un amigo para que juegue.
 - **Bloqueos**: tu lista de cuentas bloqueadas, que es **privada** y sólo tú
   puedes leer. Un bloqueo impide que esa persona te envíe solicitudes.
-- **Reportes**: si reportas a un jugador, recibimos el aviso junto con el
-  identificador de la cuenta reportada para poder revisarlo.
+- **Reportes**: si reportas a un jugador, guardamos quién lo reporta, a
+  quién, el motivo que eliges —«Nombre o avatar ofensivo», «Spam o acoso» u
+  «Otro motivo»— y la fecha, para poder revisarlo. **Nos llega también por correo**,
+  a support@sendapr.com, con el @usuario y el nombre visible de los dos tal
+  como estaban ese día. La persona reportada **no recibe ningún aviso** y no
+  puede ver quién la reportó. **Los reportes se borran solos a los dos
+  años**; la copia del correo la borramos nosotros, en el mismo plazo. Se
+  conservan aunque se elimine alguna de las dos cuentas: si no, bastaría con
+  borrar la cuenta para que no se pudiera revisar lo reportado.
 
 #### Qué juegos de la familia tienes, y quién puede verlo
 
@@ -367,7 +374,8 @@ Usamos la información descrita arriba únicamente para:
   aceptaste.
 - **Mostrar anuncios**, que son lo que paga el desarrollo de la App —y dejar
   de mostrarlos si compras "Quitar anuncios".
-- **Mantener la App en pie**: diagnosticar fallos y prevenir abusos.
+- **Mantener la App en pie**: diagnosticar fallos, prevenir abusos y revisar
+  los reportes.
 - **Cumplir con la ley** cuando estemos obligados a hacerlo.
 
 No usamos tu información para tomar decisiones automatizadas que produzcan
@@ -385,6 +393,7 @@ obliga a decirte en qué base legal se apoya cada tratamiento. Estas son:
 | Publicidad **no personalizada** | **Interés legítimo** (art. 6.1.f): sostener económicamente una App gratuita |
 | Datos de uso agregados | **Interés legítimo** (art. 6.1.f): saber qué mejorar |
 | Diagnóstico de fallos y comprobación de integridad (App Check) | **Interés legítimo** (art. 6.1.f): mantener la App en pie, segura y libre de abuso |
+| Los reportes: revisarlos, y conservarlos dos años aunque se elimine alguna de las dos cuentas | **Interés legítimo** (art. 6.1.f): revisar las conductas que incumplen los términos y proteger a los demás jugadores |
 | Conservar registros que la ley nos exige | **Obligación legal** (art. 6.1.c) |
 
 Cuando la base es el **consentimiento**, puedes retirarlo cuando quieras sin
@@ -408,6 +417,7 @@ proveedores que hacen funcionar la App:
 | Google BigQuery (Google Cloud) | Almacenar y consultar los datos de uso, en nuestro propio proyecto |
 | Google Play Integrity (vía Firebase App Check) | Comprobar que la App es una instalación legítima, en Android |
 | Apple App Attest (vía Firebase App Check) | Lo mismo, en iOS |
+| Zoho Mail | Nuestro correo de soporte (support@sendapr.com), donde nos llegan tus mensajes y los reportes |
 | Apple (Sign in with Apple, App Store) | Inicio de sesión, distribución y cobro de la compra en iOS |
 | Google Play | Distribución y cobro de la compra en Android |
 
@@ -459,6 +469,8 @@ quede explícito porque es la parte que más suele sorprender:
   juegos de la familia has dejado.
 - **Visible para la otra persona**: que le enviaste una solicitud de amistad,
   un empujón o una invitación a Nona.
+- **Visible solo para nosotros**: los reportes. La persona a la que reportas
+  no ve el reporte ni quién lo envió.
 
 Si prefieres no aparecer con tu nombre real, usa un nombre visible distinto:
 es editable en cualquier momento desde tu perfil.
@@ -529,6 +541,7 @@ Con más detalle, por tipo de dato:
 | Dato | Cuánto lo conservamos |
 |---|---|
 | Perfil, @usuario, marcadores, partidas, amistades, bloqueos y token de notificaciones | Mientras la cuenta esté activa. Al eliminarla se borran **de inmediato** |
+| Reportes | **Dos años** desde que se envían; después se borran solos. La copia que nos llega por correo la borramos nosotros, en el mismo plazo. Se conservan aunque se elimine alguna de las dos cuentas, para poder revisar lo que se reportó (ver 3.4) |
 | Informes de fallos (Crashlytics y Sentry) | El plazo de retención de cada servicio, **90 días por defecto**. No contienen tu perfil |
 | Datos de uso | **Un máximo de 400 días**, tanto en Google Analytics para Firebase como en la copia exportada a BigQuery. Pasado ese plazo se borran solos |
 | Datos guardados sólo en tu teléfono | Hasta que desinstales la App |

@@ -1,7 +1,7 @@
 # Cómo Borrar tu Cuenta en Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 25 de septiembre de 2026
+**Última actualización:** 28 de septiembre de 2026
 
 Nona forma parte de **Juegos Senda**, una familia de juegos de SENDA LLC que
 comparten una misma cuenta. Por eso borrar tiene **dos significados distintos**,
@@ -148,11 +148,18 @@ Conviene ser claro sobre lo que sobrevive al borrado, y por qué:
 - **Los datos de uso** ya recogidos, que van atados a un identificador de
   instalación y **nunca estuvieron vinculados a tu cuenta**. Se borran solos al
   cumplir su plazo de retención.
+- **Los reportes**: si reportaste a alguien, o alguien te reportó, el reporte
+  —quién, a quién, el motivo y la fecha— se conserva **hasta dos años** desde
+  que se envió, para poder revisarlo, y después se borra solo. También su
+  copia en nuestro correo de soporte, que lleva además el @usuario y el nombre
+  visible de los dos tal como estaban ese día; esa la borramos nosotros, en el
+  mismo plazo.
 - **Los datos que la ley nos obligue a conservar**, típicamente por razones
   contables o fiscales.
 
-Nada de lo anterior te identifica como jugador de Nona una vez borrada la
-cuenta.
+Una vez borrada la cuenta, nada de lo anterior te identifica, **salvo la copia
+por correo de un reporte**, que conserva el @usuario y el nombre visible que
+tenías entonces hasta que la borremos.
 
 ---
 

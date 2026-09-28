@@ -1,7 +1,7 @@
 # Nona Privacy Policy
 
 **Effective:** August 25, 2026
-**Last updated:** September 25, 2026
+**Last updated:** September 28, 2026
 
 ---
 
@@ -157,7 +157,7 @@ We store two different things in Firestore, and the difference matters:
 We also store, in a **private area only you can read**, your **last activity**
 and your **notification token** (see 3.5).
 
-### 3.4 Friendships, cross-game invitations and blocks
+### 3.4 Friendships, cross-game invitations, blocks and reports
 
 If you use the social features we store:
 
@@ -166,8 +166,15 @@ If you use the social features we store:
 - **Nudges**: the prompt you send a friend to get them to play.
 - **Blocks**: your list of blocked accounts, which is **private** and readable
   only by you. A block prevents that person from sending you requests.
-- **Reports**: if you report a player, we receive the alert along with the
-  identifier of the reported account so that we can review it.
+- **Reports**: if you report a player, we keep who is reporting, who is
+  reported, the reason you choose —"Offensive name or avatar", "Spam or
+  harassment" or "Another reason"— and the date, so that we can review it. **It also reaches
+  us by email**, at support@sendapr.com, with both players' @username and
+  display name as they stood that day. The reported person **receives no
+  notice** and cannot see who reported them. **Reports delete themselves after
+  two years**; we delete the email copy ourselves, within the same period.
+  They are kept even if either account is deleted: otherwise, deleting an
+  account would be enough to put what was reported beyond review.
 
 #### Which games in the family you have, and who can see it
 
@@ -366,7 +373,8 @@ We use the information described above solely to:
 - **Send you notifications** related to those features, if you accepted them.
 - **Show ads**, which are what pays for the App's development — and stop
   showing them if you buy "Remove ads".
-- **Keep the App standing**: diagnose failures and prevent abuse.
+- **Keep the App standing**: diagnose failures, prevent abuse and review
+  reports.
 - **Comply with the law** when we are required to.
 
 We do not use your information to make automated decisions producing legal
@@ -385,6 +393,7 @@ These are:
 | **Non-personalized** advertising | **Legitimate interests** (Art. 6(1)(f)): financially sustaining a free App |
 | Aggregate usage data | **Legitimate interests** (Art. 6(1)(f)): knowing what to improve |
 | Crash diagnostics and the integrity check (App Check) | **Legitimate interests** (Art. 6(1)(f)): keeping the App standing, secure and free of abuse |
+| Reports: reviewing them, and keeping them for two years even if either account is deleted | **Legitimate interests** (Art. 6(1)(f)): reviewing conduct that breaks the Terms and protecting other players |
 | Keeping records the law requires of us | **Legal obligation** (Art. 6(1)(c)) |
 
 Where the basis is **consent**, you can withdraw it at any time without
@@ -409,6 +418,7 @@ providers that make the App work:
 | Google BigQuery (Google Cloud) | Storing and querying the usage data, inside our own project |
 | Google Play Integrity (via Firebase App Check) | Verifying the App is a legitimate installation, on Android |
 | Apple App Attest (via Firebase App Check) | The same, on iOS |
+| Zoho Mail | Our support mailbox (support@sendapr.com), where your messages and reports reach us |
 | Apple (Sign in with Apple, App Store) | Sign-in, distribution and charging for the purchase on iOS |
 | Google Play | Distribution and charging for the purchase on Android |
 
@@ -460,6 +470,8 @@ people:
   family you have left.
 - **Visible to the other person**: that you sent them a friend request, a nudge
   or an invitation to Nona.
+- **Visible only to us**: reports. The person you report does not see the
+  report or who sent it.
 
 If you would rather not appear under your real name, use a different display
 name: it is editable at any time from your profile.
@@ -531,6 +543,7 @@ In more detail, by type of data:
 | Data | How long we keep it |
 |---|---|
 | Profile, @username, scores, games, friendships, blocks and notification token | While the account is active. On deletion they are erased **immediately** |
+| Reports | **Two years** from when they are sent; after that they delete themselves. We delete the copy that reaches us by email ourselves, within the same period. They are kept even if either account is deleted, so that what was reported can be reviewed (see 3.4) |
 | Crash reports (Crashlytics and Sentry) | Each service's retention period, **90 days by default**. They contain no part of your profile |
 | Usage data | **A maximum of 400 days**, both in Google Analytics for Firebase and in the copy exported to BigQuery. After that period it deletes itself |
 | Data stored only on your phone | Until you uninstall the App |

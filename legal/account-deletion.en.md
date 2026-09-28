@@ -1,7 +1,7 @@
 # How to Delete Your Nona Account
 
 **Effective:** August 25, 2026
-**Last updated:** September 25, 2026
+**Last updated:** September 28, 2026
 
 Nona is part of **Juegos Senda**, a family of games by SENDA LLC that share a
 single account. That is why deleting has **two distinct meanings**, and the App
@@ -149,10 +149,18 @@ It is worth being clear about what survives deletion, and why:
 - **Usage data** already collected, which is tied to an installation
   identifier and **was never linked to your account**. It deletes itself once
   its retention period is up.
+- **Reports**: if you reported someone, or someone reported you, the report
+  —who, whom, the reason and the date— is kept for **up to two years** from
+  when it was sent, so that it can be reviewed, and then deletes itself. So is
+  its copy in our support mailbox, which also carries both players' @username
+  and display name as they stood that day; we delete that one ourselves,
+  within the same period.
 - **Data the law requires us to keep**, typically for accounting or tax
   reasons.
 
-None of the above identifies you as a Nona player once the account is deleted.
+Once the account is deleted, none of the above identifies you, **except the
+email copy of a report**, which keeps the @username and display name you had
+at the time until we delete it.
 
 ---
 
