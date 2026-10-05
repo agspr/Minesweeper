@@ -366,11 +366,24 @@ void main() {
         RegExp(r'ProgressSync\(([\s\S]*?)\)\s*\.start\(\);').firstMatch(src);
     expect(arranque, isNotNull, reason: 'no hay un ProgressSync(...).start() vivo');
     expect(arranque!.group(1), contains('onDeviceClaimed: daily.reloadFromPrefs'));
+    // Dentro del `if (firebaseReady) {` más cercano, y sin haberlo cerrado:
+    // el bloque ya no empieza por él —antes va la partida en la nube—, así
+    // que se mira que siga DENTRO, no que sea lo primero.
+    final antes = src.substring(0, arranque.start);
+    final si = antes.lastIndexOf('if (firebaseReady) {');
+    expect(si, isNonNegative, reason: 'no hay if (firebaseReady) antes');
+    final tramo = antes.substring(si + 'if (firebaseReady) {'.length);
+    final abiertas =
+        '{'.allMatches(tramo).length - '}'.allMatches(tramo).length;
     expect(
-      RegExp(r'if \(firebaseReady\) \{\s*$')
-          .hasMatch(src.substring(0, arranque.start)),
-      isTrue,
-      reason: 'el ProgressSync no cuelga directamente de if (firebaseReady)',
+      abiertas,
+      greaterThanOrEqualTo(0),
+      reason: 'el ProgressSync está fuera del if (firebaseReady)',
+    );
+    expect(
+      RegExp(r'\bif \(').allMatches(tramo),
+      isEmpty,
+      reason: 'el ProgressSync cuelga de otro if, no de firebaseReady',
     );
   });
 

@@ -95,6 +95,9 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   /// otra vez `diaria_terminada`.
   bool? _completaAlVer;
 
+  /// La carga del tablero que se está mirando. Ver `DailyController.generacion`.
+  int? _generacionVista;
+
   @override
   void initState() {
     super.initState();
@@ -330,6 +333,14 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               );
             }
 
+            // Un tablero NUEVO del mismo día —el que llegó de otro teléfono—
+            // se mira de cero: si llega ya resuelto, se resolvió allí, y aquí
+            // es una repetición, no una celebración (ni un anuncio).
+            if (c.generacion != _generacionVista) {
+              _generacionVista = c.generacion;
+              _completaAlVer = null;
+              _wasComplete = false;
+            }
             _completaAlVer ??= c.isComplete;
 
             // Al completarse, el reloj se para, se registra el día y sale el

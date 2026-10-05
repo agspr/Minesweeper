@@ -35,6 +35,11 @@ dependencies:
   # identidad (auth, amistades, avisos) llega por juegos_senda.
   firebase_core: ^4.13.0
 
+  # La diaria a medias se guarda en la nube para seguirla en otro teléfono
+  # (lib/services/partida_en_la_nube.dart). Ya venía con el paquete; se declara
+  # porque Nona la usa ella misma, con la misma restricción que el paquete.
+  cloud_firestore: ^6.8.0
+
   # «Actualizar» abre la ficha de la tienda. Ya venía con el paquete; se
   # declara porque Nona la importa ella misma.
   url_launcher: ^6.3.2

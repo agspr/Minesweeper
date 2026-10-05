@@ -28,6 +28,8 @@
 /// `debugPrint` en depuración.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 
@@ -46,6 +48,7 @@ class ProgressSync {
     required this.session,
     required this.prefs,
     this.onDeviceClaimed,
+    this.alEstrenarSesion,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now;
 
@@ -79,6 +82,13 @@ class ProgressSync {
   /// entero para que el sincronizador no dependa de la pantalla de juego. Es
   /// el mismo punto en que CINCO llama a `game.reloadFromPrefs()` (su main.dart).
   final void Function()? onDeviceClaimed;
+
+  /// Se llama con la sesión ya reclamada —después de [onDeviceClaimed]— para
+  /// traer lo que es de esta cuenta y no vive en el resumen: la diaria a medias
+  /// (`PartidaEnLaNube`). DESPUÉS del reclamo y no antes, que es el orden que
+  /// importa: traída antes, el reclamo la borraría; y sin reclamar, la cuenta
+  /// nueva compararía contra el tablero de la anterior.
+  final Future<void> Function(String uid)? alEstrenarSesion;
   final DateTime Function() _clock;
 
   bool _attached = false;
@@ -121,6 +131,8 @@ class ProgressSync {
     // En el acto y antes de cualquier `await`: entre el borrado y la recarga
     // no puede colarse nada que lea o anote la partida de la cuenta anterior.
     onDeviceClaimed?.call();
+    final traer = alEstrenarSesion;
+    if (traer != null) unawaited(traer(uid));
 
     _reconciling = true;
     try {

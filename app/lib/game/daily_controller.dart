@@ -72,6 +72,22 @@ class DailyController extends ChangeNotifier {
   int _selected = -1;
   bool _notesMode = false;
 
+  /// Jugadas hechas en el tablero de hoy: cifras, notas, borrar y deshacer.
+  /// Solo sube, y viaja con la partida: es lo que dice cuál de dos teléfonos
+  /// va más avanzado (ver [partidaQueSeAdopta]).
+  int _jugadas = 0;
+
+  /// Cada carga del tablero. Quien pinte la partida la compara para saber si
+  /// el tablero que tiene delante es otro —por ejemplo, el que llegó de otro
+  /// teléfono— aunque sea del mismo día.
+  int _generacion = 0;
+  int get generacion => _generacion;
+
+  /// Avisa en cada guardado: es lo que sube la partida a la nube (ver
+  /// `PartidaEnLaNube`). Aparte de `notifyListeners`, que salta también al
+  /// mover la selección, que no es jugada.
+  final ValueNotifier<int> guardados = ValueNotifier(0);
+
   int _accumulatedSeconds = 0;
   DateTime? _runningSince;
 
@@ -120,6 +136,8 @@ class DailyController extends ChangeNotifier {
               saved: saved,
             );
       _accumulatedSeconds = (saved?['seconds'] as num?)?.toInt() ?? 0;
+      _jugadas = (saved?['jugadas'] as num?)?.toInt() ?? 0;
+      _generacion++;
       _runningSince = null;
       _selected = -1;
       _notesMode = false;
@@ -185,6 +203,7 @@ class DailyController extends ChangeNotifier {
     final b = _board;
     if (b == null || _selected < 0 || isComplete) return false;
     var fallo = false;
+    _jugadas++;
     if (_notesMode) {
       b.toggleNote(_selected, digit);
     } else {
@@ -202,6 +221,7 @@ class DailyController extends ChangeNotifier {
   void erase() {
     final b = _board;
     if (b == null || _selected < 0 || isComplete) return;
+    _jugadas++;
     b.erase(_selected);
     _save();
     notifyListeners();
@@ -210,6 +230,7 @@ class DailyController extends ChangeNotifier {
   void undo() {
     final b = _board;
     if (b == null || isComplete) return;
+    _jugadas++;
     b.undo();
     _save();
     notifyListeners();
@@ -248,19 +269,45 @@ class DailyController extends ChangeNotifier {
     }
   }
 
-  void _save() {
+  /// La partida de hoy tal como se guarda: lo que sube a la nube.
+  Map<String, dynamic>? get estadoGuardado {
     final b = _board;
-    if (b == null || _dayKey == null) return;
-    unawaited(
-      _prefs.setString(
-        _kState,
-        jsonEncode({
-          'day': _dayKey,
-          ...b.toJson(),
-          'seconds': elapsed.inSeconds,
-        }),
-      ),
-    );
+    if (b == null || _dayKey == null) return null;
+    return {
+      'day': _dayKey,
+      ...b.toJson(),
+      'seconds': elapsed.inSeconds,
+      'jugadas': _jugadas,
+      'completa': b.isComplete,
+    };
+  }
+
+  void _save() {
+    final estado = estadoGuardado;
+    if (estado == null) return;
+    unawaited(_prefs.setString(_kState, jsonEncode(estado)));
+    guardados.value++;
+  }
+
+  /// Adopta la partida de hoy que llega de otro teléfono, si va por delante
+  /// (ver [partidaQueSeAdopta]). Devuelve si la adoptó.
+  ///
+  /// Escribe en las preferencias y recarga, sin pasar por [_save]: lo que se
+  /// acaba de traer no tiene por qué volver a subir. Si el reloj corría —la
+  /// partida estaba delante—, sigue corriendo con el tablero nuevo.
+  Future<bool> adoptar(Map<String, dynamic> remota) async {
+    final hoy = dayKeyFor(_clock());
+    final local = _readSaved(hoy);
+    final elegida = partidaQueSeAdopta(local: local, remota: remota, hoy: hoy);
+    if (elegida == null) return false;
+    final corria = _runningSince != null;
+    pauseTimer();
+    await _prefs.setString(_kState, jsonEncode(elegida));
+    _ready = false;
+    _dayKey = null;
+    await load();
+    if (corria) startTimer();
+    return true;
   }
 
   /// Vuelve a leer las prefs para el día actual, si lo que hay en memoria ya
@@ -333,6 +380,37 @@ class DailyController extends ChangeNotifier {
   void dispose() {
     stopWatchingMidnight();
     pauseTimer();
+    guardados.dispose();
     super.dispose();
   }
+}
+
+/// Qué partida queda en este teléfono cuando llega la de otro, o null si se
+/// queda la que hay. **Pura.**
+///
+/// - Solo la de **hoy**: la de ayer a medias no dice nada del día de hoy.
+/// - Una partida **terminada** aquí no se cambia por nada: ya está apuntada.
+/// - Una terminada **allí** se adopta siempre: se resolvió en el otro.
+/// - Si no, la que lleve **más jugadas**: el contador solo sube, así que es la
+///   que va por delante —también si los dos teléfonos jugaron sin red—.
+/// - **Los fallos nunca bajan**: se queda el mayor de los dos. Son lo único que
+///   puntúa, y cambiar de teléfono no puede servir para borrarlos.
+Map<String, dynamic>? partidaQueSeAdopta({
+  required Map<String, dynamic>? local,
+  required Map<String, dynamic> remota,
+  required String hoy,
+}) {
+  if (remota['day'] != hoy) return null;
+  final localDeHoy = local != null && local['day'] == hoy ? local : null;
+  if (localDeHoy == null) return Map.of(remota);
+  if (localDeHoy['completa'] == true) return null;
+  int n(Object? x) => (x as num?)?.toInt() ?? 0;
+  final adelante =
+      remota['completa'] == true ||
+      n(remota['jugadas']) > n(localDeHoy['jugadas']);
+  if (!adelante) return null;
+  final fallos = n(remota['mistakes']) > n(localDeHoy['mistakes'])
+      ? n(remota['mistakes'])
+      : n(localDeHoy['mistakes']);
+  return {...remota, 'mistakes': fallos};
 }

@@ -29,6 +29,7 @@ import 'nona_config.dart';
 import 'screens/home_screen.dart';
 import 'widgets/puzzle_layout.dart';
 import 'services/progress_controller.dart';
+import 'services/partida_en_la_nube.dart';
 import 'services/progress_sync.dart';
 import 'services/theme_controller.dart';
 import 'theme.dart';
@@ -121,6 +122,13 @@ Future<void> main() async {
   // que subirlo mientras la app esté abierta, y el único momento en que dejaría
   // de hacer falta es cuando ya no hay app.
   if (firebaseReady) {
+    // La diaria a medias, en la nube: empezarla en un teléfono y terminarla en
+    // otro (André, 5-10-2026). Ver `partida_en_la_nube.dart`.
+    final partida = PartidaEnLaNube(
+      daily: daily,
+      uidOf: () => auth.user?.uid,
+      almacen: const AlmacenDePartidaFirestore(),
+    )..start();
     ProgressSync(
       prefs: prefs,
       progress: progress,
@@ -136,6 +144,8 @@ Future<void> main() async {
       // cargado: sin esto la cuenta nueva veía la partida de la anterior como
       // hecha, y abrirla le anotaba ese resultado. Lo vio André el 12-9-2026.
       onDeviceClaimed: daily.reloadFromPrefs,
+      // Y, ya reclamado el aparato, la diaria a medias de ESTA cuenta.
+      alEstrenarSesion: partida.traer,
     ).start();
   }
 
