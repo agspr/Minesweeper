@@ -178,19 +178,25 @@ class DailyController extends ChangeNotifier {
   }
 
   /// Pulsa un dígito del numpad sobre la casilla seleccionada.
-  void tapDigit(int digit) {
+  /// Devuelve si la cifra contó como FALLO. El numpad lo necesita para no
+  /// encabalgar su golpe con el patrón de error: la cifra entra al tocar la
+  /// tecla, así que el veredicto ya no llega «después», al soltar.
+  bool tapDigit(int digit) {
     final b = _board;
-    if (b == null || _selected < 0 || isComplete) return;
+    if (b == null || _selected < 0 || isComplete) return false;
+    var fallo = false;
     if (_notesMode) {
       b.toggleNote(_selected, digit);
     } else {
       // Un fallo se siente, no solo se ve: ver NonaHaptics.mistake.
-      if (b.place(_selected, digit)) NonaHaptics.mistake();
+      fallo = b.place(_selected, digit);
+      if (fallo) NonaHaptics.mistake();
       // Terminar para el reloj: la partida ya está cerrada.
       if (b.isComplete) pauseTimer();
     }
     _save();
     notifyListeners();
+    return fallo;
   }
 
   void erase() {

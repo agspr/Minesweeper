@@ -25,10 +25,11 @@
 /// fallo: deshacer, borrar, notas, paleta y la X no pueden producirlo ni por
 /// error.
 ///
-/// Los botones vibran en `onTapDown` y no al soltar (igual que el teclado de
-/// CINCO): así la vibración acompaña al dedo bajando, y en un dígito
-/// equivocado se siente como PULSACIÓN y luego VEREDICTO en vez de dos
-/// vibraciones encimadas.
+/// Las teclas del numpad vibran y actúan al BAJAR el dedo (como el teclado de
+/// CINCO desde el 28-9-2026; en Nona, el 5-10-2026): la cifra entra en el acto,
+/// así que el veredicto también. Por eso **una cifra equivocada no da [tap]**,
+/// solo [mistake]: los dos a la vez se encabalgarían. Un acierto da un golpe,
+/// un fallo da el patrón, y se distinguen sin mirar (ver `numpad.dart`).
 ///
 /// ## Lo que aquí NO se puede prometer
 ///
