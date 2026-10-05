@@ -1630,3 +1630,45 @@ nuevas están, y las viejas ya no.
 copia lo que escribió el reportado, y la política habría que ampliarla. Hoy el paquete no manda `battleId`.
 
 Nota: al dejar esto sólo commiteé `legal/PENDIENTE.md`.
+
+---
+
+## ⚠️ PARA LA POLÍTICA DE PRIVACIDAD — la diaria a medias ahora se guarda en la cuenta (5-10-2026, agente dev)
+
+**Antes de que la build que lo lleva (1.0.5+35 en adelante) salga a la
+tienda**, la política tiene que decirlo. Hoy §3.3 enumera lo que guarda la zona
+privada —«tu última actividad y tu token de notificaciones»— y esto lo amplía.
+
+**Qué hace el código** (`app/lib/services/partida_en_la_nube.dart`, commit
+`bcc751c`), comprobado en el código, no descrito de oídas:
+
+- **Qué**: el tablero de la diaria **de hoy** tal como está —las cifras
+  puestas, las notas, los fallos, el tiempo de juego, cuántas jugadas lleva y si
+  está terminada— y la hora de la última escritura.
+- **Dónde**: `users/{uid}/private/partidaEnCurso_nona`, la misma zona privada
+  que ya declara §3.3: **solo la puede leer la propia cuenta**.
+- **Cuándo**: solo con sesión iniciada, al jugar (un momento después de cada
+  jugada), al terminar y al irse la app al fondo. Sin cuenta, nada sale del
+  teléfono, como siempre.
+- **Para qué**: seguir la diaria en otro teléfono, o tras salir de la cuenta y
+  volver a entrar.
+- **Cuánto dura**: un solo documento, que se **reescribe** con la partida de
+  cada día; no se acumula historial. **Borrar la cuenta lo borra** (se lleva
+  `private/*`).
+- **Hueco abierto**: **quitar Nona de la cuenta todavía NO lo borra**
+  (`leaveSendaGame` no lo toca). Reportado al agente de CINCO, que lleva el
+  backend; a CINCO le pasa lo mismo con su `partidaEnCurso_cinco`. Hasta que
+  se arregle, la política no debería prometer que quitar Nona borra *todo* lo
+  de Nona, o hay que cerrar el hueco antes de publicar.
+
+Lo que ya dice la política y sigue siendo cierto: «Tus partidas son privadas. El
+detalle de cada sudoku —qué pusiste en cada casilla, cuántos fallos, cuánto
+tardaste— sólo lo puede leer tu propia cuenta» (resumen), y §3.10 («no salen de
+tu teléfono salvo cuando se sincronizan con tu cuenta»).
+
+**Nada más de la 0.86.0 cambia lo que se recoge**: los anuncios a pantalla
+completa ya estaban declarados («de pantalla completa entre partidas»); «Califica
+Nona» abre el cuadro de la tienda, que es de Apple o Google; «Otros Juegos
+Senda» son enlaces; la fila de privacidad de anuncios reabre el formulario de
+Google. No se añadió ningún evento de analítica (el `quitar_anuncios_tocado`
+de CINCO, a propósito no).
