@@ -386,6 +386,28 @@
         "sha256": "973ac1dabc3e72208dd977c02711817c4d6d6a2a0c40ce11c65faff09982e938"
       },
       "tienda": "TestFlight interno y Play pruebas internas, 25-9-2026; sin enviar a revisión"
+    },
+    "35": {
+      "version": "1.0.5",
+      "fecha": "2026-10-05",
+      "commit": "63cacd4c8d9b4323e884fe241c87049ef482f0b9",
+      "arbol_limpio": false,
+      "aab": {
+        "fichero": "nona-1.0.5-35.aab",
+        "bytes": 67694385,
+        "sha256": "d8106e59ec2c914dfa0fb7d0aa9e5575c5e48008f94f8066307af69e3694145d"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.5-35.ipa",
+        "bytes": 53453810,
+        "sha256": "3272de48b27ece7a0c29f90d0232cea6923aff0c8d94ce3e48d4f27781b9076f"
+      },
+      "simbolos": {
+        "fichero": "nona-1.0.5-35-simbolos.zip",
+        "bytes": 7907159,
+        "sha256": "cbe020cdac221520d52c22b9d2693e05fd46e29ad6e3919d6a5e4a5dcfa9043c"
+      },
+      "tienda": "TestFlight interno y Play pruebas internas, 5-10-2026; sin enviar a revisión. Paquete 0.86.0, numpad y diaria que viaja"
     }
   },
   "paquete_android": "com.nonaapp.nona",

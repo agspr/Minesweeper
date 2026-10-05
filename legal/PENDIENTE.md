@@ -1655,11 +1655,10 @@ privada —«tu última actividad y tu token de notificaciones»— y esto lo am
 - **Cuánto dura**: un solo documento, que se **reescribe** con la partida de
   cada día; no se acumula historial. **Borrar la cuenta lo borra** (se lleva
   `private/*`).
-- **Hueco abierto**: **quitar Nona de la cuenta todavía NO lo borra**
-  (`leaveSendaGame` no lo toca). Reportado al agente de CINCO, que lleva el
-  backend; a CINCO le pasa lo mismo con su `partidaEnCurso_cinco`. Hasta que
-  se arregle, la política no debería prometer que quitar Nona borra *todo* lo
-  de Nona, o hay que cerrar el hueco antes de publicar.
+- **Quitar Nona de la cuenta también lo borra** desde el 5-10-2026:
+  `leaveSendaGame` borra `private/partidaEnCurso_${juego}` (juegos-senda
+  `e7a2536`, desplegada solo esa función). Lo mismo para CINCO. Así que la
+  política puede seguir prometiendo que quitar Nona borra lo de Nona.
 
 Lo que ya dice la política y sigue siendo cierto: «Tus partidas son privadas. El
 detalle de cada sudoku —qué pusiste en cada casilla, cuántos fallos, cuánto
