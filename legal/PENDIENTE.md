@@ -1692,6 +1692,8 @@ Pedido por André («push the latest build to production on both platforms»).
 - **⚠️ La política sigue sin declarar la diaria a medias** en la zona privada
   (ver la entrada de arriba, «PARA LA POLÍTICA DE PRIVACIDAD»). André decidió
   enviar igual; conviene publicarla mientras las tiendas revisan.
+  **Resuelto el mismo día**: publicada antes de que ninguna tienda aprobara
+  (ver «✅ PUBLICADO» abajo).
 
 **Lo que queda**: cuando cada tienda la tenga a la venta,
 `node tools/publicar-version.js nona ios 35` y `… nona android 35`
@@ -1720,3 +1722,9 @@ diaria pasa a `PartidaEnLaNube`), y juegos-senda `e7a2536` (`leaveSendaGame` bor
 es idéntico a lo generado.
 
 Nota: al dejar esto sólo commiteé `legal/PENDIENTE.md`.
+
+**El despliegue de `leaveSendaGame`, comprobado en producción** (agente dev, 5-10-2026). Era lo único que
+el agente del sitio daba por bueno sin verlo. Lo desplegado en `cinco-fe5cc` (us-east1, actualizada
+15:25:30 UTC, minuto y medio después del commit `e7a2536`) se bajó de su `function-source.zip`, y su
+`index.js` borra `private/partidaEnCurso_${gameId}` dentro de `leaveSendaGame`. Lo que promete la política
+de quitar Nona es lo que hace hoy el servidor.
