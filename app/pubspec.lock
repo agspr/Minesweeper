@@ -381,6 +381,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  games_services:
+    dependency: transitive
+    description:
+      name: games_services
+      sha256: ee42b3b1a86fc20f27ccd383f8c32d1a0297cd6afd121c8827d2b946118c3507
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.0"
+  games_services_platform_interface:
+    dependency: transitive
+    description:
+      name: games_services_platform_interface
+      sha256: "171eb476db388e2162bd4a29a36153e8bcd28a67f4712a99763f38e7d1b70a03"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.0"
   glob:
     dependency: transitive
     description:
@@ -509,6 +525,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.11+1"
+  in_app_review:
+    dependency: transitive
+    description:
+      name: in_app_review
+      sha256: "364db0c160b37fe7fad9cdaa18f968473924b17368869010af902760421b6bf8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.12"
+  in_app_review_platform_interface:
+    dependency: transitive
+    description:
+      name: in_app_review_platform_interface
+      sha256: fed2c755f2125caa9ae10495a3c163aa7fab5af3585a9c62ef4a6920c5b45f10
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.5"
   injector:
     dependency: transitive
     description:
@@ -545,11 +577,11 @@ packages:
     dependency: "direct main"
     description:
       path: package
-      ref: "package-v0.70.0"
-      resolved-ref: b350c9dfae43901a9fbbe7d7728da802d97f2b4f
+      ref: "package-v0.86.0"
+      resolved-ref: f410e4cf44ac0780c0d9f099ffb409bb012f3a63
       url: "https://github.com/agspr/juegos-senda.git"
     source: git
-    version: "0.70.0"
+    version: "0.86.0"
   leak_tracker:
     dependency: transitive
     description:

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../game/daily_controller.dart';
 import '../game/practice_controller.dart';
+import '../game/day_key.dart';
 import '../l10n/app_localizations.dart';
 
 import 'package:juegos_senda/juegos_senda.dart';
@@ -22,6 +23,7 @@ import '../services/progress_controller.dart';
 import '../services/theme_controller.dart';
 import '../theme.dart';
 import '../widgets/difficulty_label.dart';
+import '../widgets/chip_de_racha_de_amigo.dart';
 import '../widgets/sin_anuncios.dart';
 import 'game_screen.dart';
 import 'practice_screen.dart';
@@ -43,6 +45,9 @@ class HomeScreen extends StatefulWidget {
     this.banner,
     this.versiones,
     this.versionActual,
+    this.ads,
+    this.resenas,
+    this.consent,
   });
 
   final DailyController daily;
@@ -76,6 +81,17 @@ class HomeScreen extends StatefulWidget {
   /// La versión de este binario, leída en `main` antes de pintar. Es lo que
   /// deja decidir el aviso de versión nueva en el primer fotograma.
   final SendaVersionActual? versionActual;
+
+  /// Los anuncios a pantalla completa. Null en las pruebas que no los miran:
+  /// el de verdad habla con AdMob por un canal que en una prueba no existe.
+  final AdManager? ads;
+
+  /// La reseña en la tienda: «Califica Nona» en Más y la petición en los días
+  /// de hito. Null en las pruebas que no la miran.
+  final SendaResenas? resenas;
+
+  /// Para «Privacidad de los anuncios» en Más. Null en las pruebas.
+  final ConsentManager? consent;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -114,6 +130,14 @@ class _HomeScreenState extends State<HomeScreen>
     } else {
       widget.daily.stopWatchingMidnight();
     }
+  }
+
+  /// La diaria de hoy ya está terminada en esta cuenta: en este teléfono, o en
+  /// otro y lo dice el progreso.
+  bool get _terminadaHoy {
+    final hoy = dayKeyFor(DateTime.now());
+    return (widget.daily.isComplete && widget.daily.dayKey == hoy) ||
+        widget.progress.lastCompletedDay == hoy;
   }
 
   /// Hay tablero delante dentro de Jugar. Suelto porque lo necesita también
@@ -158,7 +182,20 @@ class _HomeScreenState extends State<HomeScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(_versiones.comprobar());
     });
+    // Si se debe el anuncio del día —se cerró la app con la diaria recién
+    // terminada—, se CARGA para la próxima pausa. Nunca se enseña al abrir. Y
+    // a los 4 s, no antes: el primer arranque del SDK de anuncios bloquea el
+    // hilo principal, y al abrir la app caería bajo los dedos de quien toca.
+    final ads = widget.ads;
+    if (ads != null && ads.debido.hay) {
+      _precargaDebida = Timer(
+        const Duration(seconds: 4),
+        () => unawaited(ads.precargarLoDebido()),
+      );
+    }
   }
+
+  Timer? _precargaDebida;
 
   /// Del APARATO, no de la cuenta: la X se guarda en `prefs` fuera de los
   /// prefijos de Nona, así que quien entra con otra cuenta en el mismo teléfono
@@ -187,6 +224,7 @@ class _HomeScreenState extends State<HomeScreen>
     WidgetsBinding.instance.removeObserver(this);
     widget.daily.removeListener(_alCambiarLaDiaria);
     widget.daily.stopWatchingMidnight();
+    _precargaDebida?.cancel();
     // Solo el que es suyo: el de una prueba lo cierra quien lo creó.
     if (widget.versiones == null) _versiones.dispose();
     super.dispose();
@@ -323,6 +361,8 @@ class _HomeScreenState extends State<HomeScreen>
                     theme: widget.theme,
                     friends: widget.friends,
                     purchases: widget.purchases,
+                    ads: widget.ads,
+                    resenas: widget.resenas,
                     onExit: () => _goPlay(_Play.menu),
                     onPractice: () {
                       if (widget.practice.board == null) widget.practice.load();
@@ -331,6 +371,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   _Play.practice => PracticeScreen(
                     controller: widget.practice,
+                    ads: widget.ads,
                     theme: widget.theme,
                     onExit: () => _goPlay(_Play.menu),
                   ),
@@ -351,7 +392,12 @@ class _HomeScreenState extends State<HomeScreen>
                 // invitaciones viven detrás del icono de persona, en Amigos, que se
                 // abre como pantalla completa (§15).
                 ListenableBuilder(
-                  listenable: Listenable.merge([widget.auth, widget.progress]),
+                  listenable: Listenable.merge([
+                    widget.auth,
+                    widget.progress,
+                    widget.daily,
+                    widget.friends,
+                  ]),
                   builder: (context, _) =>
                       widget.auth.signedIn && widget.leaderboard != null
                       ? SendaLeaderboardScreen(
@@ -374,6 +420,31 @@ class _HomeScreenState extends State<HomeScreen>
                           // porque te hayan avisado de algo.
                           onOpenFriends: () =>
                               Navigator.of(context).push(_rutaDeAmigos()),
+                          // La racha que llevas con cada amigo, junto a su
+                          // bandera, como en CINCO: viva si hoy jugaron los dos.
+                          insigniaDeFila: (uid) {
+                            final rel = widget.friends.relationWith(uid);
+                            final racha = rel == null
+                                ? null
+                                : widget.friends.rachaCon(rel.id);
+                            if (racha == null) return null;
+                            final hoy = dayKeyFor(DateTime.now());
+                            return ChipDeRachaDeAmigo(
+                              n: racha.n,
+                              yoJugue: racha.jugoHoy(
+                                widget.friends.miUid ?? '',
+                                hoy,
+                              ),
+                              elJugo: racha.jugoHoy(uid, hoy),
+                            );
+                          },
+                          // El empujón, solo si TÚ ya terminaste la de hoy:
+                          // meter prisa sin haber jugado es pedir sin dar. Es
+                          // la misma regla del servidor, que mira el último día
+                          // jugado de Nona; el «y él no» lo comprueba el
+                          // paquete. Desde la 0.70.0 el empujón es por juego:
+                          // llega a Nona como «Nona te llama».
+                          puedeEmpujar: _terminadaHoy,
                         )
                       : SendaSocialSignedOut(onSignIn: widget.auth.exitGuest),
                 ),
@@ -388,6 +459,8 @@ class _HomeScreenState extends State<HomeScreen>
                   locale: widget.locale,
                   theme: widget.theme,
                   progress: widget.progress,
+                  consent: widget.consent,
+                  resenas: widget.resenas,
                 ),
               ],
             ),

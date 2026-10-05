@@ -57,18 +57,24 @@ void main() {
     expect(find.text('Acerca de Nona'), findsOneWidget);
   });
 
-  test('Nona pide expresamente que Más NO enseñe los bloqueados', () {
+  test('«Bloqueados» sale solo si hay alguien bloqueado, y la lista se carga', () {
+    // Como en CINCO (André, 5-10-2026). Estuvo apagada del todo, y quien solo
+    // tiene Nona y bloqueaba a alguien no podía deshacerlo desde Nona —y el
+    // aviso de bloquear del paquete le manda a «Bloqueados»—.
+    //
     // Se lee el CÓDIGO, no la pantalla, y no por comodidad: la sección solo se
     // monta con `showBlocked && auth.signedIn`, y una sesión de verdad necesita
-    // Firebase. Una prueba de widget aquí pasaría igual con el interruptor
-    // puesto al revés — lo comprobé mutándolo, y no se enteró. Más vale una
-    // prueba que mira el sitio raro y sirve, que una que mira el sitio bonito
-    // y no distingue nada.
-    //
-    // Lo que vigila: que nadie quite la línea. El dueño sacó los bloqueados de
-    // esta pantalla, y volverían solos con el valor por defecto del paquete.
-    final fuente = File('lib/screens/settings_tab.dart').readAsStringSync();
-    expect(fuente, contains('showBlocked: false'));
+    // Firebase. Una prueba de widget aquí pasaría igual con el interruptor al
+    // revés: se comprobó mutándolo.
+    final fuente = File('lib/screens/settings_tab.dart')
+        .readAsLinesSync()
+        .where((l) => !l.trimLeft().startsWith('//'))
+        .join('\n');
+    expect(fuente, contains('showBlocked: widget.friends.blocked.isNotEmpty'));
+    // Sin cargarla, `blocked` está vacía y la sección no sale nunca.
+    expect(fuente, contains('widget.friends.loadBlocked()'));
+    // Y Más se repinta cuando la lista llega.
+    expect(fuente, contains('widget.friends]'));
   });
 
   test('quitar la sección no desarma el filtro de bloqueo', () {

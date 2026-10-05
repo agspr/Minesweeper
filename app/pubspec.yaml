@@ -28,7 +28,7 @@ dependencies:
   juegos_senda:
     git:
       url: https://github.com/agspr/juegos-senda.git
-      ref: package-v0.70.0
+      ref: package-v0.86.0
       path: package
 
   # Firebase Core se declara aquí porque main() lo inicializa; el resto de la
@@ -73,6 +73,8 @@ flutter:
     # Banco diario horneado (tools/bake_bank.dart). Va DENTRO del binario a
     # propósito: el diario tiene que existir sin red.
     - assets/bank/
+    # Los iconos de los otros Juegos Senda, para «Otros Juegos Senda» en Más.
+    - assets/juegos/
 
 # Subida de símbolos a Sentry (org senda-6q / proyecto nona).
 # Requiere SENTRY_AUTH_TOKEN en el entorno; se ejecuta tras el build de release:

@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
 import '../nona_config.dart';
+import '../otros_juegos.dart';
 import '../theme.dart';
 import '../game/difficulty.dart';
 import '../game/practice_controller.dart';
@@ -31,6 +32,8 @@ class SettingsTab extends StatefulWidget {
     required this.locale,
     required this.theme,
     required this.progress,
+    this.consent,
+    this.resenas,
   });
 
   final PracticeController practice;
@@ -44,6 +47,13 @@ class SettingsTab extends StatefulWidget {
   final LocaleController locale;
   final ThemeController theme;
   final ProgressController progress;
+
+  /// «Privacidad de los anuncios»: la fila sale solo donde Google dice que
+  /// hace falta. Null en las pruebas.
+  final ConsentManager? consent;
+
+  /// «Califica Nona». Null en las pruebas.
+  final SendaResenas? resenas;
 
   @override
   State<SettingsTab> createState() => _SettingsTabState();
@@ -64,6 +74,14 @@ class _SettingsTabState extends State<SettingsTab> {
       ownedPrefixes: nonaConfig.ownedPrefKeyPrefixes,
     ),
   );
+
+  @override
+  void initState() {
+    super.initState();
+    // Para saber si hay a quién desbloquear: la sección «Bloqueados» sale solo
+    // si la lista no está vacía, como en CINCO.
+    widget.friends.loadBlocked();
+  }
 
   @override
   void dispose() {
@@ -118,7 +136,7 @@ class _SettingsTabState extends State<SettingsTab> {
     final avg = progress.averageMistakes;
 
     return ListenableBuilder(
-      listenable: Listenable.merge([progress, widget.practice]),
+      listenable: Listenable.merge([progress, widget.practice, widget.friends]),
       builder: (context, _) => SendaSettingsScreen(
         config: nonaConfig,
         auth: widget.auth,
@@ -199,11 +217,15 @@ class _SettingsTabState extends State<SettingsTab> {
         onPickTheme: (option) => widget.theme.select(
           SendaPalettes.byId(option.id, fallback: NonaColors.defaultPalette),
         ),
-        // La lista de bloqueados no se enseña por ahora. El FILTRO sigue
-        // vivo: quien busca por @usuario no encuentra a quien bloqueó, porque
-        // la pantalla de Amigos carga la lista por su cuenta.
         notifications: widget.notifications,
-        showBlocked: false,
+        // «Bloqueados», solo si hay alguien bloqueado, como en CINCO (André,
+        // 5-10-2026). Estuvo apagada del todo, y entonces quien solo tiene
+        // Nona y bloqueaba a alguien no podía deshacerlo desde Nona —y el
+        // aviso de bloquear del paquete le manda a «Bloqueados»—.
+        showBlocked: widget.friends.blocked.isNotEmpty,
+        consent: widget.consent,
+        resenas: widget.resenas,
+        otrosJuegos: kOtrosJuegosDeNona,
         aboutTitle: l.aboutNona,
         aboutSubtitle: l.aboutSubtitle,
         onAbout: () => Navigator.of(context).push(

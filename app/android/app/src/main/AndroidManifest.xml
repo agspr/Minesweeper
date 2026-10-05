@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <application
         android:label="Nona Sudoku"
         android:name="${applicationName}"
@@ -50,6 +51,21 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-5030233210775781~4088527589" />
+        <!-- Play Juegos, FUERA hasta que Nona adopte los logros. Llega con el
+             paquete (juegos_senda 0.73+, por games_services →
+             play-services-games-v2), y su proveedor arranca Play Juegos al
+             abrir CUALQUIER app que lo lleve: registra sus atajos y una
+             actividad exportada aunque el juego no lo use. CINCO lo tiene
+             configurado (su games.APP_ID); Nona no, y sin poder probarlo aquí
+             no se deja correr a ciegas al arrancar. Para adoptar los logros: el
+             APP_ID de Nona, y quitar estas dos líneas. -->
+        <provider
+            android:name="com.google.android.gms.games.provider.PlayGamesInitProvider"
+            android:authorities="${applicationId}.playgamesinitprovider"
+            tools:node="remove" />
+        <activity
+            android:name="com.google.android.gms.games.internal.v2.appshortcuts.PlayGamesAppShortcutsActivity"
+            tools:node="remove" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

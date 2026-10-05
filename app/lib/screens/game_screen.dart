@@ -17,9 +17,11 @@
 /// quien los viera.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:juegos_senda/juegos_senda.dart'
-    show Analytics, FriendsService, PurchaseService;
+    show AdManager, Analytics, FriendsService, PurchaseService, SendaResenas;
 
 import '../game/daily_controller.dart';
 import '../game/scoring.dart';
@@ -46,6 +48,8 @@ class GameScreen extends StatefulWidget {
     required this.onPractice,
     required this.friends,
     required this.purchases,
+    this.ads,
+    this.resenas,
   });
 
   final DailyController controller;
@@ -57,6 +61,13 @@ class GameScreen extends StatefulWidget {
 
   /// «Jugar sin anuncios», en la primera escena del final.
   final PurchaseService purchases;
+
+  /// El anuncio del día, entre el tablero resuelto y la celebración. Null en
+  /// las pruebas que no lo miran.
+  final AdManager? ads;
+
+  /// La reseña en la tienda, los días de hito: va EN LUGAR del anuncio.
+  final SendaResenas? resenas;
 
   /// Volver al menú. No es `Navigator.pop`: la pantalla no es una ruta, vive
   /// dentro de la pestaña Jugar (ver `home_screen.dart`).
@@ -89,14 +100,28 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     widget.controller.startTimer();
+    // El anuncio del día se carga mientras se juega, para que al resolver esté
+    // listo. A los 4 s y no al abrir: el primer arranque del SDK de anuncios
+    // bloquea el hilo principal, y caería bajo los dedos de quien empieza.
+    _precarga = Timer(const Duration(seconds: 4), () {
+      final c = widget.controller;
+      if (mounted && !c.isComplete && c.dayKey != null) {
+        unawaited(widget.ads?.preloadFor(c.dayKey!));
+      }
+    });
     // Aquí vivía un tic por segundo cuyo único trabajo era repintar el reloj de
     // la cabecera. Sin reloj a la vista, repintar la pantalla entera una vez
     // por segundo no dibujaba nada nuevo. El tiempo lo sigue llevando el
     // controlador con su propio reloj, y se lee cuando hace falta.
   }
 
+  Timer? _precarga;
+  Timer? _respiro;
+
   @override
   void dispose() {
+    _precarga?.cancel();
+    _respiro?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     widget.controller.pauseTimer();
     super.dispose();
@@ -177,10 +202,40 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     final c = widget.controller;
     if (!mounted || !c.isComplete || c.outcome == null) return;
     final score = scoreDaily(c.outcome!);
-    final ahora = DateTime.now();
+    // El día de la diaria, no el reloj: en la app son el mismo día, y así la
+    // racha, la semana y el hito se cuentan sobre el día que se acaba de
+    // jugar aunque el reloj diga otra cosa (en una prueba, o un instante
+    // pasada la medianoche).
+    final ahora = DateTime.parse(c.dayKey!);
     // La racha YA está registrada: la partida se guarda al completarse, así
     // que este número incluye el día de hoy.
     final racha = widget.progress.streakAsOf(ahora);
+    final hito = hitoDeHoy(
+      score: score,
+      racha: racha,
+      hitos: nonaConfig.streakMilestones,
+    );
+    // **El día de un hito, la reseña en la tienda si toca, y ENTONCES SIN EL
+    // ANUNCIO**: dos cosas a pantalla completa seguidas en el mejor momento
+    // del juego, no (André, en CINCO, 29-9-2026). Se decide aquí, antes del
+    // anuncio; la reseña se pide después de la celebración. Una repetición no
+    // tiene ni lo uno ni lo otro.
+    final conResena =
+        !repeticion && hito != null && (widget.resenas?.toca ?? false);
+    final ads = widget.ads;
+    if (!repeticion && ads != null) {
+      // **El anuncio, entre el tablero resuelto y la celebración** (André,
+      // 4-10-2026): la racha y los amigos esperan detrás, así que nadie los
+      // pierde por cerrarlo, y nadie se salta el anuncio cerrando la
+      // celebración. Si no está listo en un segundo no se espera: queda
+      // debido para la próxima pausa.
+      if (conResena) {
+        await ads.saldarDelDia();
+      } else {
+        await ads.maybeShowAfterPuzzle(c.dayKey!);
+      }
+      if (!mounted) return;
+    }
     final accion = await mostrarEscenasDelFinal(
       context,
       score: score,
@@ -191,16 +246,15 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       todayIndex: ahora.weekday - 1,
       purchases: widget.purchases,
       onShare: () async => _share(context, c),
-      hito: hitoDeHoy(
-        score: score,
-        racha: racha,
-        hitos: nonaConfig.streakMilestones,
-      ),
+      hito: hito,
       amigos: _amigosDeLaEscena(),
       recargarAmigos: _recargarAmigos,
       onRecordar: _recordar,
       repeticion: repeticion,
     );
+    // La reseña, después de la celebración y nunca pegada a un anuncio: hoy
+    // no lo hubo, se cambió por esto.
+    if (conResena) unawaited(widget.resenas!.pedirSiToca());
     if (!mounted) return;
     switch (accion) {
       case AccionDelFinal.practica:
@@ -304,11 +358,32 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                   'fallos': score.countedMistakes,
                 });
               }
-              // Tras el fotograma: abrir una ruta en mitad de un `build` no se
-              // puede.
-              WidgetsBinding.instance.addPostFrameCallback(
-                (_) => _abrirElFinal(repeticion: repeticion),
-              );
+              if (repeticion) {
+                // Tras el fotograma: abrir una ruta en mitad de un `build` no
+                // se puede.
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _abrirElFinal(repeticion: true),
+                );
+              } else {
+                // **El anuncio del día se DEBE desde este instante**, antes del
+                // respiro: quien cierre la app con el tablero recién resuelto
+                // lo verá en la próxima pausa. CINCO lo apunta tras su respiro
+                // de 2 s, y esos 2 s eran una rendija; aquí no.
+                final dia = c.dayKey!;
+                final ads = widget.ads;
+                if (ads != null) {
+                  unawaited(ads.deberElDelDia(dia));
+                  // Por si no se precargó (se resolvió antes de 4 s, o falló):
+                  // quedan los 2 s del respiro.
+                  unawaited(ads.preloadFor(dia));
+                }
+                // Un respiro para ver el tablero resuelto antes del anuncio y
+                // de la celebración, como CINCO tras su última fila.
+                _respiro = Timer(
+                  const Duration(seconds: 2),
+                  () => _abrirElFinal(repeticion: false),
+                );
+              }
             }
 
             final board = c.board!;

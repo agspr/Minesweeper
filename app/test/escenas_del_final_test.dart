@@ -752,6 +752,16 @@ void main() {
       return (daily, salidas);
     }
 
+    /// De la última casilla a la celebración en pantalla: el fotograma que la
+    /// ve terminada, los 2 s de respiro con el tablero resuelto (y el anuncio,
+    /// si lo hay), el que monta la ruta fuera de escena y su transición.
+    Future<void> hastaElFinal(WidgetTester tester) async {
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+
     void resolver(DailyController c) {
       for (var i = 0; i < cellCount; i++) {
         if (c.board!.isGiven(i)) continue;
@@ -767,11 +777,7 @@ void main() {
       final (daily, salidas) = await montar(tester, prefs);
       expect(find.byType(EscenasDelFinal), findsNothing);
       resolver(daily);
-      // Un fotograma para verla terminada (y abrir el final tras él), otro en
-      // que la ruta nueva se monta fuera de escena, y el de la transición.
-      await tester.pump();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+      await hastaElFinal(tester);
       expect(find.byType(EscenasDelFinal), findsOneWidget);
       expect(find.byTooltip('Cerrar'), findsNothing, reason: 'es celebración');
       await continuar(tester);
@@ -812,9 +818,7 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       final (daily, _) = await montar(tester, prefs, amistades: amistades);
       resolver(daily);
-      await tester.pump();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+      await hastaElFinal(tester);
       await continuar(tester);
       await continuar(tester);
       await tester.pump(const Duration(seconds: 2));

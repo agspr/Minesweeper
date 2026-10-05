@@ -151,8 +151,28 @@ Future<void> main() async {
   try {
     versionActual = await SendaVersionActual.leer();
   } catch (_) {}
+  final purchases = PurchaseService(prefs, nonaConfig.iap)..init();
+  // El consentimiento (RGPD + ATT) se pide una vez por sesión y lo comparte
+  // todo lo que muestre anuncios, así que vive aquí arriba y no dentro del
+  // banner.
+  final consent = ConsentManager();
+  // Los anuncios a pantalla completa: el del día, al terminar la diaria, y
+  // uno cada cuatro partidas de práctica en una pausa (André, 4-10-2026).
+  // Nona no los enseñó NUNCA hasta aquí: las unidades estaban en
+  // `nona_config` desde el principio, pero nada creaba el `AdManager` —y su
+  // política ya los declaraba—. «Quitar anuncios» los quita también.
+  final ads = AdManager(consent, prefs, nonaConfig.ads)
+    ..isEntitled = () => purchases.adsRemoved;
+  // Pedir la reseña en la tienda, en los días de hito de racha. El id del App
+  // Store sale de la ficha de Nona, la misma de «Actualizar».
+  final resenas = SendaResenas(
+    prefs,
+    appStoreId: nonaConfig.tiendaIos?.pathSegments.last.replaceFirst('id', ''),
+  );
   final app = NonaApp(
     versionActual: versionActual,
+    ads: ads,
+    resenas: resenas,
     daily: daily,
     practice: PracticeController(prefs),
     locale: LocaleController(prefs),
@@ -170,11 +190,8 @@ Future<void> main() async {
     leaderboard: firebaseReady
         ? LeaderboardService(layout: nonaConfig.dataLayout)
         : null,
-    purchases: PurchaseService(prefs, nonaConfig.iap)..init(),
-    // El consentimiento (RGPD + ATT) se pide una vez por sesión y lo comparte
-    // todo lo que muestre anuncios, así que vive aquí arriba y no dentro del
-    // banner.
-    consent: ConsentManager(),
+    purchases: purchases,
+    consent: consent,
   );
 
   // Sentry envuelve los manejadores de error ya instalados (los de Crashlytics
@@ -214,6 +231,8 @@ class NonaApp extends StatelessWidget {
     required this.leaderboard,
     required this.prefs,
     required this.versionActual,
+    required this.ads,
+    required this.resenas,
   });
 
   final DailyController daily;
@@ -233,6 +252,9 @@ class NonaApp extends StatelessWidget {
 
   /// La de este binario, o null si no se pudo leer.
   final SendaVersionActual? versionActual;
+
+  final AdManager ads;
+  final SendaResenas resenas;
 
   @override
   Widget build(BuildContext context) {
@@ -292,6 +314,9 @@ class NonaApp extends StatelessWidget {
                 prefs: prefs,
                 leaderboard: leaderboard,
                 versionActual: versionActual,
+                ads: ads,
+                resenas: resenas,
+                consent: consent,
                 // Se construye AQUÍ, una sola vez y arriba del todo: el banner
                 // reserva su alto desde el primer fotograma, y rehacerlo en
                 // cada reconstrucción del armazón lo haría recargar. Las

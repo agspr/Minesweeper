@@ -25,7 +25,10 @@
 /// terminar, y ocupan lo mismo: las dos son legítimas, no hay una principal.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:juegos_senda/juegos_senda.dart' show AdManager;
 
 import '../game/difficulty.dart';
 import '../game/practice_controller.dart';
@@ -45,9 +48,14 @@ class PracticeScreen extends StatefulWidget {
     required this.controller,
     required this.theme,
     required this.onExit,
+    this.ads,
   });
 
   final PracticeController controller;
+
+  /// Los anuncios a pantalla completa: uno cada cuatro partidas terminadas, en
+  /// la pausa entre una y otra. Null en las pruebas que no los miran.
+  final AdManager? ads;
 
   /// Para la tecla de color del numpad.
   final ThemeController theme;
@@ -63,6 +71,42 @@ class PracticeScreen extends StatefulWidget {
 class _PracticeScreenState extends State<PracticeScreen> {
   /// Al entrar SIEMPRE se elige nivel primero; el tablero viene después.
   bool _choosing = true;
+
+  /// El tablero de delante ya se apuntó como partida terminada.
+  bool _apuntada = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_alCambiar);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_alCambiar);
+    super.dispose();
+  }
+
+  /// Cada partida terminada se apunta UNA vez en la cuenta de los anuncios,
+  /// que es de todos los modos y está guardada (la lleva el paquete). Un
+  /// tablero nuevo vuelve a armar el apunte.
+  void _alCambiar() {
+    final terminada = widget.controller.isComplete;
+    if (terminada && !_apuntada) {
+      _apuntada = true;
+      unawaited(widget.ads?.anotarPartida());
+    } else if (!terminada) {
+      _apuntada = false;
+    }
+  }
+
+  /// La pausa entre una partida y la siguiente: el anuncio, si la cuenta dice
+  /// que toca y YA está cargado. Sin red no se espera ni un segundo: se sigue
+  /// jugando, y toca en la próxima pausa.
+  Future<void> _siguiente() async {
+    await widget.ads?.mostrarSiToca();
+    if (mounted) await widget.controller.newPuzzle();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +165,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
                       children: [
                         if (c.isComplete)
                           _SolvedActions(
-                            onKeepPlaying: c.newPuzzle,
+                            onKeepPlaying: _siguiente,
                             onExit: widget.onExit,
                           )
                         else
