@@ -6,10 +6,13 @@ publish_to: 'none'
 # la 1.0.4 sale sola y esto se prueba antes de enviarlo.
 #
 # Qué lleva la 1.0.5 respecto a la 32: el final de la diaria en escenas y
-# «Quitar anuncios» fuera de Más, los dos copiados de CINCO 1.9 (24-9-2026). La
-# 34 añade a la 33 «Recordar» en las rachas de amigos, que esperó a que el
-# servidor entendiera empujones por juego (paquete 0.70.0, 25-9-2026).
-version: 1.0.5+34
+# «Quitar anuncios» fuera de Más, los dos copiados de CINCO 1.9 (24-9-2026), y
+# «Recordar» en las rachas de amigos. La 35 añade a la 34 (André, 5-10-2026): el
+# paquete 0.86.0 con los anuncios a pantalla completa, «Califica Nona», «Otros
+# Juegos Senda», la privacidad de anuncios, «Bloqueados» y la Social con rachas
+# y empujones; el numpad que no se salta cifras; y la diaria a medias que viaja
+# con la cuenta. La 1.0.5 no se ha enviado a revisión, así que sigue siendo ella.
+version: 1.0.5+35
 
 environment:
   sdk: ^3.13.0
