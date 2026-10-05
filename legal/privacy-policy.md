@@ -1,7 +1,7 @@
 # Política de Privacidad de Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 28 de septiembre de 2026
+**Última actualización:** 5 de octubre de 2026
 
 ---
 
@@ -154,7 +154,14 @@ Guardamos en Firestore dos cosas distintas, y la diferencia importa:
   las creó.
 
 Guardamos además, en una zona **privada que sólo tú puedes leer**, tu **última
-actividad** y tu **token de notificaciones** (ver 3.5).
+actividad**, tu **token de notificaciones** (ver 3.5) y **la diaria de hoy, si
+la tienes a medias**: el tablero tal como va —las cifras que pusiste, tus
+notas, los fallos, el tiempo de juego, cuántas jugadas llevas y si ya está
+terminada—, para que puedas seguirla en otro teléfono o después de salir de tu
+cuenta y volver a entrar. Solo se guarda con la sesión iniciada, se actualiza un
+momento después de cada jugada y al salir de la App, y es **un único registro
+que la partida de cada día reemplaza**: no se acumula historial. Las partidas
+del modo libre no se guardan en tu cuenta.
 
 ### 3.4 Amistades, invitaciones cruzadas, bloqueos y reportes
 
@@ -541,6 +548,7 @@ Con más detalle, por tipo de dato:
 | Dato | Cuánto lo conservamos |
 |---|---|
 | Perfil, @usuario, marcadores, partidas, amistades, bloqueos y token de notificaciones | Mientras la cuenta esté activa. Al eliminarla se borran **de inmediato** |
+| La diaria de hoy a medias | Un único registro, que reemplaza la partida del siguiente día que juegues. Se borra **de inmediato** al quitar Nona de tu cuenta o al eliminarla |
 | Reportes | **Dos años** desde que se envían; después se borran solos. La copia que nos llega por correo la borramos nosotros, en el mismo plazo. Se conservan aunque se elimine alguna de las dos cuentas, para poder revisar lo que se reportó (ver 3.4) |
 | Informes de fallos (Crashlytics y Sentry) | El plazo de retención de cada servicio, **90 días por defecto**. No contienen tu perfil |
 | Datos de uso | **Un máximo de 400 días**, tanto en Google Analytics para Firebase como en la copia exportada a BigQuery. Pasado ese plazo se borran solos |

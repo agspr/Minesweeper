@@ -1,7 +1,7 @@
 # Cómo Borrar tu Cuenta en Nona
 
 **Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 28 de septiembre de 2026
+**Última actualización:** 5 de octubre de 2026
 
 Nona forma parte de **Juegos Senda**, una familia de juegos de SENDA LLC que
 comparten una misma cuenta. Por eso borrar tiene **dos significados distintos**,
@@ -62,7 +62,8 @@ Esto es lo que la App llama **"Borrar Nona de tu cuenta"**.
 ### Qué se borra
 
 - **Tu progreso de Nona**: tu racha, tu mejor racha, tus puntos —totales, de la
-  semana y del mes— y el registro de cada partida diaria que jugaste.
+  semana y del mes—, el registro de cada partida diaria que jugaste y la de hoy
+  si la dejaste a medias.
 - **Tu presencia en la clasificación de Nona**: dejas de aparecer en el
   marcador de tus amigos.
 - **La marca de que tienes Nona**: tus amigos dejan de verte como jugador de

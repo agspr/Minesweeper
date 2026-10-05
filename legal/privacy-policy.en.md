@@ -1,7 +1,7 @@
 # Nona Privacy Policy
 
 **Effective:** August 25, 2026
-**Last updated:** September 28, 2026
+**Last updated:** October 5, 2026
 
 ---
 
@@ -154,8 +154,15 @@ We store two different things in Firestore, and the difference matters:
 - **Your daily games**: the result of each day. They are **private**: our
   security rules allow only the account that created them to read them.
 
-We also store, in a **private area only you can read**, your **last activity**
-and your **notification token** (see 3.5).
+We also store, in a **private area only you can read**, your **last activity**,
+your **notification token** (see 3.5) and **today's daily, if you have it half
+played**: the board as it stands —the digits you placed, your notes, your
+mistakes, the playing time, how many moves you have made and whether it is
+finished—, so that you can carry on with it on another phone or after signing
+out of your account and back in. It is only saved while you are signed in, it is
+updated a moment after each move and when you leave the App, and it is **a single
+record that each day's game replaces**: no history builds up. Free play games are
+not saved to your account.
 
 ### 3.4 Friendships, cross-game invitations, blocks and reports
 
@@ -543,6 +550,7 @@ In more detail, by type of data:
 | Data | How long we keep it |
 |---|---|
 | Profile, @username, scores, games, friendships, blocks and notification token | While the account is active. On deletion they are erased **immediately** |
+| Today's half-played daily | A single record, replaced by the game of the next day you play. Erased **immediately** when you remove Nona from your account or delete it |
 | Reports | **Two years** from when they are sent; after that they delete themselves. We delete the copy that reaches us by email ourselves, within the same period. They are kept even if either account is deleted, so that what was reported can be reviewed (see 3.4) |
 | Crash reports (Crashlytics and Sentry) | Each service's retention period, **90 days by default**. They contain no part of your profile |
 | Usage data | **A maximum of 400 days**, both in Google Analytics for Firebase and in the copy exported to BigQuery. After that period it deletes itself |

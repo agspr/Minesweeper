@@ -1,7 +1,7 @@
 # How to Delete Your Nona Account
 
 **Effective:** August 25, 2026
-**Last updated:** September 28, 2026
+**Last updated:** October 5, 2026
 
 Nona is part of **Juegos Senda**, a family of games by SENDA LLC that share a
 single account. That is why deleting has **two distinct meanings**, and the App
@@ -61,7 +61,8 @@ This is what the App calls **"Remove Nona from your account"**.
 ### What is deleted
 
 - **Your Nona progress**: your streak, your best streak, your points — total,
-  weekly and monthly — and the record of every daily game you played.
+  weekly and monthly —, the record of every daily game you played, and today's
+  if you left it half played.
 - **Your presence in the Nona leaderboard**: you stop appearing in your
   friends' standings.
 - **The marker showing that you have Nona**: your friends stop seeing you as a
