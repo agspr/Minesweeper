@@ -1671,3 +1671,29 @@ Nona» abre el cuadro de la tienda, que es de Apple o Google; «Otros Juegos
 Senda» son enlaces; la fila de privacidad de anuncios reabre el formulario de
 Google. No se añadió ningún evento de analítica (el `quitar_anuncios_tocado`
 de CINCO, a propósito no).
+
+---
+
+## HECHO — 1.0.5 (35) enviada a producción en las dos tiendas (5-10-2026, agente dev)
+
+Pedido por André («push the latest build to production on both platforms»).
+
+- **Play**: producción pasa de 1.0.3 (31) —que alguien subió entre el 25-9 y
+  hoy— a **1.0.5 (35)**, despliegue completo. Notas en es-419 y en-US (antes
+  decían solo «Arreglos menores»): las escenas del final con las rachas de
+  amigos y «Recordar», la diaria que se empieza en un teléfono y se termina en
+  otro, el teclado que no se salta cifras, y el «Menú principal» que se salía
+  con la letra grande —ese arreglo no había llegado a Android—.
+- **App Store**: versión **1.0.5** con la 35, `AFTER_APPROVAL`,
+  `WAITING_FOR_REVIEW`. Mismas novedades sin lo del «Menú principal», que iOS ya
+  tiene desde la 1.0.4. Nota de revisión nueva: ya cuenta los anuncios a
+  pantalla completa (tras la diaria y como mucho uno cada cuatro prácticas) y
+  que «Quitar anuncios» los quita todos.
+- **⚠️ La política sigue sin declarar la diaria a medias** en la zona privada
+  (ver la entrada de arriba, «PARA LA POLÍTICA DE PRIVACIDAD»). André decidió
+  enviar igual; conviene publicarla mientras las tiendas revisan.
+
+**Lo que queda**: cuando cada tienda la tenga a la venta,
+`node tools/publicar-version.js nona ios 35` y `… nona android 35`
+(`docs/CONSTRUIR.md` §5), para que salga el aviso de versión nueva a quien
+tenga la 1.0.3 o la 1.0.4.

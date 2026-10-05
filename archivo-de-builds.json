@@ -407,7 +407,7 @@
         "bytes": 7907159,
         "sha256": "cbe020cdac221520d52c22b9d2693e05fd46e29ad6e3919d6a5e4a5dcfa9043c"
       },
-      "tienda": "TestFlight interno y Play pruebas internas, 5-10-2026; sin enviar a revisión. Paquete 0.86.0, numpad y diaria que viaja"
+      "tienda": "Producción enviada el 5-10-2026: Play (1.0.5, completa, en revisión de Google) y App Store (1.0.5 WAITING_FOR_REVIEW, sale sola al aprobarse)"
     }
   },
   "paquete_android": "com.nonaapp.nona",
