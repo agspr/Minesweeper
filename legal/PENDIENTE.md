@@ -1633,7 +1633,7 @@ Nota: al dejar esto sólo commiteé `legal/PENDIENTE.md`.
 
 ---
 
-## ⚠️ PARA LA POLÍTICA DE PRIVACIDAD — la diaria a medias ahora se guarda en la cuenta (5-10-2026, agente dev)
+## ✅ PUBLICADO el 5-10 (ver abajo) — la diaria a medias ahora se guarda en la cuenta (5-10-2026, agente dev)
 
 **Antes de que la build que lo lleva (1.0.5+35 en adelante) salga a la
 tienda**, la política tiene que decirlo. Hoy §3.3 enumera lo que guarda la zona
@@ -1697,3 +1697,26 @@ Pedido por André («push the latest build to production on both platforms»).
 `node tools/publicar-version.js nona ios 35` y `… nona android 35`
 (`docs/CONSTRUIR.md` §5), para que salga el aviso de versión nueva a quien
 tenga la 1.0.3 o la 1.0.4.
+
+---
+
+## ✅ PUBLICADO — 5-10-2026. La diaria a medias, en privacidad y en borrar cuenta (ES+EN).
+
+Nona `abd8a3c`, sitio `ee9c6a2`. Cambian **cuatro páginas**, al **5 de octubre de 2026**: privacidad y
+borrar cuenta, en español y en inglés. Los términos no cambian.
+
+- **§3.3**: la zona privada guarda además **la diaria de hoy, si la tienes a medias**: las cifras, las
+  notas, los fallos, el tiempo, las jugadas y si está terminada. Sirve para seguirla en otro teléfono o tras
+  salir y volver a entrar. Solo con sesión, se sube un momento después de cada jugada y al salir de la App,
+  y es un único registro que reemplaza la partida de cada día. **El modo libre no se guarda en la cuenta.**
+- **§9**: una fila: un único registro, que se borra de inmediato al quitar Nona o al eliminar la cuenta.
+- **Borrar cuenta, opción 1**: entre lo que se borra, «y la de hoy si la dejaste a medias».
+
+Repasado contra el código, no contra la nota: `partida_en_la_nube.dart` (`private/partidaEnCurso_nona`,
+1,5 s de espera, `paused`/`inactive`, solo con `uid`), `DailyController.estadoGuardado` (`day`,
+`entries`, `notes`, `mistakes`, `seconds`, `jugadas`, `completa`, más `updatedAt`), `main.dart` (solo la
+diaria pasa a `PartidaEnLaNube`), y juegos-senda `e7a2536` (`leaveSendaGame` borra
+`private/partidaEnCurso_${gameId}`). Comprobado en el HTML servido: las seis páginas dan 200 y lo servido
+es idéntico a lo generado.
+
+Nota: al dejar esto sólo commiteé `legal/PENDIENTE.md`.
