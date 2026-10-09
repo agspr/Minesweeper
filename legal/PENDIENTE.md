@@ -1699,6 +1699,10 @@ Pedido por André («push the latest build to production on both platforms»).
 `node tools/publicar-version.js nona ios 35` y `… nona android 35`
 (`docs/CONSTRUIR.md` §5), para que salga el aviso de versión nueva a quien
 tenga la 1.0.3 o la 1.0.4.
+**Hecho el 9-10-2026**: las dos tiendas la tienen a la venta (App Store
+`READY_FOR_SALE`; la ficha pública de Play enseña la 1.0.5, actualizada el
+5-10), y el número está publicado: android — → 35 (era la primera vez), ios
+32 → 35.
 
 ---
 
