@@ -696,7 +696,7 @@ class _BotonDeCompartir extends StatelessWidget {
       child: IconButton(
         tooltip: tooltip,
         onPressed: onPressed,
-        icon: const Icon(Icons.ios_share_rounded),
+        icon: Icon(iconoDeCompartir()),
         style: ButtonStyle(
           backgroundColor: WidgetStatePropertyAll(NonaColors.accentChip),
           foregroundColor: WidgetStatePropertyAll(NonaColors.accent),

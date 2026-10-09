@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -464,6 +465,31 @@ void main() {
         reason: 'en la racha no',
       );
     });
+
+    testWidgets(
+      'compartir lleva el icono del sistema, no el de iOS en todos',
+      (tester) async {
+        // André lo vio en Android (8-10-2026): estaba fijo al cuadrado con la
+        // flecha, un símbolo que en Android nadie ha aprendido.
+        await abrir(tester, onShare: () async {});
+        final icono = tester.widget<Icon>(
+          find.descendant(
+            of: find.byTooltip('Compartir'),
+            matching: find.byType(Icon),
+          ),
+        );
+        expect(
+          icono.icon,
+          defaultTargetPlatform == TargetPlatform.iOS
+              ? Icons.ios_share_rounded
+              : Icons.share_rounded,
+        );
+      },
+      variant: const TargetPlatformVariant(<TargetPlatform>{
+        TargetPlatform.android,
+        TargetPlatform.iOS,
+      }),
+    );
 
     testWidgets('amigos: quién falta, y «Recordar» solo para ese', (
       tester,
