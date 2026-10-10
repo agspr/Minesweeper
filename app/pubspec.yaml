@@ -1,18 +1,15 @@
 name: nona
 description: "Nona — Sudoku del día. Parte de Juegos Senda."
 publish_to: 'none'
-# 1.0.5 y no otra build de la 1.0.4: la 1.0.4 (32) está en revisión de Apple
-# con el arreglo del resultado, que es urgente, y esto es mucho más grande. Así
-# la 1.0.4 sale sola y esto se prueba antes de enviarlo.
+# 1.0.6 porque la 1.0.5 (35) ya está a la venta en las dos tiendas, y Apple no
+# deja reenviar una versión READY_FOR_SALE (docs/CONSTRUIR.md §1).
 #
-# Qué lleva la 1.0.5 respecto a la 32: el final de la diaria en escenas y
-# «Quitar anuncios» fuera de Más, los dos copiados de CINCO 1.9 (24-9-2026), y
-# «Recordar» en las rachas de amigos. La 35 añade a la 34 (André, 5-10-2026): el
-# paquete 0.86.0 con los anuncios a pantalla completa, «Califica Nona», «Otros
-# Juegos Senda», la privacidad de anuncios, «Bloqueados» y la Social con rachas
-# y empujones; el numpad que no se salta cifras; y la diaria a medias que viaja
-# con la cuenta. La 1.0.5 no se ha enviado a revisión, así que sigue siendo ella.
-version: 1.0.5+35
+# Qué lleva la 36 respecto a la 35 (André, 10-10-2026): la diaria a medias que
+# por fin se adopta —el Timestamp del servidor rompía jsonEncode y ningún
+# aparato adoptaba nunca la del otro—, un tablero sin jugadas que ya no sube y
+# pisa la partida del otro teléfono, los fallos de esa sincronización a Sentry,
+# y el icono de compartir de cada sistema (paquete 0.87.0).
+version: 1.0.6+36
 
 environment:
   sdk: ^3.13.0
