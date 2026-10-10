@@ -117,6 +117,12 @@ class PartidaEnLaNube with WidgetsBindingObserver {
     final uid = uidOf();
     final estado = daily.estadoGuardado;
     if (uid == null || estado == null) return;
+    // Sin una sola jugada no hay nada que llevar al otro teléfono, y sí mucho
+    // que perder: abrir la diaria y salir guarda el reloj, y ese tablero en
+    // blanco pisaba la partida del otro si este aún no la había traído (el
+    // 10-10-2026 la nube de André tenía 0 jugadas y 12 segundos). Como CINCO,
+    // que solo sube al jugar.
+    if (estado['jugadas'] == 0) return;
     // Lo idéntico no se reescribe: irse al fondo sin haber jugado nada no
     // gasta una escritura.
     final huella = estado.toString();

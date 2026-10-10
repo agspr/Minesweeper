@@ -395,14 +395,24 @@ class DailyController extends ChangeNotifier {
 ///   que va por delante —también si los dos teléfonos jugaron sin red—.
 /// - **Los fallos nunca bajan**: se queda el mayor de los dos. Son lo único que
 ///   puntúa, y cambiar de teléfono no puede servir para borrarlos.
+/// - De la nube se queda **solo lo que guarda [DailyController.estadoGuardado]**.
+///   El documento trae además el `updatedAt` del servidor, un `Timestamp` que
+///   `jsonEncode` no sabe escribir: copiado entero, `adoptar` fallaba con CADA
+///   partida de verdad, en silencio, y ningún aparato adoptaba nunca la del
+///   otro (André, 10-10-2026: «progress isn't syncing on my tablet»). Las
+///   pruebas no lo vieron porque su nube fingida no ponía la fecha.
 Map<String, dynamic>? partidaQueSeAdopta({
   required Map<String, dynamic>? local,
   required Map<String, dynamic> remota,
   required String hoy,
 }) {
   if (remota['day'] != hoy) return null;
+  remota = {
+    for (final k in clavesDeLaPartida)
+      if (remota.containsKey(k)) k: remota[k],
+  };
   final localDeHoy = local != null && local['day'] == hoy ? local : null;
-  if (localDeHoy == null) return Map.of(remota);
+  if (localDeHoy == null) return remota;
   if (localDeHoy['completa'] == true) return null;
   int n(Object? x) => (x as num?)?.toInt() ?? 0;
   final adelante =
@@ -414,3 +424,17 @@ Map<String, dynamic>? partidaQueSeAdopta({
       : n(localDeHoy['mistakes']);
   return {...remota, 'mistakes': fallos};
 }
+
+/// Las claves de [DailyController.estadoGuardado] (`entries`, `notes` y
+/// `mistakes` vienen de `SudokuBoard.toJson`). Una clave nueva allí que no
+/// esté aquí no viajaría; la prueba de la nube compara las dos.
+@visibleForTesting
+const clavesDeLaPartida = {
+  'day',
+  'entries',
+  'notes',
+  'mistakes',
+  'seconds',
+  'jugadas',
+  'completa',
+};

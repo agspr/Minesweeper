@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:juegos_senda/juegos_senda.dart';
@@ -46,6 +48,10 @@ Map<String, dynamic> partida({
 };
 
 /// La nube, fingida: un documento por cuenta.
+///
+/// **Lee como Firestore**: con el `updatedAt` que pone el servidor, un
+/// `Timestamp`. Sin él, esta nube era más amable que la de verdad, y todas
+/// estas pruebas pasaban mientras ningún teléfono adoptaba nada (10-10-2026).
 class _Nube implements AlmacenDePartida {
   final docs = <String, Map<String, dynamic>>{};
   int escrituras = 0;
@@ -54,7 +60,8 @@ class _Nube implements AlmacenDePartida {
   @override
   Future<Map<String, dynamic>?> leer(String uid) async {
     pasos.add('leer:$uid');
-    return docs[uid];
+    final d = docs[uid];
+    return d == null ? null : {...d, 'updatedAt': Timestamp.now()};
   }
 
   @override
@@ -181,6 +188,28 @@ void main() {
     });
   });
 
+  group('lo que llega de Firestore', () {
+    test('se adopta con el updatedAt del servidor dentro', () async {
+      // El documento de verdad lleva un `Timestamp`, que `jsonEncode` no sabe
+      // escribir. Copiado tal cual, `adoptar` lanzaba con cada partida real y
+      // el sincronizador se lo tragaba: ningún teléfono adoptaba nunca.
+      final c = await diaria();
+      final remota = {
+        ...partida(jugadas: 5, entries: '.' * cellCount),
+        'updatedAt': Timestamp.now(),
+      };
+      expect(await c.adoptar(remota), isTrue);
+      expect(c.estadoGuardado!['jugadas'], 5);
+    });
+
+    test('viaja todo lo que la diaria guarda, y nada más', () async {
+      // Una clave nueva en `estadoGuardado` que no esté en la lista subiría,
+      // pero el otro teléfono no la adoptaría.
+      final c = await diaria();
+      expect(clavesDeLaPartida, c.estadoGuardado!.keys.toSet());
+    });
+  });
+
   group('la diaria', () {
     test('cuenta las jugadas, y el contador se guarda', () async {
       final c = await diaria();
@@ -254,6 +283,23 @@ void main() {
       expect(nube.escrituras, 1, reason: 'una, por las dos jugadas');
       expect(nube.docs['ana']!['jugadas'], 2);
       expect(nube.docs['ana']!['day'], hoy);
+    });
+
+    testWidgets('abrir la diaria y salir sin jugar no sube nada', (
+      tester,
+    ) async {
+      // Ese tablero en blanco pisaba la partida del otro teléfono.
+      final (c, nube, sync) = await montar(tester);
+      c.startTimer();
+      c.pauseTimer();
+      await tester.pump(const Duration(seconds: 3));
+      sync.didChangeAppLifecycleState(AppLifecycleState.paused);
+      await tester.pump();
+      expect(nube.escrituras, 0);
+      // Y en cuanto hay una jugada, sí.
+      poner(c, vacias(c).first);
+      await tester.pump(const Duration(seconds: 2));
+      expect(nube.escrituras, 1);
     });
 
     testWidgets('terminada, sube en el acto', (tester) async {
