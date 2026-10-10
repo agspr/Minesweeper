@@ -1732,3 +1732,29 @@ el agente del sitio daba por bueno sin verlo. Lo desplegado en `cinco-fe5cc` (us
 15:25:30 UTC, minuto y medio después del commit `e7a2536`) se bajó de su `function-source.zip`, y su
 `index.js` borra `private/partidaEnCurso_${gameId}` dentro de `leaveSendaGame`. Lo que promete la política
 de quitar Nona es lo que hace hoy el servidor.
+
+---
+
+## HECHO — 1.0.6 (36) enviada a producción en las dos tiendas (10-10-2026, agente dev)
+
+Pedido por André («build and upload straight to production on both platforms»),
+tras ver que la diaria a medias no sincronizaba con su tableta.
+
+- **El fallo**: ningún aparato adoptaba nunca la partida del otro. El documento
+  de Firestore trae `updatedAt` (un `Timestamp`) y `adoptar` lo copiaba entero
+  a `jsonEncode`, que lanzaba; el catch se lo tragaba. Además, abrir la diaria
+  sin jugar subía el tablero en blanco y pisaba la partida del otro (la nube de
+  André tenía ese día 0 jugadas y 12 segundos). Arreglado en `7128184`; los
+  fallos de esa sincronización van ahora a Sentry (`26d8a54`).
+- **Lo que se recoge no cambia**: se adopta un subconjunto de lo que ya subía,
+  y un tablero sin jugadas deja de subir. Los informes a Sentry ya están
+  declarados en §3.9 y no llevan nada de la partida. La política no se toca.
+- **Play**: producción 1.0.6 (36), despliegue completo, en revisión. Notas en
+  es-419 y en-US: la diaria que pasa de un dispositivo a otro, y el icono de
+  compartir de Android (paquete 0.87.0).
+- **App Store**: versión 1.0.6 con la 36, `AFTER_APPROVAL`, `WAITING_FOR_REVIEW`.
+  Notas sin lo del icono, que en iOS no cambia. Las notas de revisión se
+  heredaron de la 1.0.5 y siguen siendo ciertas.
+
+**Lo que queda**: cuando cada tienda la tenga a la venta,
+`node tools/publicar-version.js nona android 36` y `… nona ios 36`.

@@ -428,7 +428,8 @@
         "fichero": "nona-1.0.6-36-simbolos.zip",
         "bytes": 7904102,
         "sha256": "5e7e48b2a9f37d172e762af7105fa5c1a7c81704c9483b240bd9ee842b4f62a7"
-      }
+      },
+      "tienda": "Producción enviada el 10-10-2026: Play (1.0.6, completa, en revisión de Google) y App Store (1.0.6 WAITING_FOR_REVIEW, sale sola al aprobarse). Cuando esté a la venta: publicar-version nona android/ios 36"
     }
   },
   "paquete_android": "com.nonaapp.nona",
