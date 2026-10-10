@@ -27,7 +27,10 @@
 /// - Qué se adopta lo decide `partidaQueSeAdopta`: solo la de hoy, nunca
 ///   hacia atrás, y los fallos nunca bajan.
 ///
-/// Todo falla en silencio: es una copia, no algo que haya pedido quien juega.
+/// Falla en silencio para quien juega —es una copia, no algo que haya pedido—
+/// pero **no para nosotros**: cada fallo va a Sentry. Hasta el 10-10-2026 se
+/// tragaban sin rastro, y adoptar falló con cada partida real durante cinco
+/// días sin que nada lo dijera; lo descubrió André al ver que no sincronizaba.
 library;
 
 import 'dart:async';
@@ -35,6 +38,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../game/daily_controller.dart';
 
@@ -74,6 +78,7 @@ class PartidaEnLaNube with WidgetsBindingObserver {
     required this.uidOf,
     required this.almacen,
     this.espera = const Duration(milliseconds: 1500),
+    this.informar = _aSentry,
   });
 
   final DailyController daily;
@@ -82,6 +87,13 @@ class PartidaEnLaNube with WidgetsBindingObserver {
 
   /// Cuánto se juntan las jugadas antes de subir.
   final Duration espera;
+
+  /// A dónde va un fallo. Sentry, salvo en las pruebas: sin DSN no se puede
+  /// ejercer, pero que se LLAME sí.
+  final void Function(Object error, StackTrace pila) informar;
+
+  static void _aSentry(Object error, StackTrace pila) =>
+      unawaited(Sentry.captureException(error, stackTrace: pila));
 
   Timer? _pendiente;
   String? _ultimaSubida;
@@ -130,8 +142,9 @@ class PartidaEnLaNube with WidgetsBindingObserver {
     try {
       await almacen.escribir(uid, estado);
       _ultimaSubida = huella;
-    } catch (e) {
+    } catch (e, st) {
       if (kDebugMode) debugPrint('PartidaEnLaNube: no se pudo subir: $e');
+      informar(e, st);
     }
   }
 
@@ -151,8 +164,9 @@ class PartidaEnLaNube with WidgetsBindingObserver {
         // Lo adoptado ya está en la nube: no hace falta volver a subirlo.
         _ultimaSubida = daily.estadoGuardado?.toString();
       }
-    } catch (e) {
+    } catch (e, st) {
       if (kDebugMode) debugPrint('PartidaEnLaNube: no se pudo leer: $e');
+      informar(e, st);
     }
   }
 

@@ -72,6 +72,16 @@ class _Nube implements AlmacenDePartida {
   }
 }
 
+/// Una nube que falla siempre: sin red, sin permiso, o un dato que no cabe.
+class _NubeRota implements AlmacenDePartida {
+  @override
+  Future<Map<String, dynamic>?> leer(String uid) async => throw 'no leo';
+
+  @override
+  Future<void> escribir(String uid, Map<String, dynamic> p) async =>
+      throw 'no subo';
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   final p = generate(seed: 5, target: Difficulty.easy)!;
@@ -300,6 +310,28 @@ void main() {
       poner(c, vacias(c).first);
       await tester.pump(const Duration(seconds: 2));
       expect(nube.escrituras, 1);
+    });
+
+    testWidgets('un fallo al subir o al traer se informa, no se traga', (
+      tester,
+    ) async {
+      // Tragados sin rastro, adoptar falló con cada partida real durante
+      // cinco días y nada lo dijo.
+      late DailyController c;
+      await tester.runAsync(() async => c = await diaria());
+      final informados = <Object>[];
+      final sync = PartidaEnLaNube(
+        daily: c,
+        uidOf: () => 'ana',
+        almacen: _NubeRota(),
+        informar: (e, _) => informados.add(e),
+      )..start();
+      addTearDown(sync.dispose);
+      poner(c, vacias(c).first);
+      await tester.pump(const Duration(seconds: 2));
+      expect(informados, ['no subo']);
+      await sync.traer('ana');
+      expect(informados, ['no subo', 'no leo']);
     });
 
     testWidgets('terminada, sube en el acto', (tester) async {
