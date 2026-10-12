@@ -1758,3 +1758,6 @@ tras ver que la diaria a medias no sincronizaba con su tableta.
 
 **Lo que queda**: cuando cada tienda la tenga a la venta,
 `node tools/publicar-version.js nona android 36` y `… nona ios 36`.
+**Hecho el 12-10-2026**: las dos tiendas la tienen a la venta (App Store
+`READY_FOR_SALE`; la ficha pública de Play enseña la 1.0.6, actualizada el
+10-10), y el número está publicado: android y ios, 35 → 36.
