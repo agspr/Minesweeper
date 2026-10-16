@@ -143,8 +143,15 @@ python3 tools/archivar_build.py archivar
 ```
 
 Verifica **dentro** de los dos binarios, los copia a `~/Nona-releases/` con su
-nombre numerado, escribe el `.sha256` con la procedencia y crea la etiqueta
-`v<version>+<build>`. Si algo no cuadra, no archiva y dice qué.
+nombre numerado, escribe el `.sha256` con la procedencia y apunta la build en
+`archivo-de-builds.json` con su `commit` y si el árbol estaba limpio. Si algo no
+cuadra, no archiva y dice qué.
+
+**No crea etiquetas de git.** El vínculo binario↔commit vive en el registro, que
+va en git y lo vigila una prueba; una etiqueta lo repetiría en un segundo sitio
+que nada comprueba. Este párrafo prometió una etiqueta `v<version>+<build>`
+desde el primer día y el guion nunca la hizo: se notó el 10-10-2026 al intentar
+subir `v1.0.6+36`.
 
 Los tres finales posibles:
 
