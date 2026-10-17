@@ -1786,5 +1786,6 @@ Pedido por André tras ver a @mama_yuya a 0 puntos en la Social.
 - **Play**: producción 1.0.7 (37), completa, en revisión. **App Store**: 1.0.7
   con la 37, `AFTER_APPROVAL`, `WAITING_FOR_REVIEW`.
 
-**Lo que queda**: cuando cada tienda la tenga a la venta,
-`node tools/publicar-version.js nona android 37` y `… nona ios 37`.
+**Lo que queda**: cuando el App Store la tenga a la venta,
+`node tools/publicar-version.js nona ios 37`. Android ya: a la venta el 17-10
+(ficha de Play con la 1.0.7) y número publicado, 36 → 37.
