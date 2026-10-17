@@ -1761,3 +1761,30 @@ tras ver que la diaria a medias no sincronizaba con su tableta.
 **Hecho el 12-10-2026**: las dos tiendas la tienen a la venta (App Store
 `READY_FOR_SALE`; la ficha pública de Play enseña la 1.0.6, actualizada el
 10-10), y el número está publicado: android y ios, 35 → 36.
+
+---
+
+## HECHO — 1.0.7 (37) enviada a producción en las dos tiendas (17-10-2026, agente dev)
+
+Pedido por André tras ver a @mama_yuya a 0 puntos en la Social.
+
+- **Lo que le pasaba**: su iPad perdió la sesión el 11-10 (entre las 07:30 y
+  las 12:23 AST; no queda rastro de si fue ella o el cierre automático del
+  paquete) y siguió jugando como invitada. Además le faltaban seis diarias del
+  20 al 25-9, jugadas con sesión en la 1.0.1. Diez en total, todas en el iPad.
+  Encontrado cruzando la analítica (`diaria_terminada`, día y fallos) con los
+  días de cada cuenta: el resto de jugadores cuadra, salvo un día de
+  @ana_diaz (20-9).
+- **El arreglo** (`98dafb6`): al estrenar sesión se pregunta al servidor qué
+  días tiene la cuenta y se suben los que falten. Antes el histórico subía una
+  sola vez por aparato, y un día que no subía al jugarlo no subía nunca.
+- **Lo que se recoge no cambia**: son los mismos días de siempre, que ahora sí
+  llegan. La política no se toca.
+- **Para ella**: actualizar el iPad y volver a entrar con el MISMO Apple ID. Con
+  otra cuenta, el aparato borra su progreso local y esos diez días se pierden.
+- Lleva también el paquete 0.88.1 («Quitar anuncios» que reintenta).
+- **Play**: producción 1.0.7 (37), completa, en revisión. **App Store**: 1.0.7
+  con la 37, `AFTER_APPROVAL`, `WAITING_FOR_REVIEW`.
+
+**Lo que queda**: cuando cada tienda la tenga a la venta,
+`node tools/publicar-version.js nona android 37` y `… nona ios 37`.

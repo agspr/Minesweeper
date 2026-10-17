@@ -450,7 +450,8 @@
         "fichero": "nona-1.0.7-37-simbolos.zip",
         "bytes": 7908976,
         "sha256": "5aa74561386bd8c78554896858b226332dba721b107de6a88eeb5b1df60d0e48"
-      }
+      },
+      "tienda": "Producción enviada el 17-10-2026: Play (1.0.7, completa, en revisión de Google) y App Store (1.0.7 WAITING_FOR_REVIEW, sale sola al aprobarse). Cuando esté a la venta: publicar-version nona android/ios 37"
     }
   },
   "paquete_android": "com.nonaapp.nona",
