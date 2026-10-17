@@ -1,15 +1,14 @@
 name: nona
 description: "Nona — Sudoku del día. Parte de Juegos Senda."
 publish_to: 'none'
-# 1.0.6 porque la 1.0.5 (35) ya está a la venta en las dos tiendas, y Apple no
+# 1.0.7 porque la 1.0.6 (36) ya está a la venta en las dos tiendas, y Apple no
 # deja reenviar una versión READY_FOR_SALE (docs/CONSTRUIR.md §1).
 #
-# Qué lleva la 36 respecto a la 35 (André, 10-10-2026): la diaria a medias que
-# por fin se adopta —el Timestamp del servidor rompía jsonEncode y ningún
-# aparato adoptaba nunca la del otro—, un tablero sin jugadas que ya no sube y
-# pisa la partida del otro teléfono, los fallos de esa sincronización a Sentry,
-# y el icono de compartir de cada sistema (paquete 0.87.0).
-version: 1.0.6+36
+# Qué lleva la 37 respecto a la 36 (André, 17-10-2026): los días que la cuenta
+# no tiene suben al entrar, no solo la primera vez —@mama_yuya tenía diez
+# diarias que nunca llegaron a la Social—, y el paquete 0.88.1, con «Quitar
+# anuncios» que reintenta si la tienda no contestó al arrancar.
+version: 1.0.7+37
 
 environment:
   sdk: ^3.13.0
