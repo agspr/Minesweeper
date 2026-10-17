@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:juegos_senda/juegos_senda.dart';
@@ -47,13 +49,24 @@ class _StoreEspia implements ProgressStore {
 
   final List<String> dias = [];
 
-  /// Días cuya escritura FALLA, para ejercer el reintento del backfill.
+  /// Días cuya escritura FALLA, para ejercer el reintento en el próximo estreno.
   final Set<String> fallan = {};
 
   @override
   Future<void> writeDay(String uid, String d, Map<String, dynamic> r) async {
     if (fallan.contains(d)) throw Exception('sin red');
     dias.add('$uid:$d:${r['points']}');
+    delServidor.add(d);
+  }
+
+  /// Los días que el SERVIDOR tiene de la cuenta: los sembrados y los que se
+  /// van escribiendo, como en Firestore.
+  final Set<String> delServidor = {};
+  bool leerDiasFalla = false;
+
+  Future<Set<String>> diasEnLaNube(String uid) async {
+    if (leerDiasFalla) throw Exception('unavailable');
+    return Set.of(delServidor);
   }
 
   @override
@@ -90,6 +103,7 @@ void main() {
     uidOf: () => sesion.uid,
     store: store,
     session: SessionSync(prefs, ownedPrefixes: nonaConfig.ownedPrefKeyPrefixes),
+    diasEnLaNube: store.diasEnLaNube,
     clock: () => DateTime(2026, 8, 18, 10),
   );
 
@@ -272,53 +286,123 @@ void main() {
       expect(store.dias.single, startsWith('u1:2026-08-18:'));
     });
   });
-  group('el backfill del histórico (la migración del #3)', () {
-    test('al entrar, TODO el histórico local sube una vez', () async {
+  group('lo que la cuenta no tiene, sube al entrar', () {
+    test(
+      'al entrar, sube lo de aquí que el servidor no tiene, y solo eso',
+      () async {
+        jugar(DateTime(2026, 8, 16));
+        jugar(DateTime(2026, 8, 17));
+        jugar(DateTime(2026, 8, 18));
+
+        final store = _StoreEspia()..delServidor.add('2026-08-16');
+        sync(store).start();
+        sesion.entrar('u1');
+        await pumpEventQueue();
+
+        expect(
+          store.dias.map((d) => d.split(':')[1]),
+          unorderedEquals(['2026-08-17', '2026-08-18']),
+        );
+
+        // Un ARRANQUE nuevo, con todo ya arriba, no reescribe el histórico:
+        // cada escritura es un recálculo en el servidor. (Hoy sí se reenvía
+        // una vez por arranque, a propósito: ver `_pushDay`.)
+        store.dias.clear();
+        final s2 = sync(store)..start();
+        sesion.entrar('u1');
+        await pumpEventQueue();
+        expect(store.dias.where((d) => !d.contains('2026-08-18')), isEmpty);
+        s2.dispose();
+      },
+    );
+
+    test('lo jugado sin sesión sube al volver a entrar, aunque el histórico '
+        'ya se hubiera subido antes', () async {
+      // @mama_yuya, 17-10-2026: perdió la sesión del iPad, jugó cuatro días
+      // como invitada, y la bandera del volcado único ya estaba puesta, así
+      // que entrar de nuevo no habría subido ninguno.
+      prefs.setBool('progress.daysBackfilled', true);
+      jugar(DateTime(2026, 8, 15));
       jugar(DateTime(2026, 8, 16));
       jugar(DateTime(2026, 8, 17));
-      jugar(DateTime(2026, 8, 18));
 
-      final store = _StoreEspia();
+      final store = _StoreEspia()..delServidor.add('2026-08-15');
       sync(store).start();
       sesion.entrar('u1');
       await pumpEventQueue();
 
-      expect(store.dias.where((d) => d.startsWith('u1:')).length, 3);
-      expect(prefs.getBool('progress.daysBackfilled'), isTrue);
-
-      // Un ARRANQUE nuevo (sincronizador nuevo, mismas prefs) no vuelve a
-      // subir nada: la bandera manda.
-      store.dias.clear();
-      final s2 = sync(store)..start();
-      sesion.entrar('u1');
-      await pumpEventQueue();
-      expect(store.dias.where((d) => d.contains('2026-08-16')), isEmpty);
-      expect(store.dias.where((d) => d.contains('2026-08-17')), isEmpty);
-      s2.dispose();
+      expect(
+        store.dias.map((d) => d.split(':')[1]),
+        unorderedEquals(['2026-08-16', '2026-08-17']),
+      );
     });
 
-    test('si UN día falla, la bandera no se marca y se reintenta', () async {
-      // Marcada a medias sería no reintentar nunca: el fallo silencioso de
-      // siempre, en su variante de migración.
-      jugar(DateTime(2026, 8, 16));
-      jugar(DateTime(2026, 8, 17));
+    test(
+      'sin poder preguntar al servidor, no sube el histórico a ciegas',
+      () async {
+        // Una lista vacía de la caché haría subir encima de los días buenos de
+        // otro aparato. Se deja para el próximo estreno.
+        jugar(DateTime(2026, 8, 16));
 
-      final store = _StoreEspia()..fallan.add('2026-08-16');
-      sync(store).start();
-      sesion.entrar('u1');
-      await pumpEventQueue();
+        final store = _StoreEspia()..leerDiasFalla = true;
+        sync(store).start();
+        sesion.entrar('u1');
+        await pumpEventQueue();
+        expect(store.dias.where((d) => d.contains('2026-08-16')), isEmpty);
 
-      expect(prefs.getBool('progress.daysBackfilled'), isNot(isTrue));
+        store.leerDiasFalla = false;
+        final s2 = sync(store)..start();
+        sesion.entrar('u1');
+        await pumpEventQueue();
+        expect(store.dias.where((d) => d.contains('2026-08-16')), hasLength(1));
+        s2.dispose();
+      },
+    );
 
-      // Vuelve la red: el siguiente ARRANQUE (sincronizador nuevo) completa
-      // y marca.
-      store.fallan.clear();
-      final s2 = sync(store)..start();
-      sesion.entrar('u1');
-      await pumpEventQueue();
-      expect(store.dias.where((d) => d.contains('2026-08-16')), isNotEmpty);
-      expect(prefs.getBool('progress.daysBackfilled'), isTrue);
-      s2.dispose();
+    test(
+      'si UN día falla al subir, el próximo estreno lo vuelve a intentar',
+      () async {
+        jugar(DateTime(2026, 8, 16));
+        jugar(DateTime(2026, 8, 17));
+
+        final store = _StoreEspia()..fallan.add('2026-08-16');
+        sync(store).start();
+        sesion.entrar('u1');
+        await pumpEventQueue();
+        expect(store.dias.where((d) => d.contains('2026-08-17')), hasLength(1));
+
+        store.fallan.clear();
+        store.dias.clear();
+        final s2 = sync(store)..start();
+        sesion.entrar('u1');
+        await pumpEventQueue();
+        expect(store.dias.map((d) => d.split(':')[1]), ['2026-08-16']);
+        s2.dispose();
+      },
+    );
+
+    test('los días se preguntan al servidor, nunca a la caché', () {
+      // Sin red, una lectura normal contesta con la caché, quizá vacía, y
+      // «no tiene nada» subiría encima de los días de otro aparato. Firestore
+      // no se puede montar aquí: se mira el código.
+      final fuente = File('lib/services/progress_sync.dart').readAsStringSync();
+      final lector = fuente.substring(
+        fuente.indexOf('Future<Set<String>> diasEnLaNubeDeFirestore('),
+      );
+      expect(lector, contains('GetOptions(source: Source.server)'));
+    });
+
+    test('main le pasa al sincronizador los días del servidor', () {
+      // Sin esto el parámetro queda en null y no sube nada, sin error.
+      final main = File('lib/main.dart')
+          .readAsLinesSync()
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      expect(main, contains('diasEnLaNube: (uid) =>'));
+      expect(
+        main,
+        contains('diasEnLaNubeDeFirestore(nonaConfig.dataLayout, uid)'),
+      );
     });
   });
 }

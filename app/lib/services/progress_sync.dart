@@ -30,6 +30,7 @@ library;
 
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:juegos_senda/juegos_senda.dart';
 
@@ -49,13 +50,14 @@ class ProgressSync {
     required this.prefs,
     this.onDeviceClaimed,
     this.alEstrenarSesion,
+    this.diasEnLaNube,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now;
 
-  /// La bandera del backfill vive aquí y no en el controlador: es un hecho de
-  /// SINCRONIZACIÓN ("esta cuenta ya subió su histórico desde este aparato"),
-  /// no de progreso.
-  static const _kBackfilled = 'progress.daysBackfilled';
+  /// Qué días tiene YA la cuenta en el servidor, para subir los que falten
+  /// (ver [_subirLoQueFalta]). Sin él no se sube el histórico: `main` le pasa
+  /// [diasEnLaNubeDeFirestore], y una prueba mira que lo haga.
+  final Future<Set<String>> Function(String uid)? diasEnLaNube;
 
   final SharedPreferences prefs;
 
@@ -145,7 +147,7 @@ class ProgressSync {
     } finally {
       _reconciling = false;
     }
-    await _backfillDays(uid);
+    await _subirLoQueFalta(uid);
     await _pushDay(uid);
     // Y AQUÍ TERMINA: el resumen ya no se escribe desde el cliente — es la
     // mitad cliente del cierre del #3 (27-8-2026). Lo recalcula SOLO el
@@ -159,27 +161,41 @@ class ProgressSync {
     // escribir los DÍAS (la materia prima), y LEER (adoptar la nube).
   }
 
-  /// Sube UNA VEZ el histórico completo de días de este aparato.
+  /// Sube los días de este aparato que la cuenta **no tiene**, en cada estreno
+  /// de sesión.
   ///
-  /// Es la migración del hallazgo #3 (go de André, 26-8-2026): los días crudos
-  /// en la nube empezaron a existir con `writeDay`, así que el recálculo del
-  /// servidor siempre salía corto — 150 puntos contra los 515 reales — y dos
-  /// escritores del mismo resumen significaba que el que ganara podía pisar al
-  /// otro. Subiendo el histórico REAL del teléfono, el servidor cuadra desde
-  /// datos completos y puede pasar a ser la autoridad; el guardia de
-  /// "nunca bajar" del servidor queda de cinturón para lo que este teléfono ya
-  /// no tenga.
+  /// Empezó como migración del hallazgo #3 (26-8-2026): subir UNA VEZ todo el
+  /// histórico, con una bandera (`progress.daysBackfilled`) que lo daba por
+  /// hecho para siempre. Pero después de esa vez, un día solo subía en el
+  /// momento de jugarlo, y **el que no subía entonces no subía nunca**: sin
+  /// sesión, sin red o con un fallo, se quedaba en el teléfono. A @mama_yuya le
+  /// faltaban así diez diarias (17-10-2026): seis del 20 al 25-9, jugadas con
+  /// sesión en la 1.0.1, y cuatro del 13 al 16-10, como invitada tras perder la
+  /// sesión del iPad. Volver a entrar no las habría subido: la bandera ya
+  /// estaba puesta. La bandera ya no se lee.
   ///
-  /// La bandera se marca SOLO cuando todos los días subieron: marcada a medias
-  /// sería no reintentar nunca, y el reintento es gratis porque cada escritura
-  /// es un `set` con clave por día — idempotente. Lleva prefijo `progress.`
-  /// (de cuenta): cambiar de cuenta la borra junto con los registros a los que
-  /// se refiere.
-  Future<void> _backfillDays(String uid) async {
-    if (prefs.getBool(_kBackfilled) ?? false) return;
+  /// **Se pregunta al servidor, nunca a la caché.** Sin red, una lectura normal
+  /// devuelve la caché —quizá vacía— y "no tiene nada" haría subir encima de
+  /// los días buenos de otro aparato. Si no se puede preguntar, no se sube nada
+  /// y se reintenta en el próximo estreno.
+  ///
+  /// Solo los que FALTAN: un día que la cuenta ya tiene no se toca, aunque aquí
+  /// sea distinto —puede ser el de otro aparato que lo terminó—. Y cada
+  /// escritura dispara un recálculo en el servidor, así que lo normal, que no
+  /// falte nada, no cuesta ninguno.
+  Future<void> _subirLoQueFalta(String uid) async {
+    final leer = diasEnLaNube;
+    if (leer == null) return;
+    final Set<String> enLaNube;
+    try {
+      enLaNube = await leer(uid);
+    } catch (e) {
+      if (kDebugMode) debugPrint('ProgressSync: no se pudo leer los días: $e');
+      return;
+    }
     final hoy = dayKeyFor(_clock());
-    var todos = true;
     for (final r in progress.allRecords) {
+      if (enLaNube.contains(r.dayKey)) continue;
       try {
         final json = r.toJson();
         await store.writeDay(uid, r.dayKey, json);
@@ -189,10 +205,9 @@ class ProgressSync {
         // exactamente lo que la huella existe para impedir.
         if (r.dayKey == hoy) _ultimoDiaSubido = '$hoy=${json.toString()}';
       } catch (_) {
-        todos = false;
+        // Sigue faltando, así que el próximo estreno lo vuelve a intentar.
       }
     }
-    if (todos) await prefs.setBool(_kBackfilled, true);
   }
 
   void _onProgressChanged() {
@@ -235,4 +250,18 @@ class ProgressSync {
       if (kDebugMode) debugPrint('ProgressSync: no se pudo subir el día: $e');
     }
   }
+}
+
+/// Los días que la cuenta tiene en Firestore, preguntados al SERVIDOR (ver
+/// `ProgressSync._subirLoQueFalta`): sin red, lanza en vez de contestar con la
+/// caché.
+Future<Set<String>> diasEnLaNubeDeFirestore(
+  SendaDataLayout layout,
+  String uid,
+) async {
+  final q = await FirebaseFirestore.instance
+      .doc(layout.summaryPath(uid))
+      .collection(layout.daysCollectionName)
+      .get(const GetOptions(source: Source.server));
+  return {for (final d in q.docs) d.id};
 }

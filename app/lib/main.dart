@@ -146,6 +146,10 @@ Future<void> main() async {
       onDeviceClaimed: daily.reloadFromPrefs,
       // Y, ya reclamado el aparato, la diaria a medias de ESTA cuenta.
       alEstrenarSesion: partida.traer,
+      // Y los días de este aparato que la cuenta no tenga: el que no subió al
+      // jugarlo —sin sesión, sin red— sube aquí, en vez de nunca.
+      diasEnLaNube: (uid) =>
+          diasEnLaNubeDeFirestore(nonaConfig.dataLayout, uid),
     ).start();
   }
 
