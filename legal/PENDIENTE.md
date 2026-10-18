@@ -1786,6 +1786,8 @@ Pedido por André tras ver a @mama_yuya a 0 puntos en la Social.
 - **Play**: producción 1.0.7 (37), completa, en revisión. **App Store**: 1.0.7
   con la 37, `AFTER_APPROVAL`, `WAITING_FOR_REVIEW`.
 
-**Lo que queda**: cuando el App Store la tenga a la venta,
-`node tools/publicar-version.js nona ios 37`. Android ya: a la venta el 17-10
-(ficha de Play con la 1.0.7) y número publicado, 36 → 37.
+**Hecho**: a la venta en las dos tiendas y número publicado (android 36 → 37
+el 17-10, ios 36 → 37 el 18-10, con el App Store ya en `READY_FOR_SALE`).
+**Pendiente de @mama_yuya**: el 17-10 a las 17:18 su iPad se actualizó solo a
+la 1.0.6, sin entrar en la cuenta. Le faltan la 1.0.7 y volver a entrar con el
+mismo Apple ID; hasta entonces sus diez días siguen solo en el iPad.
