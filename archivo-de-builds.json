@@ -473,7 +473,7 @@
         "bytes": 7921106,
         "sha256": "c7dfdbf01a08eca36c29f087dae46e64e2ec44272d6788cc5ff664b94407af1f"
       },
-      "tienda": "Producción enviada el 22-10-2026: Play (1.0.8, completa, en revisión de Google) y App Store (1.0.8 WAITING_FOR_REVIEW, sale sola al aprobarse). Cuando esté a la venta: publicar-version nona android/ios 38"
+      "tienda": "Play: a la venta (ficha pública con la 1.0.8, actualizada el 22-10-2026), número publicado: android 37 → 38. App Store: 1.0.8 WAITING_FOR_REVIEW, sale sola al aprobarse; falta publicar-version nona ios 38"
     }
   },
   "paquete_android": "com.nonaapp.nona",

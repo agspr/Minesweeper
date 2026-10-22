@@ -1841,5 +1841,6 @@ capturas de la letra.
   504 de Apple; luego se cayó del todo y volvió por otra red). La página de
   estado de Apple estaba en verde.
 
-**Lo que queda**: cuando cada tienda la tenga a la venta,
-`node tools/publicar-version.js nona android 38` y `… nona ios 38`.
+**Lo que queda**: cuando el App Store la tenga a la venta,
+`node tools/publicar-version.js nona ios 38`. Android ya: a la venta el 22-10
+(ficha de Play con la 1.0.8) y número publicado, 37 → 38.
