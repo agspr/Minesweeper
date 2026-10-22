@@ -1809,3 +1809,9 @@ Elegida la opción de hacerlo a propósito en el paquete; André pasa la
 especificación al agente de CINCO. **Lo que le toca a Nona**: subir al tag del
 paquete cuando exista, mirar sus pantallas propias (tablero, inicio, final) y
 construir cuando André lo pida.
+
+**Estado el 22-10**: el agente de CINCO dejó CINCO con `google_fonts` a
+propósito (CINCO `0707c14`, con una prueba que lo vigila; «quitarlo es otra
+decisión, con capturas»), así que CINCO sigue bajando la letra de Google. El
+cambio de pesos del paquete **no está hecho**: ni commit ni tag (el último,
+0.88.2, es el cierre de sesión automático a Sentry). Nona ya está en 0.88.2.
