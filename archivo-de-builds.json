@@ -452,6 +452,27 @@
         "sha256": "5aa74561386bd8c78554896858b226332dba721b107de6a88eeb5b1df60d0e48"
       },
       "tienda": "A la venta en las dos tiendas: Play desde el 17-10-2026 (ficha pública con la 1.0.7) y App Store READY_FOR_SALE (comprobado el 18-10). Su número, publicado en public/versiones: android 36 → 37 el 17-10, ios 36 → 37 el 18-10"
+    },
+    "38": {
+      "version": "1.0.8",
+      "fecha": "2026-10-22",
+      "commit": "b1a8b2fb112f91a537c513a4e0111696e49fc37f",
+      "arbol_limpio": true,
+      "aab": {
+        "fichero": "nona-1.0.8-38.aab",
+        "bytes": 67648467,
+        "sha256": "befc064448fb2f1ade9310a95a69ca0788acb4e89dfd54dba71e53f234709c70"
+      },
+      "ipa": {
+        "fichero": "nona-1.0.8-38.ipa",
+        "bytes": 53352806,
+        "sha256": "f67d6a484c153fe0df4374ac313dbaa9c79a5ac298e79ddc4feff102e30ec90b"
+      },
+      "simbolos": {
+        "fichero": "nona-1.0.8-38-simbolos.zip",
+        "bytes": 7921106,
+        "sha256": "c7dfdbf01a08eca36c29f087dae46e64e2ec44272d6788cc5ff664b94407af1f"
+      }
     }
   },
   "paquete_android": "com.nonaapp.nona",
