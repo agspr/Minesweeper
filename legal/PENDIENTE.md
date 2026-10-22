@@ -1822,3 +1822,24 @@ Nona ya está en 0.89.1 (pruebas en verde; la de las escenas con Figtree lee
 ahora los ficheros del manifiesto en vez de una lista de pesos). Capturas
 antes/después del inicio y del tablero enseñadas a André. **No se construye
 hasta que André las dé por buenas.**
+
+---
+
+## HECHO — 1.0.8 (38) enviada a producción en las dos tiendas (22-10-2026, agente dev)
+
+Pedido por André («build 1.0.8 and push to production on both»), tras ver las
+capturas de la letra.
+
+- **Lleva**: un número puesto no se pisa (primero se borra; un aviso sube
+  desde el borde del tablero y lo dice), la letra de CINCO (paquete 0.89.1,
+  Figtree solo en 400) y el cierre de sesión automático a Sentry (0.88.2).
+- **Lo que se recoge no cambia**: el aviso de cierre automático va a Sentry,
+  declarado en §3.9, sin nada de la persona. La política no se toca.
+- **Play**: producción 1.0.8 (38), completa, en revisión. **App Store**: 1.0.8
+  con la 38, `AFTER_APPROVAL`, `WAITING_FOR_REVIEW`. Subir el IPA costó tres
+  intentos: la red de este Mac estaba lenta e inestable (NAT64, 0,2 Mbps; un
+  504 de Apple; luego se cayó del todo y volvió por otra red). La página de
+  estado de Apple estaba en verde.
+
+**Lo que queda**: cuando cada tienda la tenga a la venta,
+`node tools/publicar-version.js nona android 38` y `… nona ios 38`.
