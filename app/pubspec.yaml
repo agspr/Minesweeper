@@ -1,14 +1,14 @@
 name: nona
 description: "Nona — Sudoku del día. Parte de Juegos Senda."
 publish_to: 'none'
-# 1.0.7 porque la 1.0.6 (36) ya está a la venta en las dos tiendas, y Apple no
+# 1.0.8 porque la 1.0.7 (37) ya está a la venta en las dos tiendas, y Apple no
 # deja reenviar una versión READY_FOR_SALE (docs/CONSTRUIR.md §1).
 #
-# Qué lleva la 37 respecto a la 36 (André, 17-10-2026): los días que la cuenta
-# no tiene suben al entrar, no solo la primera vez —@mama_yuya tenía diez
-# diarias que nunca llegaron a la Social—, y el paquete 0.88.1, con «Quitar
-# anuncios» que reintenta si la tienda no contestó al arrancar.
-version: 1.0.7+37
+# Qué lleva la 38 respecto a la 37 (André, 22-10-2026): un número puesto no se
+# pisa —primero se borra, y un aviso lo dice—, la letra de CINCO en todo
+# (paquete 0.89.1, Figtree solo en 400) y el cierre de sesión automático a
+# Sentry (paquete 0.88.2).
+version: 1.0.8+38
 
 environment:
   sdk: ^3.13.0
