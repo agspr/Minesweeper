@@ -71,6 +71,11 @@ class PracticeController extends ChangeNotifier {
   bool _generating = false;
   int _selected = -1;
   bool _notesMode = false;
+
+  /// Cuántas veces se tocó una cifra sobre un número ya puesto (ver
+  /// `SudokuBoard.place`). Solo sube: la pantalla lo escucha para avisar de
+  /// que hay que borrarlo primero.
+  final ValueNotifier<int> intentosDeSobrescribir = ValueNotifier(0);
   int _hintsUsed = 0;
 
   SudokuBoard? get board => _board;
@@ -246,6 +251,11 @@ class PracticeController extends ChangeNotifier {
   bool tapDigit(int digit) {
     final b = _board;
     if (b == null || _selected < 0 || isComplete) return false;
+    if (b.ocupada(_selected) && (_notesMode || b.entries[_selected] != digit)) {
+      // No es una jugada: ni cuenta, ni se guarda, ni cambia nada.
+      intentosDeSobrescribir.value++;
+      return false;
+    }
     _touch();
     var fallo = false;
     if (_notesMode) {
@@ -294,12 +304,18 @@ class PracticeController extends ChangeNotifier {
     }
     // Se coloca el dígito correcto, así que nunca cuenta como fallo.
     _touch();
-    b.place(cell, b.solution[cell]);
+    b.place(cell, b.solution[cell], sobrescribir: true);
     if (b.isComplete) _finished();
     _selected = cell;
     _hintsUsed++;
     _save();
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    intentosDeSobrescribir.dispose();
+    super.dispose();
   }
 
   int _firstUnsolved(SudokuBoard b) {

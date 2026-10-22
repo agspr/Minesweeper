@@ -312,4 +312,7 @@ class LEs extends L {
 
   @override
   String get sceneReminded => 'Recordado';
+
+  @override
+  String get eraseFirst => 'Usa el botón de borrar para quitarlo primero.';
 }

@@ -588,6 +588,12 @@ abstract class L {
   /// In es, this message translates to:
   /// **'Recordado'**
   String get sceneReminded;
+
+  /// Aviso al tocar una cifra sobre un número ya puesto: no se sobrescribe, primero se borra. La tecla no lleva texto, solo el icono de borrar, que el aviso repite.
+  ///
+  /// In es, this message translates to:
+  /// **'Usa el botón de borrar para quitarlo primero.'**
+  String get eraseFirst;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

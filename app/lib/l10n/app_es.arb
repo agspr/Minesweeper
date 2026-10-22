@@ -227,5 +227,9 @@
   },
   "@sceneReminded": {
     "description": "El mismo botón, ya enviado el empujón de hoy."
+  },
+  "eraseFirst": "Usa el botón de borrar para quitarlo primero.",
+  "@eraseFirst": {
+    "description": "Aviso al tocar una cifra sobre un número ya puesto: no se sobrescribe, primero se borra. La tecla no lleva texto, solo el icono de borrar, que el aviso repite."
   }
 }

@@ -39,6 +39,7 @@ import '../theme.dart';
 import '../widgets/game_header.dart';
 import '../widgets/numpad.dart';
 import '../widgets/puzzle_layout.dart';
+import '../widgets/aviso_flotante.dart';
 import '../widgets/difficulty_label.dart';
 import '../widgets/sudoku_board_view.dart';
 
@@ -134,6 +135,12 @@ class _PracticeScreenState extends State<PracticeScreen> {
             final c = widget.controller;
             final l = L.of(context);
             return PuzzleLayout(
+              aviso: AvisoFlotante(
+                disparo: c.intentosDeSobrescribir,
+                texto: l.eraseFirst,
+                icono: Icons.backspace_outlined,
+                ocultarCon: c,
+              ),
               header: GameHeader(
                 title: l.menuPractice,
                 onClose: widget.onExit,

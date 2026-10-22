@@ -34,6 +34,7 @@ import '../widgets/game_header.dart';
 import '../widgets/numpad.dart';
 import '../widgets/puzzle_layout.dart';
 import '../nona_config.dart';
+import '../widgets/aviso_flotante.dart';
 import '../widgets/difficulty_label.dart';
 import '../widgets/escenas_del_final.dart';
 import '../widgets/sudoku_board_view.dart';
@@ -402,6 +403,12 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             // pantalla completa (`escenas_del_final.dart`).
             return PuzzleLayout(
               header: header,
+              aviso: AvisoFlotante(
+                disparo: c.intentosDeSobrescribir,
+                texto: l.eraseFirst,
+                icono: Icons.backspace_outlined,
+                ocultarCon: c,
+              ),
               board: SudokuBoardView(
                 board: board,
                 selected: c.selected,

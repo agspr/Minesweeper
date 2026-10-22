@@ -312,4 +312,7 @@ class LEn extends L {
 
   @override
   String get sceneReminded => 'Reminded';
+
+  @override
+  String get eraseFirst => 'Use the backspace button to erase it first.';
 }

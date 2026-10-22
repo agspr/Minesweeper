@@ -40,6 +40,7 @@ void main() {
       final wrong = right == 9 ? 1 : right + 1;
       expect(b.place(cell, wrong), isTrue);
       expect(b.mistakes, 1);
+      b.erase(cell);
       expect(b.place(cell, right), isFalse);
       expect(b.mistakes, 1);
     });
@@ -62,6 +63,7 @@ void main() {
         9,
       ].where((d) => d != right).toList();
       b.place(cell, wrongs[0]);
+      b.erase(cell);
       b.place(cell, wrongs[1]);
       expect(b.mistakes, 2);
     });
@@ -143,6 +145,7 @@ void main() {
         }
       }
       final right = b.solution[last!];
+      b.erase(last);
       b.place(last, right == 9 ? 1 : right + 1);
       expect(b.isComplete, isFalse);
       expect(b.isWrong(last), isTrue);

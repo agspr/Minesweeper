@@ -288,6 +288,7 @@ void main() {
       c.select(cell);
       final right = c.board!.solution[cell];
       c.tapDigit(right == 9 ? 1 : right + 1);
+      c.erase();
       c.tapDigit(right);
       final o = c.outcome!;
       expect(o.mistakes, 1);

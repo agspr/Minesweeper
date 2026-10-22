@@ -118,14 +118,24 @@ class SudokuBoard {
     return boardSize - placed;
   }
 
+  /// Si [cell] lleva un número que puso quien juega (las pistas no cuentan).
+  bool ocupada(int cell) => !isGiven(cell) && entries[cell] != 0;
+
   /// Escribe [digit] en [cell].
   ///
   /// Devuelve `true` si contó un fallo. No hace nada en una pista, ni si el
   /// dígito ya estaba ahí (repetir la misma tecla no debe volver a penalizar).
-  bool place(int cell, int digit) {
+  ///
+  /// **Tampoco pisa un número ya puesto**: primero se borra. Rozar otra tecla
+  /// cambiaba un número bueno por uno malo y lo contaba como fallo, y no había
+  /// forma de deshacer ese fallo (André, 22-10-2026, por quejas de
+  /// jugadores). [sobrescribir] es para la pista del modo libre, que sí
+  /// cambia un número equivocado por el bueno.
+  bool place(int cell, int digit, {bool sobrescribir = false}) {
     if (isGiven(cell)) return false;
     if (digit < 1 || digit > boardSize) return false;
     if (entries[cell] == digit) return false;
+    if (entries[cell] != 0 && !sobrescribir) return false;
 
     final move = _Move(
       entries: {cell: entries[cell]},

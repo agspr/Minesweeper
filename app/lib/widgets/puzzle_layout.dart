@@ -38,6 +38,7 @@ class PuzzleLayout extends StatelessWidget {
     required this.header,
     required this.board,
     required this.numpad,
+    this.aviso,
   });
 
   final Widget header;
@@ -47,6 +48,23 @@ class PuzzleLayout extends StatelessWidget {
   final Widget board;
 
   final Widget numpad;
+
+  /// Lo que sube desde el borde de abajo del tablero (ver `AvisoFlotante`).
+  /// Va sobre la zona del tablero y nunca sobre el numpad, que es lo que
+  /// alguien está a punto de tocar.
+  final Widget? aviso;
+
+  Widget _conAviso(Widget tablero) {
+    final a = aviso;
+    if (a == null) return tablero;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        tablero,
+        Positioned(left: 0, right: 0, bottom: 0, child: a),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +89,7 @@ class PuzzleLayout extends StatelessWidget {
             // El tablero se queda con el espacio que sobre y siempre cuadrado;
             // el numpad no se comprime nunca, porque un numpad estrujado se
             // falla al tocar.
-            Expanded(child: Center(child: board)),
+            Expanded(child: _conAviso(Center(child: board))),
             const SizedBox(height: 14),
             numpad,
             const SizedBox(height: 12),
@@ -89,7 +107,7 @@ class PuzzleLayout extends StatelessWidget {
       children: [
         // El tablero manda: se lleva todo el alto disponible y el ancho que
         // necesite para seguir cuadrado.
-        Expanded(child: Center(child: board)),
+        Expanded(child: _conAviso(Center(child: board))),
         const SizedBox(width: 24),
         // Ancho fijo y no una fracción: el numpad tiene un tamaño cómodo para
         // el dedo y crecer con la pantalla lo convertiría en teclas enormes y

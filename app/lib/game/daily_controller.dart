@@ -88,6 +88,11 @@ class DailyController extends ChangeNotifier {
   /// mover la selección, que no es jugada.
   final ValueNotifier<int> guardados = ValueNotifier(0);
 
+  /// Cuántas veces se tocó una cifra sobre un número ya puesto (ver
+  /// `SudokuBoard.place`). Solo sube: la pantalla lo escucha para avisar de
+  /// que hay que borrarlo primero.
+  final ValueNotifier<int> intentosDeSobrescribir = ValueNotifier(0);
+
   int _accumulatedSeconds = 0;
   DateTime? _runningSince;
 
@@ -202,6 +207,11 @@ class DailyController extends ChangeNotifier {
   bool tapDigit(int digit) {
     final b = _board;
     if (b == null || _selected < 0 || isComplete) return false;
+    if (b.ocupada(_selected) && (_notesMode || b.entries[_selected] != digit)) {
+      // No es una jugada: ni cuenta, ni se guarda, ni cambia nada.
+      intentosDeSobrescribir.value++;
+      return false;
+    }
     var fallo = false;
     _jugadas++;
     if (_notesMode) {
@@ -381,6 +391,7 @@ class DailyController extends ChangeNotifier {
     stopWatchingMidnight();
     pauseTimer();
     guardados.dispose();
+    intentosDeSobrescribir.dispose();
     super.dispose();
   }
 }
