@@ -1791,3 +1791,21 @@ el 17-10, ios 36 → 37 el 18-10, con el App Store ya en `READY_FOR_SALE`).
 **Pendiente de @mama_yuya**: el 17-10 a las 17:18 su iPad se actualizó solo a
 la 1.0.6, sin entrar en la cuenta. Le faltan la 1.0.7 y volver a entrar con el
 mismo Apple ID; hasta entonces sus diez días siguen solo en el iPad.
+
+---
+
+## PENDIENTE — pesos ligeros en toda la familia (André, 22-10-2026)
+
+André quiere en Nona, y en todo lo que usa el paquete, el aspecto de CINCO.
+**No es otra letra**: las dos apps llevan Figtree, la misma, empaquetada. CINCO
+se ve más fina porque no usa el tema del paquete sino el suyo, con
+`GoogleFonts.figtreeTextTheme`, que ata cada estilo a UN fichero de peso (el
+del estilo base, 400 o 500). Una negrita de una pantalla compartida hereda esa
+familia de un solo peso y sale regular. Nona usa el tema del paquete, con los
+seis pesos, y la negrita sale negrita. Y `google_fonts` además baja la letra de
+fonts.gstatic.com en el primer arranque, lo que el paquete quitó a propósito.
+
+Elegida la opción de hacerlo a propósito en el paquete; André pasa la
+especificación al agente de CINCO. **Lo que le toca a Nona**: subir al tag del
+paquete cuando exista, mirar sus pantallas propias (tablero, inicio, final) y
+construir cuando André lo pida.
