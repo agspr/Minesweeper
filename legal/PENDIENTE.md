@@ -1815,3 +1815,10 @@ propósito (CINCO `0707c14`, con una prueba que lo vigila; «quitarlo es otra
 decisión, con capturas»), así que CINCO sigue bajando la letra de Google. El
 cambio de pesos del paquete **no está hecho**: ni commit ni tag (el último,
 0.88.2, es el cierre de sesión automático a Sentry). Nona ya está en 0.88.2.
+
+**Hecho el 22-10**: el paquete 0.89.1 deja Figtree en un solo fichero, el 400,
+como el `Figtree_regular` de CINCO (no uséis la 0.89.0, que dejaba 300/400/500).
+Nona ya está en 0.89.1 (pruebas en verde; la de las escenas con Figtree lee
+ahora los ficheros del manifiesto en vez de una lista de pesos). Capturas
+antes/después del inicio y del tablero enseñadas a André. **No se construye
+hasta que André las dé por buenas.**

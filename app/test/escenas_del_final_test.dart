@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -574,14 +576,29 @@ void main() {
 
   group('en los teléfonos de verdad, con Figtree', () {
     setUpAll(() async {
-      final figtree = FontLoader('packages/juegos_senda/Figtree');
-      for (final peso in [300, 400, 500, 600, 700, 800]) {
-        figtree.addFont(
-          rootBundle.load(
-            'packages/juegos_senda/assets/fonts/Figtree-$peso.ttf',
-          ),
-        );
+      // Los ficheros que declara el paquete, leídos del mismo manifiesto con
+      // el que la app registra la letra, y no una lista de pesos copiada aquí:
+      // la 0.89.1 dejó Figtree en un solo fichero (el 400, como CINCO) y la
+      // lista vieja reventaba al cargar los que ya no existen.
+      const familia = 'packages/juegos_senda/Figtree';
+      final manifiesto =
+          jsonDecode(await rootBundle.loadString('FontManifest.json')) as List;
+      final figtree = FontLoader(familia);
+      var ficheros = 0;
+      for (final f in manifiesto.cast<Map<String, dynamic>>()) {
+        if (f['family'] != familia) continue;
+        for (final a in (f['fonts'] as List).cast<Map<String, dynamic>>()) {
+          figtree.addFont(rootBundle.load(a['asset'] as String));
+          ficheros++;
+        }
       }
+      // Sin ninguno, estas pruebas medirían con la letra de pruebas (Ahem) y
+      // pasarían sin haber probado nada.
+      expect(
+        ficheros,
+        greaterThan(0),
+        reason: 'Figtree no está en el manifiesto',
+      );
       await figtree.load();
     });
 
