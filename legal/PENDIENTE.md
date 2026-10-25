@@ -1843,3 +1843,36 @@ capturas de la letra.
 
 **Hecho**: a la venta en las dos tiendas y número publicado (android 37 → 38
 el 22-10, ios 37 → 38 el 23-10).
+
+---
+
+## HECHO — los puntos que le faltaban a @mama_yuya, repuestos a mano (25-10-2026, agente dev)
+
+Pedido por André tras el arreglo de 1.0.7/1.0.8: al entrar ella en la cuenta del
+iPad subieron 13 días (de 16 a 29) y la semana le salió en 505, que cuadra con
+el baremo día a día.
+
+- **Lo que no volvió**: cinco diarias de septiembre (20, 21, 22, 23 y 25),
+  terminadas en el iPad con la 1.0.1. Nunca llegaron a la cuenta y el iPad no
+  las tenía (Más enseñaba 29 días jugados, los mismos de la cuenta). No se sabe
+  por qué; la 1.0.1 repetía eventos de analítica al reabrir una diaria hecha y
+  no hay más rastro.
+- **Lo repuesto**: 200 puntos (75 + 25 + 50 + 25 + 25), en `legacyPoints` de
+  `users/{uid}/apps/nona`, con fecha y motivo en el propio documento, y su
+  total sumado (2.155 → 2.355; semana y mes no cambian). Vale lo que dice el
+  mecanismo de `fundirResumen`: el recálculo del servidor lo suma desde ahora.
+  No se escribieron días crudos: los puntos no tienen día detrás, y la racha y la
+  mejor racha (11) siguen siendo las de los días que sí existen.
+- **Cómo se calculó**: dificultad del **banco** de la app, no de la analítica
+  (en la 1.0.1 el parámetro `dificultad` no es de fiar: dice «difícil» el jueves
+  24-9, que su propio registro da como medio; el banco cumple la regla de la
+  semana en los 365 días de 2026 y no cambia desde el 17-8). Fallos, de la
+  analítica: 5 cada día, tope de la penalización, y coinciden con la cuenta el
+  19 y el 24-9.
+- **El viernes 23-10 no cuenta**: en Nona no se terminó ninguna diaria ese día
+  en ningún aparato suyo. El iPad abrió Nona dos veces y terminó una partida de
+  **práctica** a las 9:22; la palabra del día de CINCO se terminó en el iPhone a
+  las 8:24. De ahí que la racha sea 2 (24 y 25).
+- `tools/seed-legacy.js` no sirve para esto: calcula el residuo entre el
+  resumen guardado y los días crudos, y aquí no lo había. Se escribió el campo
+  con un script de una sola vez, con ensayo previo y relectura.
