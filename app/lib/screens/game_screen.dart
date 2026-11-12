@@ -31,13 +31,13 @@ import '../services/theme_controller.dart';
 import '../services/share_service.dart';
 import '../theme.dart';
 import '../widgets/game_header.dart';
-import '../widgets/numpad.dart';
 import '../widgets/puzzle_layout.dart';
 import '../nona_config.dart';
 import '../widgets/aviso_flotante.dart';
 import '../widgets/difficulty_label.dart';
 import '../widgets/escenas_del_final.dart';
 import '../widgets/sudoku_board_view.dart';
+import 'practice_screen.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -121,6 +121,14 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
   Timer? _precarga;
   Timer? _respiro;
+  bool _touchingCovered = false;
+
+  MinesweeperFaceState _faceState(DailyController c) {
+    if (c.isComplete) return MinesweeperFaceState.won;
+    if (c.isLost) return MinesweeperFaceState.lost;
+    if (_touchingCovered) return MinesweeperFaceState.surprised;
+    return MinesweeperFaceState.normal;
+  }
 
   @override
   void dispose() {
@@ -204,7 +212,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   /// abrir una ya hecha.
   Future<void> _abrirElFinal({required bool repeticion}) async {
     final c = widget.controller;
-    if (!mounted || !c.isComplete || c.outcome == null) return;
+    if (!mounted || !c.isFinished || c.outcome == null) return;
     final score = scoreDaily(c.outcome!);
     // El día de la diaria, no el reloj: en la app son el mismo día, y así la
     // racha, la semana y el hito se cuentan sobre el día que se acaba de
@@ -236,7 +244,10 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       if (conResena) {
         await ads.saldarDelDia();
       } else {
-        await ads.maybeShowAfterPuzzle(c.dayKey!);
+        final mostro = await ads.maybeShowAfterPuzzle(c.dayKey!);
+        if (mostro) {
+          PracticeScreen.recordAdDismissed(ads, DateTime.now());
+        }
       }
       if (!mounted) return;
     }
@@ -288,34 +299,27 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             final c = widget.controller;
             final l = L.of(context);
 
-            // La MISMA cabecera en los tres estados —error, carga y partida—,
-            // porque la X es la única forma de salir y no puede faltar en
-            // ninguno. Lo que cambia es cuánto sabe: sin puzle cargado no hay
-            // dificultad que poner de subtítulo ni fallos que contar.
+            final board = c.board;
             final header = GameHeader(
               title: l.appTagline,
               subtitle: c.difficulty == null
                   ? null
                   : difficultyLabel(context, c.difficulty!),
               onClose: widget.onExit,
-              trailing: c.board == null
+              remainingMines: board?.remainingMines,
+              faceState: _faceState(c),
+              onReset: c.restart,
+              isRunning: c.isRunning,
+              elapsedSeconds: c.elapsed.inSeconds,
+              trailing: board == null
                   ? null
-                  // Los fallos se ven SIEMPRE, también en cero: es lo que se
-                  // está puntuando, y esconderlo hasta el primer fallo haría
-                  // que la primera resta pareciera salir de la nada. Lo que
-                  // cambió es CÓMO: una equis y el número, sin la frase. Las
-                  // palabras siguen ahí para quien use un lector de pantalla.
-                  : HeaderChip(
-                      icon: Icons.close_rounded,
-                      count: c.board!.mistakes,
-                      highlight: c.board!.mistakes > 0,
-                      capped: c.board!.mistakes >= maxCountedMistakes,
-                      semanticsLabel: c.board!.mistakes == 0
+                  : MinesweeperStrikesChip(
+                      strikes: board.detonatedCount,
+                      maxStrikes: board.maxStrikes,
+                      semanticsLabel: board.detonatedCount == 0
                           ? l.noMistakes
-                          : l.mistakeCount(c.board!.mistakes) +
-                                (c.board!.mistakes >= maxCountedMistakes
-                                    ? l.mistakeCapSuffix
-                                    : ''),
+                          : l.mistakeCount(board.detonatedCount) +
+                                (board.isLost ? ' (derrota)' : ''),
                     ),
             );
 
@@ -323,14 +327,12 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               return PuzzleLayout(
                 header: header,
                 board: const _BankGap(),
-                numpad: const SizedBox.shrink(),
               );
             }
-            if (!c.ready || c.board == null) {
+            if (!c.ready || board == null) {
               return PuzzleLayout(
                 header: header,
                 board: const CircularProgressIndicator(strokeWidth: 2.5),
-                numpad: const SizedBox.shrink(),
               );
             }
 
@@ -342,14 +344,11 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               _completaAlVer = null;
               _wasComplete = false;
             }
-            _completaAlVer ??= c.isComplete;
+            _completaAlVer ??= c.isFinished;
 
-            // Al completarse, el reloj se para, se registra el día y sale el
-            // final. El registro es idempotente, así que que esto viva en un
-            // `build` no duplica puntos aunque la pantalla se reconstruya, y
-            // se hace también al abrir una diaria ya hecha: si la app murió
-            // justo al terminar, es aquí donde el día acaba apuntado.
-            if (c.isComplete && !_wasComplete) {
+            // Al completarse (por victoria o por derrota), el reloj se para,
+            // se registra el día y sale el final.
+            if (c.isFinished && !_wasComplete) {
               _wasComplete = true;
               final score = scoreDaily(c.outcome!);
               widget.progress.record(
@@ -358,39 +357,24 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                 seconds: c.elapsed.inSeconds,
               );
               final repeticion = _completaAlVer!;
-              // El evento de juego de Nona, hermano del diaria_terminada de
-              // CINCO. Solo agregados de la partida — dificultad y fallos —
-              // nunca nada que identifique a la persona. Y solo al TERMINARLA
-              // delante: abrir una diaria ya hecha no es terminarla otra vez.
-              // GATE: la política §3.8 dice "estas y ninguna más" (orden
-              // acordado con André: la política se ensancha primero).
               if (!repeticion) {
                 Analytics.gameEvent('diaria_terminada', {
                   'dificultad': c.difficulty!.name,
                   'fallos': score.countedMistakes,
+                  'victoria': c.isComplete,
                 });
               }
               if (repeticion) {
-                // Tras el fotograma: abrir una ruta en mitad de un `build` no
-                // se puede.
                 WidgetsBinding.instance.addPostFrameCallback(
                   (_) => _abrirElFinal(repeticion: true),
                 );
               } else {
-                // **El anuncio del día se DEBE desde este instante**, antes del
-                // respiro: quien cierre la app con el tablero recién resuelto
-                // lo verá en la próxima pausa. CINCO lo apunta tras su respiro
-                // de 2 s, y esos 2 s eran una rendija; aquí no.
                 final dia = c.dayKey!;
                 final ads = widget.ads;
                 if (ads != null) {
                   unawaited(ads.deberElDelDia(dia));
-                  // Por si no se precargó (se resolvió antes de 4 s, o falló):
-                  // quedan los 2 s del respiro.
                   unawaited(ads.preloadFor(dia));
                 }
-                // Un respiro para ver el tablero resuelto antes del anuncio y
-                // de la celebración, como CINCO tras su última fila.
                 _respiro = Timer(
                   const Duration(seconds: 2),
                   () => _abrirElFinal(repeticion: false),
@@ -398,7 +382,6 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               }
             }
 
-            final board = c.board!;
             // El final ya no se pinta encima: va en su propia ruta, a
             // pantalla completa (`escenas_del_final.dart`).
             return PuzzleLayout(
@@ -412,18 +395,12 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               board: SudokuBoardView(
                 board: board,
                 selected: c.selected,
-                onTapCell: c.select,
-              ),
-              numpad: Numpad(
-                board: board,
-                notesMode: c.notesMode,
-                enabled: !c.isComplete,
-                onDigit: c.tapDigit,
-                onErase: c.erase,
-                onToggleNotes: c.toggleNotesMode,
-                onUndo: c.undo,
-                boardColourOn: widget.theme.boardColour,
-                onToggleBoardColour: widget.theme.toggleBoardColour,
+                onTapCell: c.tapCellOnBoard,
+                onLongPressCell: c.longPressCellOnBoard,
+                onPointerDownCovered: () =>
+                    setState(() => _touchingCovered = true),
+                onPointerUpCovered: () =>
+                    setState(() => _touchingCovered = false),
               ),
             );
           },

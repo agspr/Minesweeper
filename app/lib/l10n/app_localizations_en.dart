@@ -10,13 +10,13 @@ class LEn extends L {
   LEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Nona';
+  String get appName => 'Minesweeper';
 
   @override
-  String get appTagline => 'Daily Sudoku';
+  String get appTagline => 'Daily Challenge';
 
   @override
-  String get menuDaily => 'Daily sudoku';
+  String get menuDaily => 'Daily challenge';
 
   @override
   String menuDailyToday(String difficulty) {
@@ -214,14 +214,14 @@ class LEn extends L {
   String get more => 'More';
 
   @override
-  String get aboutNona => 'About Nona';
+  String get aboutNona => 'About Minesweeper';
 
   @override
   String get aboutSubtitle => 'Who we are, terms, privacy and contact';
 
   @override
   String get aboutBody =>
-      'Nona is a daily sudoku built by SENDA LLC in Puerto Rico. Every day brings a new puzzle, the same one for everyone, with difficulty set by the day of the week. There’s also a practice mode with unlimited puzzles that gives no points or streak, and a leaderboard to play alongside your friends.';
+      'Minesweeper is a daily minesweeper built by SENDA LLC in Puerto Rico. Every day brings a new puzzle, the same one for everyone, with difficulty set by the day of the week. There’s also a practice mode with unlimited puzzles that gives no points or streak, and a leaderboard to play alongside your friends.';
 
   @override
   String get boardColourOn => 'Board in colour';
@@ -241,7 +241,7 @@ class LEn extends L {
   }
 
   @override
-  String get sceneTodaysSudoku => 'Today\'s sudoku';
+  String get sceneTodaysSudoku => 'Today\'s minesweeper';
 
   @override
   String get sceneMistakes => 'Mistakes';

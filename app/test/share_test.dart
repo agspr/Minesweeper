@@ -44,22 +44,22 @@ void main() {
   test('no filtra NADA del tablero', () {
     final text = build(es, finished(Difficulty.hard, mistakes: 2));
     // Ni dígitos sueltos del puzle ni rejilla: solo resultado.
-    expect(text.contains('Nona'), isTrue);
+    expect(text.contains('Buscaminas'), isTrue);
     expect(text.split('\n').length, lessThan(8), reason: 'debe ser corto');
     // El único cuadro que sale es la fila de fallos, que no dice nada del
-    // tablero: son 5 huecos fijos.
-    expect('🟩'.allMatches(text).length + '⬛'.allMatches(text).length, 5);
+    // tablero: son 3 huecos fijos (3 vidas/minas).
+    expect('🟩'.allMatches(text).length + '⬛'.allMatches(text).length, 3);
   });
 
   test('la fila de fallos refleja lo conservado', () {
-    expect(build(es, finished(Difficulty.easy)).contains('🟩🟩🟩🟩🟩'), isTrue);
+    expect(build(es, finished(Difficulty.easy)).contains('🟩🟩🟩'), isTrue);
     expect(
-      build(es, finished(Difficulty.easy, mistakes: 2)).contains('🟩🟩🟩⬛⬛'),
+      build(es, finished(Difficulty.easy, mistakes: 2)).contains('🟩⬛⬛'),
       isTrue,
     );
-    // A partir de 5 la penalización se acaba, y la fila también.
+    // A partir de 3 la penalización se acaba (derrota), y la fila también.
     expect(
-      build(es, finished(Difficulty.easy, mistakes: 9)).contains('⬛⬛⬛⬛⬛'),
+      build(es, finished(Difficulty.easy, mistakes: 9)).contains('⬛⬛⬛'),
       isTrue,
     );
   });
@@ -105,6 +105,8 @@ void main() {
 
   test('sale traducido en los dos idiomas', () {
     expect(build(es, finished(Difficulty.hard)).contains('Difícil'), isTrue);
+    expect(build(es, finished(Difficulty.hard)).contains('Buscaminas'), isTrue);
     expect(build(en, finished(Difficulty.hard)).contains('Hard'), isTrue);
+    expect(build(en, finished(Difficulty.hard)).contains('Minesweeper'), isTrue);
   });
 }

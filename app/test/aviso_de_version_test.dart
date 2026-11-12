@@ -36,22 +36,20 @@ import 'helpers.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('las fichas son las de Nona', () {
-    test('Android: la de com.nonaapp.nona', () {
+  group('las fichas son las de Minesweeper', () {
+    test('Android: la de com.sendallc.minesweeper', () {
       expect(
         nonaConfig.tiendaAndroid.toString(),
-        'https://play.google.com/store/apps/details?id=com.nonaapp.nona',
+        'https://play.google.com/store/apps/details?id=com.sendallc.minesweeper',
       );
     });
 
-    test('iOS: la de Nona, por su id, y sin país fijo', () {
+    test('iOS: la de Minesweeper, por su id, y sin país fijo', () {
       final ios = nonaConfig.tiendaIos!;
       expect(ios.host, 'apps.apple.com');
-      // El id de la ficha de Nona en App Store Connect. El de CINCO es otro,
-      // y un copia-pega pasaría la mirada rápida.
-      expect(ios.path, '/app/id6802670347');
-      // Un `/us/` o un `/es/` delante fija la tienda de un país, y Nona no
-      // está en todas: en `/es/` su ficha da 404.
+      // El id de la ficha de Minesweeper en App Store Connect.
+      expect(ios.path, '/app/id6830734481');
+      // Un `/us/` o un `/es/` delante fija la tienda de un país.
       expect(
         ios.pathSegments.first,
         'app',
@@ -86,7 +84,7 @@ void main() {
   group('el aviso en el menú', () {
     final p = generate(seed: 5, target: Difficulty.easy)!;
     const aviso = 'Hay una versión nueva';
-    const diaria = 'Sudoku del día';
+    const diaria = 'Reto diario';
     const esta = SendaVersionActual(nombre: '1.0.3', build: 31);
 
     /// Lo que el paquete guardó de la última vez que miró: la publicada.
@@ -208,7 +206,7 @@ void main() {
 
       // La red contesta con el menú ya en pantalla.
       red.complete({
-        'nona': {'android': 33},
+        nonaGameId: {'android': 33},
       });
       await tester.pumpAndSettle();
       expect(find.text(aviso), findsNothing);
@@ -240,7 +238,7 @@ void main() {
       await montar(tester, prefs, v: v, progreso: progreso);
       await tester.pump();
       red.complete({
-        'nona': {'android': 33},
+        nonaGameId: {'android': 33},
       });
       await tester.pumpAndSettle();
 
@@ -274,9 +272,9 @@ void main() {
       final v = versiones(
         prefs,
         red: () async => {
-          'nona': {'android': 31},
+          nonaGameId: {'android': 31},
           // Del documento se lee lo de ESTE juego: que CINCO publique su 99
-          // no le dice nada a quien juega Nona.
+          // no le dice nada a quien juega Minesweeper.
           'cinco': {'android': 99},
         },
       );
@@ -350,7 +348,7 @@ void main() {
       expect(abiertas, hasLength(1));
       expect(
         abiertas.single['url'],
-        'https://play.google.com/store/apps/details?id=com.nonaapp.nona',
+        'https://play.google.com/store/apps/details?id=com.sendallc.minesweeper',
       );
       // En la app de la tienda, no en un navegador dentro de Nona: desde una
       // vista web no se instala nada.

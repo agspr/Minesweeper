@@ -33,11 +33,14 @@ int baseFor(Difficulty d) => switch (d) {
   Difficulty.hard => 150,
 };
 
-/// A partir de aquí los fallos dejan de contar: es el suelo del 50%.
-const int maxCountedMistakes = 5;
+/// A partir de aquí los fallos dejan de contar: a 3 minas se pierde la partida.
+const int maxCountedMistakes = 3;
 
-/// Lo que cuesta cada fallo, en porcentaje de la base.
-const double mistakePenaltyFraction = 0.10;
+/// Lo que cuesta cada fallo (mina detonada en victoria), en porcentaje de la base.
+const double mistakePenaltyFraction = 0.15;
+
+/// Fracción de la base otorgada como suelo fijo de participación al perder por 3 minas.
+const double defeatParticipationFraction = 0.15;
 
 /// Tramos de crédito parcial: (mínimo de avance inclusive, % de la base).
 ///
@@ -62,6 +65,7 @@ class DailyScore {
     required this.points,
     required this.base,
     required this.completed,
+    this.lost = false,
     required this.countedMistakes,
     required this.mistakePenalty,
     required this.completionPercent,
@@ -73,6 +77,7 @@ class DailyScore {
 
   final int base;
   final bool completed;
+  final bool lost;
 
   /// Fallos que de verdad han restado (topado en [maxCountedMistakes]).
   final int countedMistakes;
@@ -82,13 +87,12 @@ class DailyScore {
 
   final int completionPercent;
 
-  /// Fracción del tramo parcial aplicada, o `null` si terminó.
+  /// Fracción del tramo parcial aplicada, o `null` si terminó limpiamente.
   final double? partialFraction;
 
-  /// ¿Extiende la racha? **Solo terminar** (§1). El crédito parcial da puntos
-  /// pero jamás racha: si la diera, una casilla al día mantendría una racha
-  /// infinita.
-  bool get extendsStreak => completed;
+  /// ¿Extiende la racha? Se conserva si la partida se jugó hasta su conclusión:
+  /// victoria o derrota. Las partidas incompletas o abandonadas no alargan la racha.
+  bool get extendsStreak => completed || lost;
 }
 
 /// Puntúa el resultado de una diaria.
@@ -106,6 +110,7 @@ DailyScore scoreDaily(DailyOutcome outcome) {
       points: base - penalty,
       base: base,
       completed: true,
+      lost: false,
       countedMistakes: counted,
       mistakePenalty: penalty,
       completionPercent: outcome.completionPercent,
@@ -113,9 +118,21 @@ DailyScore scoreDaily(DailyOutcome outcome) {
     );
   }
 
-  // Sin terminar: manda el avance, y los fallos no descuentan. La regla se
-  // sostiene sola porque el avance se mide en casillas CORRECTAS: las
-  // equivocadas no suman, así que nadie infla el parcial metiendo basura.
+  if (outcome.lost) {
+    final points = (base * defeatParticipationFraction).round();
+    return DailyScore(
+      points: points,
+      base: base,
+      completed: false,
+      lost: true,
+      countedMistakes: outcome.mistakes,
+      mistakePenalty: base - points,
+      completionPercent: outcome.completionPercent,
+      partialFraction: defeatParticipationFraction,
+    );
+  }
+
+  // Sin terminar: manda el avance, y los fallos no descuentan.
   final pct = outcome.completionPercent;
   for (final (minPercent, fraction) in partialTiers) {
     if (pct >= minPercent) {
@@ -123,6 +140,7 @@ DailyScore scoreDaily(DailyOutcome outcome) {
         points: (base * fraction).round(),
         base: base,
         completed: false,
+        lost: false,
         countedMistakes: 0,
         mistakePenalty: 0,
         completionPercent: pct,
@@ -136,6 +154,7 @@ DailyScore scoreDaily(DailyOutcome outcome) {
     points: 0,
     base: base,
     completed: false,
+    lost: false,
     countedMistakes: 0,
     mistakePenalty: 0,
     completionPercent: pct,

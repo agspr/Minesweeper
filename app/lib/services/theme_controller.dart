@@ -38,7 +38,7 @@ class ThemeController extends ChangeNotifier {
   /// Sin prefijo `game.` ni `progress.`: el tema es del APARATO, no de la
   /// cuenta. Está fuera de `ownedPrefKeyPrefixes` a propósito — cambiar de
   /// sesión en un teléfono compartido no debe repintar la app de otro color.
-  static const _kTheme = 'settings.theme';
+  static const _kTheme = 'settings.minesweeper_theme';
   static const _kBoardColour = 'settings.boardColour';
 
   final SharedPreferences _prefs;

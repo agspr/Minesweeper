@@ -193,21 +193,28 @@ class _SettingsTabState extends State<SettingsTab> {
         // y una tabla de ceros es ruido, igual que la de intentos de CINCO se
         // esconde vacía.
         statsChart: _practiceTable(l),
-        // Los CUATRO de la familia, los mismos que CINCO y en el mismo orden.
-        // No son "los temas de Nona": son los de Juegos Senda, y por eso los
-        // define el paquete. Que las dos apps ofrezcan lo mismo aquí es el
-        // motivo de que esta pantalla se sienta la misma en las dos.
+        // Los cuatro temas de la familia, con Cobalto (Azul + Rojo del icono de
+        // Buscaminas) en primer lugar como tema principal y las muestras de
+        // color adaptadas a la tríada de Buscaminas (acento, rojo mina / azul
+        // contraste y pizarra oscura) en vez del amarillo de CINCO.
         themes: [
-          for (final p in SendaPalettes.all)
+          for (final p in const [
+            SendaPalettes.cobalto,
+            SendaPalettes.menta,
+            SendaPalettes.lavanda,
+            SendaPalettes.coral,
+          ])
             SendaThemeOption(
-              // El id se guarda y se compara; la etiqueta se lee. Separados
-              // porque el nombre visible ya no es la identidad del tema: en
-              // inglés es "Mint", y quien lo tuviera elegido lo perdería si su
-              // preferencia dependiera de eso.
               id: p.id,
               label: sendaPaletteLabel(SendaL.of(context), p),
               brand: p.brand,
-              swatches: p.swatches,
+              swatches: [
+                p.brand.accent,
+                p.id == 'coral'
+                    ? const Color(0xFF4FA8FF)
+                    : const Color(0xFFFF5252),
+                const Color(0xFF242632),
+              ],
             ),
         ],
         selectedTheme: widget.theme.palette.id,

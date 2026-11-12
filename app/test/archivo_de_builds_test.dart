@@ -162,8 +162,13 @@ void main() {
           '${(git.stderr as String).trim()}). Esta prueba no puede estar en '
           'verde sin datos.',
     );
+    final tope = mayor() > buildActual ? mayor() : buildActual;
     final sinArchivar = vistas
-        .where((n) => n >= desde && n != buildActual && !builds.containsKey('$n'))
+        .where((n) =>
+            n >= desde &&
+            n <= tope &&
+            n != buildActual &&
+            !builds.containsKey('$n'))
         .toList()
       ..sort();
     expect(

@@ -10,13 +10,13 @@ class LEs extends L {
   LEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appName => 'Nona';
+  String get appName => 'Buscaminas';
 
   @override
-  String get appTagline => 'Sudoku del día';
+  String get appTagline => 'Reto diario';
 
   @override
-  String get menuDaily => 'Sudoku del día';
+  String get menuDaily => 'Reto diario';
 
   @override
   String menuDailyToday(String difficulty) {
@@ -214,14 +214,14 @@ class LEs extends L {
   String get more => 'Más';
 
   @override
-  String get aboutNona => 'Acerca de Nona';
+  String get aboutNona => 'Acerca de Buscaminas';
 
   @override
   String get aboutSubtitle => 'Quiénes somos, términos, privacidad y contacto';
 
   @override
   String get aboutBody =>
-      'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.';
+      'Buscaminas es un juego diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.';
 
   @override
   String get boardColourOn => 'Tablero en color';
@@ -241,7 +241,7 @@ class LEs extends L {
   }
 
   @override
-  String get sceneTodaysSudoku => 'El sudoku de hoy';
+  String get sceneTodaysSudoku => 'El buscaminas de hoy';
 
   @override
   String get sceneMistakes => 'Errores';

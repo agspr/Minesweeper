@@ -37,7 +37,6 @@ import '../services/haptics.dart';
 import '../services/theme_controller.dart';
 import '../theme.dart';
 import '../widgets/game_header.dart';
-import '../widgets/numpad.dart';
 import '../widgets/puzzle_layout.dart';
 import '../widgets/aviso_flotante.dart';
 import '../widgets/difficulty_label.dart';
@@ -50,13 +49,38 @@ class PracticeScreen extends StatefulWidget {
     required this.theme,
     required this.onExit,
     this.ads,
+    this.clock = DateTime.now,
   });
+
+  /// Tiempo mínimo de respiro desde que se cierra un anuncio a pantalla
+  /// completa hasta que puede mostrarse el siguiente.
+  static const Duration adCooldown = Duration(seconds: 15);
+
+  static final Expando<DateTime> _lastAdDismissedAt = Expando<DateTime>(
+    'lastAdDismissedAt',
+  );
+
+  /// Registra el instante en que el jugador cerró un anuncio intersticial.
+  static void recordAdDismissed(AdManager ads, DateTime dismissedAt) {
+    _lastAdDismissedAt[ads] = dismissedAt;
+  }
+
+  /// Devuelve `true` si ya pasó al menos [adCooldown] desde que se cerró el
+  /// último anuncio en [ads].
+  static bool canShowAd(AdManager ads, DateTime now) {
+    final last = _lastAdDismissedAt[ads];
+    if (last == null) return true;
+    return now.difference(last) >= adCooldown;
+  }
 
   final PracticeController controller;
 
   /// Los anuncios a pantalla completa: uno cada cuatro partidas terminadas, en
   /// la pausa entre una y otra. Null en las pruebas que no los miran.
   final AdManager? ads;
+
+  /// Reloj inyectable para medir el enfriamiento entre anuncios en las pruebas.
+  final DateTime Function() clock;
 
   /// Para la tecla de color del numpad.
   final ThemeController theme;
@@ -75,53 +99,112 @@ class _PracticeScreenState extends State<PracticeScreen> {
 
   /// El tablero de delante ya se apuntó como partida terminada.
   bool _apuntada = false;
+  Timer? _precarga;
+  Timer? _anuncioTimer;
+  bool _touchingCovered = false;
+
+  MinesweeperFaceState _faceState(PracticeController c) {
+    if (c.isComplete) return MinesweeperFaceState.won;
+    if (c.isLost) return MinesweeperFaceState.lost;
+    if (_touchingCovered) return MinesweeperFaceState.surprised;
+    return MinesweeperFaceState.normal;
+  }
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(_alCambiar);
+    _precarga = Timer(const Duration(seconds: 4), () {
+      if (mounted) {
+        unawaited(widget.ads?.preloadPractice());
+      }
+    });
   }
 
   @override
   void dispose() {
+    _precarga?.cancel();
+    _anuncioTimer?.cancel();
     widget.controller.removeListener(_alCambiar);
     super.dispose();
   }
 
-  /// Cada partida terminada se apunta UNA vez en la cuenta de los anuncios,
-  /// que es de todos los modos y está guardada (la lleva el paquete). Un
-  /// tablero nuevo vuelve a armar el apunte.
+  /// Cada partida terminada se apunta UNA vez y muestra el anuncio de inmediato
+  /// al terminar (ganar o perder), respetando el enfriamiento mínimo de 15 s.
   void _alCambiar() {
-    final terminada = widget.controller.isComplete;
+    final terminada = widget.controller.isFinished;
     if (terminada && !_apuntada) {
       _apuntada = true;
-      unawaited(widget.ads?.anotarPartida());
+      final ads = widget.ads;
+      if (ads != null) {
+        unawaited(ads.anotarPartida());
+        unawaited(_asegurarTocaCadaPartida(ads));
+        _anuncioTimer?.cancel();
+        _anuncioTimer = Timer(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            unawaited(_mostrarAnuncioAlTerminar(ads));
+          }
+        });
+      }
     } else if (!terminada) {
       _apuntada = false;
+      _anuncioTimer?.cancel();
     }
   }
 
-  /// La pausa entre una partida y la siguiente: el anuncio, si la cuenta dice
-  /// que toca y YA está cargado. Sin red no se espera ni un segundo: se sigue
-  /// jugando, y toca en la próxima pausa.
+  Future<void> _mostrarAnuncioAlTerminar(AdManager ads) async {
+    if (!mounted || !widget.controller.isFinished) return;
+    if (!PracticeScreen.canShowAd(ads, widget.clock())) {
+      await ads.partidas.reiniciar();
+      return;
+    }
+    final mostro = await ads.mostrarSiToca();
+    if (mostro) {
+      PracticeScreen.recordAdDismissed(ads, widget.clock());
+    }
+  }
+
+  Future<void> _asegurarTocaCadaPartida(AdManager ads) async {
+    for (var i = 0; i < ads.partidas.cada && !ads.partidas.toca; i++) {
+      await ads.partidas.anotar();
+    }
+  }
+
+  /// La pausa entre una partida y la siguiente: si el anuncio no se pudo
+  /// mostrar al terminar (por ejemplo, si tardó en cargar), se intenta aquí.
   Future<void> _siguiente() async {
-    await widget.ads?.mostrarSiToca();
+    final ads = widget.ads;
+    if (ads != null && ads.tocaEnLaPausa) {
+      if (PracticeScreen.canShowAd(ads, widget.clock())) {
+        final mostro = await ads.mostrarSiToca();
+        if (mostro) {
+          PracticeScreen.recordAdDismissed(ads, widget.clock());
+        }
+      } else {
+        await ads.partidas.reiniciar();
+      }
+    }
     if (mounted) await widget.controller.newPuzzle();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_choosing) {
-      return _DifficultyScreen(
-        current: widget.controller.difficulty,
-        onExit: widget.onExit,
-        onPick: (d) {
-          // No se espera a que termine: `setDifficulty` corta en seco si el
-          // nivel no cambia, y si cambia, el tablero enseña su propio
-          // indicador de "generando" en la pantalla siguiente.
-          widget.controller.setDifficulty(d);
-          setState(() => _choosing = false);
-        },
+      return ListenableBuilder(
+        listenable: widget.controller,
+        builder: (context, _) => _DifficultyScreen(
+          current: widget.controller.difficulty,
+          gameMode: widget.controller.gameMode,
+          onPickMode: (m) => widget.controller.setGameMode(m),
+          onExit: widget.onExit,
+          onPick: (d) {
+            // No se espera a que termine: `setDifficulty` corta en seco si el
+            // nivel no cambia, y si cambia, el tablero enseña su propio
+            // indicador de "generando" en la pantalla siguiente.
+            widget.controller.setDifficulty(d);
+            setState(() => _choosing = false);
+          },
+        ),
       );
     }
 
@@ -144,53 +227,43 @@ class _PracticeScreenState extends State<PracticeScreen> {
               header: GameHeader(
                 title: l.menuPractice,
                 onClose: widget.onExit,
-                // Las pistas solo cuando las hay: aquí no se puntúa, así que un
-                // "0 pistas" permanente sería un reproche por adelantado.
-                trailing: c.hintsUsed > 0
-                    ? HeaderChip(
-                        icon: Icons.lightbulb_outline_rounded,
-                        count: c.hintsUsed,
-                        semanticsLabel: l.hintCount(c.hintsUsed),
-                      )
-                    : null,
+                remainingMines: c.generating || c.board == null
+                    ? null
+                    : c.board!.remainingMines,
+                faceState: _faceState(c),
+                onReset: () => c.newPuzzle(),
+                isRunning: c.isRunning,
+                elapsedSeconds: c.elapsed.inSeconds,
+                trailing: c.board == null || c.gameMode == PracticeGameMode.classic
+                    ? null
+                    : MinesweeperStrikesChip(
+                        strikes: c.board!.detonatedCount,
+                        maxStrikes: c.board!.maxStrikes,
+                        semanticsLabel: c.board!.detonatedCount == 0
+                            ? l.noMistakes
+                            : l.mistakeCount(c.board!.detonatedCount) +
+                                (c.board!.isLost ? ' (derrota)' : ''),
+                      ),
               ),
               board: c.generating || c.board == null
                   ? const CircularProgressIndicator(strokeWidth: 2.5)
                   : SudokuBoardView(
                       board: c.board!,
                       selected: c.selected,
-                      onTapCell: c.select,
+                      onTapCell: c.tapCellOnBoard,
+                      onLongPressCell: c.longPressCellOnBoard,
+                      onPointerDownCovered: () =>
+                          setState(() => _touchingCovered = true),
+                      onPointerUpCovered: () =>
+                          setState(() => _touchingCovered = false),
                     ),
-              // El modo libre mete su barra de acciones entre el tablero y el
-              // numpad. Van juntos en la misma ranura: en tablet apaisada bajan
-              // los dos a la columna de la derecha, que es donde deben estar
-              // los controles.
-              numpad: c.board == null || c.generating
-                  ? const SizedBox.shrink()
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (c.isComplete)
-                          _SolvedActions(
-                            onKeepPlaying: _siguiente,
-                            onExit: widget.onExit,
-                          )
-                        else
-                          _HintBar(onHint: c.hint),
-                        const SizedBox(height: 10),
-                        Numpad(
-                          board: c.board!,
-                          notesMode: c.notesMode,
-                          enabled: !c.isComplete,
-                          onDigit: c.tapDigit,
-                          onErase: c.erase,
-                          onToggleNotes: c.toggleNotesMode,
-                          onUndo: c.undo,
-                          boardColourOn: widget.theme.boardColour,
-                          onToggleBoardColour: widget.theme.toggleBoardColour,
-                        ),
-                      ],
-                    ),
+              numpad: c.isFinished
+                  ? _SolvedActions(
+                      isWon: c.isComplete,
+                      onKeepPlaying: _siguiente,
+                      onExit: widget.onExit,
+                    )
+                  : null,
             );
           },
         ),
@@ -199,21 +272,22 @@ class _PracticeScreenState extends State<PracticeScreen> {
   }
 }
 
-/// Elegir nivel, antes de ver ningún tablero.
+/// Elegir nivel y modo de juego, antes de ver ningún tablero.
 class _DifficultyScreen extends StatelessWidget {
   const _DifficultyScreen({
     required this.current,
+    required this.gameMode,
+    required this.onPickMode,
     required this.onPick,
     required this.onExit,
   });
 
   final Difficulty current;
+  final PracticeGameMode gameMode;
+  final ValueChanged<PracticeGameMode> onPickMode;
   final ValueChanged<Difficulty> onPick;
   final VoidCallback onExit;
 
-  /// Qué cambia en cada nivel. Sin esto, "Fácil/Medio/Difícil" no dice QUÉ se
-  /// pone difícil — y en un sudoku no es evidente: son las pistas que trae y
-  /// las técnicas que exige, no el tamaño ni el tiempo.
   String _description(L l, Difficulty d) => switch (d) {
     Difficulty.easy => l.difficultyEasyDesc,
     Difficulty.medium => l.difficultyMediumDesc,
@@ -223,6 +297,91 @@ class _DifficultyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = L.of(context);
+    final isSenda = gameMode == PracticeGameMode.senda;
+
+    final modeToggle = Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1B1B24),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF2C2C3C),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                NonaHaptics.select();
+                onPickMode(PracticeGameMode.senda);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: isSenda ? NonaColors.accent : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Senda (3 vidas)',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: isSenda ? NonaColors.accentDeep : NonaColors.muted,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                NonaHaptics.select();
+                onPickMode(PracticeGameMode.classic);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: !isSenda ? NonaColors.accent : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Clásico (1 vida)',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: !isSenda ? NonaColors.accentDeep : NonaColors.muted,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final difficultyCards = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final d in Difficulty.values)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _DifficultyCard(
+              label: difficultyLabel(context, d),
+              description: _description(l, d),
+              selected: d == current,
+              onTap: () => onPick(d),
+            ),
+          ),
+      ],
+    );
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -244,50 +403,103 @@ class _DifficultyScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 520),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          l.practiceDifficultyTitle,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 23,
-                            height: 1.2,
-                            fontWeight: FontWeight.w800,
-                            color: NonaColors.text,
+              child: LayoutBuilder(
+                builder: (context, c) {
+                  final isWide =
+                      c.maxWidth >= 640 && c.maxWidth > c.maxHeight * 1.08;
+                  if (isWide) {
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 980),
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 10,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      l.practiceDifficultyTitle,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                        fontSize: 25,
+                                        height: 1.2,
+                                        fontWeight: FontWeight.w800,
+                                        color: NonaColors.text,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      l.practiceDifficultySubtitle,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                        fontSize: 14.5,
+                                        height: 1.4,
+                                        color: NonaColors.muted,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    modeToggle,
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 36),
+                              Expanded(
+                                flex: 11,
+                                child: difficultyCards,
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l.practiceDifficultySubtitle,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            height: 1.4,
-                            color: NonaColors.muted,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        for (final d in Difficulty.values)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _DifficultyCard(
-                              label: difficultyLabel(context, d),
-                              description: _description(l, d),
-                              selected: d == current,
-                              onTap: () => onPick(d),
+                      ),
+                    );
+                  }
+
+                  final maxWidth = c.maxWidth >= 540 ? 560.0 : 520.0;
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: maxWidth),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              l.practiceDifficultyTitle,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 23,
+                                height: 1.2,
+                                fontWeight: FontWeight.w800,
+                                color: NonaColors.text,
+                              ),
                             ),
-                          ),
-                      ],
+                            const SizedBox(height: 8),
+                            Text(
+                              l.practiceDifficultySubtitle,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                height: 1.4,
+                                color: NonaColors.muted,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            modeToggle,
+                            const SizedBox(height: 16),
+                            difficultyCards,
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
           ],
@@ -371,41 +583,38 @@ class _DifficultyCard extends StatelessWidget {
   }
 }
 
-/// Mientras se juega: solo la pista.
-class _HintBar extends StatelessWidget {
-  const _HintBar({required this.onHint});
-
-  final VoidCallback onHint;
-
-  @override
-  Widget build(BuildContext context) {
-    return _Bar(
-      icon: Icons.lightbulb_outline_rounded,
-      label: L.of(context).hint,
-      onTap: onHint,
-    );
-  }
-}
-
 /// Al terminar: seguir jugando o volver al menú, del mismo tamaño.
 class _SolvedActions extends StatelessWidget {
-  const _SolvedActions({required this.onKeepPlaying, required this.onExit});
+  const _SolvedActions({
+    required this.isWon,
+    required this.onKeepPlaying,
+    required this.onExit,
+  });
 
+  final bool isWon;
   final VoidCallback onKeepPlaying;
   final VoidCallback onExit;
 
   @override
   Widget build(BuildContext context) {
     final l = L.of(context);
+    final title = isWon
+        ? l.solved
+        : (l.localeName == 'es' ? 'Mina detonada' : 'Mine detonated');
+    final color = isWon ? NonaColors.accent : const Color(0xFFFF5252);
+    final keepPlayingLabel = isWon
+        ? l.keepPlaying
+        : (l.localeName == 'es' ? 'Reintentar' : 'Try again');
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          l.solved,
+          title,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: NonaColors.accent,
+            color: color,
           ),
         ),
         const SizedBox(height: 10),
@@ -413,7 +622,7 @@ class _SolvedActions extends StatelessWidget {
         // una principal y una secundaria.
         _Bar(
           icon: Icons.refresh_rounded,
-          label: l.keepPlaying,
+          label: keepPlayingLabel,
           onTap: onKeepPlaying,
           filled: true,
         ),

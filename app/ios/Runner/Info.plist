@@ -17,7 +17,7 @@
 	     idioma del teléfono. La clave tiene que seguir estando en el plist
 	     aunque esté traducida fuera; los .strings solo la sustituyen. -->
 	<key>NSUserTrackingUsageDescription</key>
-	<string>Nona uses your device's advertising identifier to show you more relevant ads. You can decline and keep using every feature.</string>
+	<string>Minesweeper uses your device's advertising identifier to show you more relevant ads. You can decline and keep using every feature.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
@@ -230,7 +230,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Nona Sudoku</string>
+	<string>Minesweeper</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -238,7 +238,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>nona</string>
+	<string>minesweeper</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -309,7 +309,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.708221297560-8vod20f0f10oeam53gd7g0e45n0rt0ka</string>
+				<string>com.googleusercontent.apps.708221297560-9hmu485907dl9udnqce4316tisnhtj72</string>
 			</array>
 		</dict>
 	</array>

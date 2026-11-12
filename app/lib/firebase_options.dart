@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAecrNRR3i7O2Ej9DgMt3Gsjl5HYgii4ko',
-    appId: '1:708221297560:android:2948386e6483bbd9c301ed',
+    appId: '1:708221297560:android:533dcc2c2a648fb6c301ed',
     messagingSenderId: '708221297560',
     projectId: 'cinco-fe5cc',
     storageBucket: 'cinco-fe5cc.firebasestorage.app',
@@ -59,12 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBJN6NmKRtrlFlWz06fODFO2YG8ktoOv5A',
-    appId: '1:708221297560:ios:890291c406c23afcc301ed',
+    appId: '1:708221297560:ios:002cc28f4c6ca6bfc301ed',
     messagingSenderId: '708221297560',
     projectId: 'cinco-fe5cc',
     storageBucket: 'cinco-fe5cc.firebasestorage.app',
     androidClientId: '708221297560-0nlu5hgtub1jkbjgka6269hd5qse0br4.apps.googleusercontent.com',
-    iosClientId: '708221297560-8vod20f0f10oeam53gd7g0e45n0rt0ka.apps.googleusercontent.com',
-    iosBundleId: 'com.nonaapp.nona',
+    iosClientId: '708221297560-9hmu485907dl9udnqce4316tisnhtj72.apps.googleusercontent.com',
+    iosBundleId: 'com.sendallc.minesweeper',
   );
 }

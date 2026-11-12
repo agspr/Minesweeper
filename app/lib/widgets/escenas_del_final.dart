@@ -764,16 +764,21 @@ class _Resultado extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        // Una caja de 3×3 que entra casilla a casilla: el sitio que en CINCO
-        // ocupan las letras de la palabra.
-        _Caja(c: c, llena: score.completed),
+        // Una mini rejilla de 3×3 de Buscaminas que entra casilla a casilla
+        _Caja(c: c, llena: score.completed, perdida: score.lost),
         const SizedBox(height: 24),
         FadeTransition(
           opacity: _tramo(c, .4, .7),
           child: Column(
             children: [
               Text(
-                score.completed ? l.solved : l.unfinished,
+                score.completed
+                    ? l.solved
+                    : (score.lost
+                        ? (l.localeName == 'es'
+                            ? 'Partida terminada'
+                            : 'Game over')
+                        : l.unfinished),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 30,
@@ -837,15 +842,28 @@ String _reloj(Duration d) {
   return '$m:$s';
 }
 
-/// La caja de 3×3 con sus nueve cifras, llena del acento si se resolvió.
+/// La mini rejilla decorativa de 3×3 de Buscaminas.
 class _Caja extends StatelessWidget {
-  const _Caja({required this.c, required this.llena});
+  const _Caja({required this.c, required this.llena, this.perdida = false});
 
   final AnimationController c;
   final bool llena;
+  final bool perdida;
 
   @override
   Widget build(BuildContext context) {
+    const iconPattern = [
+      Icons.flag_rounded,
+      Icons.looks_one_rounded,
+      Icons.looks_two_rounded,
+      Icons.looks_one_rounded,
+      Icons.brightness_7_rounded,
+      Icons.looks_one_rounded,
+      Icons.looks_two_rounded,
+      Icons.looks_one_rounded,
+      Icons.flag_rounded,
+    ];
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -868,17 +886,41 @@ class _Caja extends StatelessWidget {
                     height: 38,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: llena ? NonaColors.accent : NonaColors.surface,
+                      color: llena
+                          ? NonaColors.accent
+                          : perdida &&
+                                  (fila == 1 ||
+                                      (fila == 0 && col == 1) ||
+                                      (fila == 2 && col == 1))
+                              ? const Color(0xFF6B141E)
+                              : NonaColors.surface,
                       borderRadius: BorderRadius.circular(10),
+                      border: perdida &&
+                              (fila == 1 ||
+                                  (fila == 0 && col == 1) ||
+                                  (fila == 2 && col == 1))
+                          ? Border.all(
+                              color: const Color(0xFFFF5252),
+                              width: 1.2,
+                            )
+                          : null,
                     ),
-                    child: Text(
-                      '${fila * 3 + col + 1}',
-                      textScaler: TextScaler.noScaling,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: llena ? NonaColors.accentDeep : NonaColors.muted,
-                      ),
+                    child: Icon(
+                      perdida &&
+                              (fila == 1 ||
+                                  (fila == 0 && col == 1) ||
+                                  (fila == 2 && col == 1))
+                          ? Icons.brightness_7_rounded
+                          : iconPattern[fila * 3 + col],
+                      size: 20,
+                      color: llena
+                          ? NonaColors.accentDeep
+                          : perdida &&
+                                  (fila == 1 ||
+                                      (fila == 0 && col == 1) ||
+                                      (fila == 2 && col == 1))
+                              ? const Color(0xFFFF5252)
+                              : NonaColors.muted,
                     ),
                   ),
                 ),
@@ -975,6 +1017,14 @@ class _Desglose extends StatelessWidget {
               )
             else
               _Linea(etiqueta: l.breakdownNoMistakes, valor: '−0')
+          else if (score.lost)
+            _Linea(
+              etiqueta: l.localeName == 'es'
+                  ? '3 minas (participación)'
+                  : '3 mines (participation)',
+              valor: '−${score.mistakePenalty}',
+              negativa: true,
+            )
           else
             _Linea(
               etiqueta: l.breakdownCompleted(score.completionPercent),

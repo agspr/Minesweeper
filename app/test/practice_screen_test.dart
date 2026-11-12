@@ -74,27 +74,28 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('pulsar "Pista" rellena una casilla', (tester) async {
-    sized(tester);
-    final c = await loadedIn(tester);
-
-    await tester.pumpWidget(wrap(c));
-    await tester.pump();
-    await entrarAlTablero(tester, c);
-
-    expect(c.hintsUsed, 0);
-    await tester.tap(find.text('Pista'));
-    await tester.pump();
-
-    expect(c.hintsUsed, 1, reason: 'el botón de pista no llegó al controlador');
-    expect(c.board!.correctCount, 1);
-  });
-
-  testWidgets('mientras se juega NO hay "Otro puzle" ni salidas', (
+  testWidgets('cambiar entre Senda y Clásico responde al toque en la pantalla de nivel', (
     tester,
   ) async {
-    // Las dos salidas son de fin de partida. Verlas a mitad de un puzle
-    // invitaba a tirar el tablero por accidente.
+    sized(tester);
+    final c = await loadedIn(tester);
+
+    await tester.pumpWidget(wrap(c));
+    await tester.pump();
+
+    expect(c.gameMode, PracticeGameMode.senda);
+    await tester.tap(find.text('Clásico (1 vida)'));
+    await tester.pump();
+    expect(c.gameMode, PracticeGameMode.classic);
+
+    await tester.tap(find.text('Senda (3 vidas)'));
+    await tester.pump();
+    expect(c.gameMode, PracticeGameMode.senda);
+  });
+
+  testWidgets('mientras se juega NO hay pastillas de control ni numpad bajo el tablero', (
+    tester,
+  ) async {
     sized(tester);
     final c = await loadedIn(tester);
 
@@ -102,11 +103,12 @@ void main() {
     await tester.pump();
     await entrarAlTablero(tester, c);
 
-    expect(find.text('Otro puzle'), findsNothing);
+    expect(find.byType(Numpad), findsNothing);
+    expect(find.text('Pista'), findsNothing);
+    expect(find.text('Cavar'), findsNothing);
+    expect(find.text('Marcar'), findsNothing);
     expect(find.text('Seguir jugando'), findsNothing);
     expect(find.text('Menú principal'), findsNothing);
-    // La pista sí, que es lo único que se usa jugando.
-    expect(find.text('Pista'), findsOneWidget);
   });
 
   testWidgets('al resolver salen "Seguir jugando" y "Menú principal"', (
@@ -129,7 +131,6 @@ void main() {
     expect(c.isComplete, isTrue);
     expect(find.text('Seguir jugando'), findsOneWidget);
     expect(find.text('Menú principal'), findsOneWidget);
-    expect(find.text('Pista'), findsNothing);
   });
 
   testWidgets('"Menú principal" del final vuelve al menú', (tester) async {
@@ -150,7 +151,7 @@ void main() {
     expect(salidas, 1);
   });
 
-  testWidgets('los tres botones del numpad siguen respondiendo', (
+  testWidgets('la pulsación larga alterna la bandera en una casilla oculta', (
     tester,
   ) async {
     sized(tester);
@@ -160,11 +161,14 @@ void main() {
     await tester.pump();
     await entrarAlTablero(tester, c);
 
-    // Las teclas de acción ya no llevan etiqueta: se buscan por su tooltip,
-    // que es también su nombre accesible.
-    await tester.tap(find.byTooltip('Notas'));
+    expect(c.board!.isFlagged(0), isFalse);
+    c.longPressCellOnBoard(0);
     await tester.pump();
-    expect(c.notesMode, isTrue);
+    expect(c.board!.isFlagged(0), isTrue);
+
+    c.longPressCellOnBoard(0);
+    await tester.pump();
+    expect(c.board!.isFlagged(0), isFalse);
   });
 
   testWidgets('la pantalla de nivel se ve al entrar, con los tres niveles', (
@@ -233,7 +237,9 @@ void main() {
     expect(salidas, 1, reason: 'la X no llegó al armazón');
   });
 
-  testWidgets('la tecla de color apaga y enciende el tablero', (tester) async {
+  testWidgets('tocar una pista con sus minas marcadas ejecuta el acorde automáticamente', (
+    tester,
+  ) async {
     sized(tester);
     final c = await loadedIn(tester);
 
@@ -241,32 +247,40 @@ void main() {
     await tester.pump();
     await entrarAlTablero(tester, c);
 
-    final antes = theme!.boardColour;
-    await tester.tap(
-      find.byTooltip(antes ? 'Tablero en color' : 'Tablero en gris'),
-    );
+    final b = c.board!;
+    // Encontrar una casilla segura con pista > 0
+    var clueCell = -1;
+    for (var i = 0; i < b.boardCellCount; i++) {
+      if (!b.isMine(i)) {
+        b.reveal(i);
+        if (b.clueAt(i) > 0) {
+          clueCell = i;
+          break;
+        }
+      }
+    }
+    expect(clueCell, greaterThanOrEqualTo(0));
+
+    // Abanderar las minas vecinas
+    final clue = b.clueAt(clueCell);
+    var flagsPlaced = 0;
+    for (final n in b.neighborsOf(clueCell)) {
+      if (b.isMine(n) && flagsPlaced < clue) {
+        b.toggleFlag(n);
+        flagsPlaced++;
+      }
+    }
+    expect(flagsPlaced, clue);
+
+    // Al tocar la casilla de la pista, se ejecuta el acorde y se descubren
+    // todas las demás vecinas seguras sin necesidad de tocar una a una.
+    c.tapCellOnBoard(clueCell);
     await tester.pump();
-    expect(theme!.boardColour, !antes);
-  });
 
-  testWidgets('ninguna tecla enseña ya cuántas quedan', (tester) async {
-    // El contador vivía debajo del dígito. Si alguien lo devuelve, esta prueba
-    // lo dice: en un tablero recién hecho hay dígitos con 7 u 8 por colocar.
-    sized(tester);
-    final c = await loadedIn(tester);
-
-    await tester.pumpWidget(wrap(c));
-    await tester.pump();
-    await entrarAlTablero(tester, c);
-
-    final numpad = find.byType(Numpad);
-    for (final n in ['5', '6', '7', '8', '9']) {
-      expect(
-        find.descendant(of: numpad, matching: find.text(n)),
-        findsOneWidget,
-        reason:
-            'el $n aparece más de una vez en el numpad: ¿volvió el contador?',
-      );
+    for (final n in b.neighborsOf(clueCell)) {
+      if (!b.isMine(n)) {
+        expect(b.isRevealed(n), isTrue, reason: 'la vecina segura $n debió ser descubierta por el acorde');
+      }
     }
   });
 }

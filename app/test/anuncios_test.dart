@@ -232,8 +232,7 @@ void main() {
   });
 
   group('la práctica', () {
-    testWidgets('cada partida terminada se apunta una vez, y la pausa es al '
-        'seguir', (tester) async {
+    testWidgets('cada partida terminada muestra el anuncio inmediatamente al terminar', (tester) async {
       // Generar un puzle va en un isolate, que en el tiempo falso de las
       // pruebas no termina: se carga fuera, con `runAsync`, como en
       // `practice_screen_test`.
@@ -272,16 +271,106 @@ void main() {
         practica.select(i);
         practica.tapDigit(b.solution[i]);
       }
-      await tester.pump();
-      // Un repintado más no la vuelve a apuntar.
+      // Al resolver, se anota la partida y se muestra el anuncio inmediatamente
+      // tras el respiro de 300 ms, sin necesidad de esperar a "Seguir jugando".
       await tester.pump();
       expect(ads.llamadas.where((x) => x == 'partida'), hasLength(1));
-      expect(ads.llamadas, isNot(contains('pausa')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      expect(ads.llamadas, contains('pausa'));
 
       await tester.tap(find.text('Seguir jugando'));
       await tester.pump();
-      expect(ads.llamadas.last, 'pausa');
       expect(practica.generating, isTrue, reason: 'y empieza otra');
+    });
+
+    testWidgets('respeta un enfriamiento mínimo de 15 s desde que se cierra '
+        'un anuncio hasta el siguiente', (tester) async {
+      late PracticeController practica;
+      late SharedPreferences prefs;
+      await tester.runAsync(() async {
+        prefs = await SharedPreferences.getInstance();
+        practica = PracticeController(prefs);
+        await practica.load();
+      });
+      final ads = _Anuncios(prefs)..mostrarEnPausa = true;
+      var ahora = DateTime(2026, 11, 9, 12, 0, 0);
+
+      await tester.pumpWidget(
+        testApp(
+          Scaffold(
+            body: PracticeScreen(
+              controller: practica,
+              theme: ThemeController(prefs),
+              ads: ads,
+              clock: () => ahora,
+              onExit: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.tap(
+        find.text(switch (practica.difficulty) {
+          Difficulty.easy => 'Fácil',
+          Difficulty.medium => 'Medio',
+          Difficulty.hard => 'Difícil',
+        }),
+      );
+      await tester.pump();
+
+      void resolverTableroActual() {
+        final b = practica.board!;
+        for (var i = 0; i < cellCount; i++) {
+          if (b.isGiven(i)) continue;
+          practica.select(i);
+          practica.tapDigit(b.solution[i]);
+        }
+      }
+
+      // 1ª partida terminada -> muestra el primer anuncio inmediatamente al resolver (t = 0s).
+      resolverTableroActual();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      expect(ads.llamadas.where((x) => x == 'pausa'), hasLength(1));
+
+      Future<void> pasarASiguienteTablero() async {
+        await tester.runAsync(() async {
+          await practica.newPuzzle();
+        });
+        await tester.pump();
+      }
+
+      // Empezar nuevo puzle
+      await pasarASiguienteTablero();
+
+      // 2ª partida terminada a los 8s (< 15s) -> NO debe mostrar otro anuncio.
+      ahora = ahora.add(const Duration(seconds: 8));
+      resolverTableroActual();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      expect(
+        ads.llamadas.where((x) => x == 'pausa'),
+        hasLength(1),
+        reason: 'dentro de los 15 s de enfriamiento no debe salir otro anuncio',
+      );
+
+      // Empezar nuevo puzle
+      await pasarASiguienteTablero();
+
+      // 3ª partida terminada a los 16s desde el 1er anuncio (>= 15s) -> SÍ sale de inmediato.
+      ahora = ahora.add(const Duration(seconds: 8));
+      resolverTableroActual();
+      await tester.pump();
+      expect(ads.llamadas.where((x) => x == 'partida'), hasLength(3));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      expect(
+        ads.llamadas.where((x) => x == 'pausa'),
+        hasLength(2),
+        reason: 'pasados los 15 s de enfriamiento vuelve a permitir el anuncio de inmediato',
+      );
     });
   });
 }
@@ -294,6 +383,7 @@ class _Anuncios extends AdManager {
 
   final llamadas = <String>[];
   Completer<bool>? _enPantalla;
+  bool mostrarEnPausa = false;
 
   void cierraElAnuncio() => _enPantalla?.complete(true);
 
@@ -323,7 +413,7 @@ class _Anuncios extends AdManager {
   @override
   Future<bool> mostrarSiToca() async {
     llamadas.add('pausa');
-    return false;
+    return mostrarEnPausa;
   }
 }
 

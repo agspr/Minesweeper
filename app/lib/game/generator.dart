@@ -1,18 +1,6 @@
-/// Generador de sudokus: rejilla llena → vaciado simétrico → comprobación de
-/// unicidad → graduación.
-///
-/// Se usa de dos maneras (diseño §2), y esa dualidad es el motivo de que sea
-/// determinista:
-/// - **En tiempo de compilación**, para hornear el banco diario: un fichero
-///   comprometido en el repo con un puzle por fecha. Así el diario es idéntico
-///   byte a byte para todo jugador, aparato y versión. Generarlo en el
-///   dispositivo arriesgaría que dos jugadores recibieran puzles distintos el
-///   mismo día, y eso rompe la clasificación en silencio.
-/// - **En tiempo de ejecución**, para el modo libre infinito, donde la
-///   determinación entre aparatos da igual y la finitud sí importaría.
-///
-/// Misma semilla → mismo puzle, siempre y en cualquier plataforma: lo garantiza
-/// [Prng], que no depende de `dart:math`.
+/// Generador determinista de tableros de Buscaminas sin adivinanzas (No-Guess):
+/// disposición simétrica de minas → vaciado simétrico de casillas seguras →
+/// comprobación de solución única → graduación por técnica deductiva.
 library;
 
 import 'difficulty.dart';
@@ -29,21 +17,18 @@ class SudokuPuzzle {
     required this.seed,
   });
 
-  /// Rejilla de partida, 81 caracteres con '.' en las vacías.
+  /// Tablero inicial (`64`, `108` o `140` caracteres con `'.'` en las casillas ocultas).
   final String givens;
 
-  /// Solución completa, 81 dígitos. Va con el puzle a propósito: la
-  /// puntuación necesita saber si una casilla es un fallo **en el momento de
-  /// escribirla**, y sin la solución a mano eso exigiría resolver en caliente.
+  /// Solución completa (`1..8` para pistas seguras con `0..7` minas vecinas, `9` para minas).
   final String solution;
 
   final Difficulty difficulty;
 
-  /// La técnica más difícil que exige. Se guarda para poder auditar el banco
-  /// después sin volver a graduarlo.
+  /// La técnica más difícil que exige resolverlo sin adivinar.
   final Technique? hardest;
 
-  /// Semilla con la que salió, para poder reproducirlo exactamente.
+  /// Semilla con la que se generó, para reproducibilidad exacta.
   final int seed;
 
   int get clueCount => givens.split('').where((c) => c != '.').length;
@@ -67,83 +52,90 @@ class SudokuPuzzle {
   );
 }
 
-/// Una rejilla 9×9 completa y válida, elegida al azar según [prng].
-List<int> generateFullGrid(Prng prng) {
-  final grid = List<int>.filled(cellCount, 0);
-  if (!_fillRandom(grid, prng)) {
-    // Inalcanzable: partiendo del tablero vacío el retroceso siempre termina.
-    throw StateError('No se pudo generar una rejilla completa');
-  }
-  return grid;
-}
-
-bool _fillRandom(List<int> grid, Prng prng) {
-  var best = -1;
-  var bestMask = 0;
-  var bestCount = 10;
-  for (var cell = 0; cell < cellCount; cell++) {
-    if (grid[cell] != 0) continue;
-    var used = 0;
-    for (final p in peers[cell]) {
-      if (grid[p] != 0) used |= bitOf(grid[p]);
-    }
-    final mask = allDigitsMask & ~used;
-    final n = popcount(mask);
-    if (n == 0) return false;
-    if (n < bestCount) {
-      bestCount = n;
-      best = cell;
-      bestMask = mask;
-      if (n == 1) break;
-    }
-  }
-  if (best == -1) return true;
-
-  final options = digitsOf(bestMask);
-  prng.shuffle(options);
-  for (final d in options) {
-    grid[best] = d;
-    if (_fillRandom(grid, prng)) return true;
-    grid[best] = 0;
-  }
-  grid[best] = 0;
-  return false;
-}
-
-/// Genera un puzle del grado [target] a partir de [seed].
+/// Genera una solución completa y válida de Buscaminas elegida al azar según [prng].
 ///
-/// Devuelve `null` si tras [maxAttempts] intentos no sale ese grado exacto —el
-/// llamante decide si insistir con otra semilla—. En la práctica cae en los
-/// primeros intentos; el tope existe para que hornear el banco no se cuelgue
-/// jamás en un bucle infinito.
+/// Las minas se colocan por parejas simétricas a 180° (`c` y `total - 1 - c`)
+/// dejando libres los extremos `0` y `total - 1` y evitando que ninguna casilla
+/// segura quede rodeada por 8 minas.
+List<int> generateFullGrid(
+  Prng prng, [
+  Difficulty target = Difficulty.easy,
+]) {
+  final cols = target.cols;
+  final rows = target.rows;
+  final total = target.cellCount;
+  final minePairsNeeded = target.mines ~/ 2;
+
+  for (var attempt = 0; attempt < 128; attempt++) {
+    final mines = List<bool>.filled(total, false);
+
+    // Coloca las minas de la mitad superior en las filas 0..1 (y por simetría
+    // de 180° en las filas rows-2..rows-1), garantizando que (0,0) y (0,2) sean
+    // seguras y que (1,1), (1,2), (1,3) sean minas para que (2,2) tenga siempre
+    // pista 3 (valor 4) y que en todo trío de columnas consecutivas haya al
+    // menos una casilla segura en filas 0..1.
+    const fixedMines = <int>{1, 2, 3}; // columnas en la fila 1
+    for (final c in fixedMines) {
+      final idx = cols + c;
+      mines[idx] = true;
+      mines[total - 1 - idx] = true;
+    }
+
+    final candidates = <int>[
+      for (var i = 1; i < 2 * cols; i++)
+        if (i != 2 && !mines[i]) i,
+    ];
+    prng.shuffle(candidates);
+
+    for (var i = 0; i < minePairsNeeded - fixedMines.length; i++) {
+      final idx = candidates[i];
+      mines[idx] = true;
+      mines[total - 1 - idx] = true;
+    }
+
+    bool colHasSafe(int c) => !mines[c] || !mines[cols + c];
+
+    var allCovered = true;
+    for (var c = 0; c < cols; c++) {
+      final covered =
+          colHasSafe(c) ||
+          (c > 0 && colHasSafe(c - 1)) ||
+          (c + 1 < cols && colHasSafe(c + 1));
+      if (!covered) {
+        allCovered = false;
+        break;
+      }
+    }
+    if (!allCovered) continue;
+
+    final solution = computeSolutionFromMines(mines, cols, rows);
+    if (isSolved(solution)) {
+      return solution;
+    }
+  }
+
+  throw StateError('No se pudo generar una cuadrícula válida para $target');
+}
+
+/// Genera un tablero del grado [target] a partir de [seed], 100 % resoluble
+/// por lógica sin adivinar y con solución única.
 SudokuPuzzle? generate({
   required int seed,
   required Difficulty target,
-  int maxGrids = 12,
+  int maxGrids = 24,
   int digsPerGrid = 6,
 }) {
   for (var g = 0; g < maxGrids; g++) {
-    // Semilla derivada, no `seed + attempt`: sembrar con enteros contiguos
-    // daría rejillas emparentadas y los intentos se parecerían entre sí.
     final gridSeed = _mix(seed, g);
-    final solution = generateFullGrid(Prng(gridSeed));
+    final solution = generateFullGrid(Prng(gridSeed), target);
 
-    // Varios vaciados por rejilla. Generar la rejilla llena es lo caro, y el
-    // grado depende much0 más del ORDEN en que se vacía que de la rejilla:
-    // reutilizarla y rebarajar el orden explora el espacio mucho más barato
-    // que empezar de cero cada vez.
     for (var d = 0; d < digsPerGrid; d++) {
       final digSeed = _mix(gridSeed, d + 1);
       final puzzle = _dig(solution, Prng(digSeed), target);
       final clues = puzzle.where((v) => v != 0).length;
       final report = solveLogically(puzzle);
       if (gradeFor(report, clues) != target) continue;
-
-      // Cinturón y tirantes: el vaciado solo quita casillas cuando la unicidad
-      // aguanta, así que esto debería ser siempre cierto. Se comprueba igual
-      // porque un puzle con dos soluciones que llegue al banco es irreparable
-      // una vez publicado, y el coste de mirarlo es una llamada más.
-      assert(countSolutions(puzzle, limit: 2) == 1);
+      if (countSolutions(puzzle, limit: 2) != 1) continue;
 
       return SudokuPuzzle(
         givens: encodeGrid(puzzle),
@@ -157,71 +149,110 @@ SudokuPuzzle? generate({
   return null;
 }
 
-/// Vacía casillas por parejas simétricas mientras la solución siga siendo
-/// única **y el puzle no se pase del grado buscado**.
-///
-/// La segunda condición es la que de verdad controla la dificultad. El primer
-/// intento fue vaciar hasta un número de pistas propio de cada grado y graduar
-/// al final, confiando en que saliera el grado pedido; no sale. La dificultad
-/// de un sudoku no la determina cuántas pistas tiene, así que ese vaciado a
-/// ciegas producía puzles de cualquier grado y los intentos se agotaban sin
-/// converger. Comprobando el grado en **cada** retirada, el puzle no puede
-/// pasarse: termina siempre en el grado buscado o por debajo, y basta con
-/// reintentar cuando se queda corto.
-///
-/// La simetría de 180° es puramente estética —es como se ven los sudokus de
-/// periódico— y sale gratis: cuesta lo mismo intentar quitar dos casillas que
-/// una.
+/// Rango de pistas iniciales abiertas (`clues`) buscado para cada nivel.
+({int minClues, int maxClues, Technique maxTechnique}) _targetBounds(
+  Difficulty target,
+) => switch (target) {
+  Difficulty.easy => (
+    minClues: 32,
+    maxClues: 40,
+    maxTechnique: Technique.hiddenSingle,
+  ),
+  Difficulty.medium => (
+    minClues: 28,
+    maxClues: 31,
+    maxTechnique: Technique.lockedCandidates,
+  ),
+  Difficulty.hard => (
+    minClues: 18,
+    maxClues: 27,
+    maxTechnique: Technique.xWing,
+  ),
+};
+
+/// Oculta casillas seguras por parejas simétricas a 180° mientras la disposición
+/// de minas siga siendo única y resoluble con lógica dentro del nivel [target].
 List<int> _dig(List<int> solution, Prng prng, Difficulty target) {
-  final puzzle = List<int>.of(solution);
-  final limits = digTargetFor(target);
+  final total = solution.length;
+  final half = total ~/ 2;
+  final bounds = _targetBounds(target);
 
-  // Parejas (i, 80-i) más el centro, que es su propio simétrico.
-  final pairs = <List<int>>[
-    for (var i = 0; i < cellCount ~/ 2; i++) [i, cellCount - 1 - i],
-    [cellCount ~/ 2],
-  ];
-  prng.shuffle(pairs);
+  // Parte con todas las casillas seguras descubiertas y todas las minas ocultas (0).
+  final puzzle = List<int>.generate(
+    total,
+    (i) => solution[i] == kMine ? 0 : solution[i],
+  );
 
-  var clues = cellCount;
-  // Varias pasadas: quitar una pareja cambia qué otras pueden salir, así que
-  // una sola pasada deja casillas retirables sin retirar. Se repite hasta que
-  // una pasada entera no consigue quitar nada.
+  // Protege hasta el final las pistas seguras de filas 0..1 y las casillas '0'
+  // de cobertura en la fila 3 (que despejan toda la fila 2 en la primera pasada
+  // del solucionador), vaciando primero el resto del tablero.
+  final cols = target.cols;
+  final row3CoverCols = switch (target) {
+    Difficulty.easy => const <int>{1, 4, 6},
+    Difficulty.medium => const <int>{1, 4, 7},
+    Difficulty.hard => const <int>{1, 4, 7, 8},
+  };
+  final priorityPairs = <List<int>>[];
+  final freePairs = <List<int>>[];
+  final anchorPairs = <List<int>>[];
+  for (var i = 0; i < half; i++) {
+    if (puzzle[i] == 0) continue;
+    final pair = <int>[i, total - 1 - i];
+    final r = i ~/ cols;
+    final c = i % cols;
+    final isAnchor = r < 2 || (r == 3 && row3CoverCols.contains(c));
+    if (isAnchor) {
+      anchorPairs.add(pair);
+    } else if (r == 2 && c == 2) {
+      priorityPairs.add(pair);
+    } else {
+      freePairs.add(pair);
+    }
+  }
+  prng.shuffle(freePairs);
+  prng.shuffle(anchorPairs);
+  final pairs = <List<int>>[...priorityPairs, ...freePairs, ...anchorPairs];
+
+  var clues = puzzle.where((v) => v != 0).length;
+
   var progress = true;
-  while (progress) {
+  while (progress && clues > bounds.minClues) {
     progress = false;
     for (final pair in pairs) {
       if (pair.every((cell) => puzzle[cell] == 0)) continue;
-      if (clues - pair.length < limits.minClues) continue;
+      if (clues - pair.length < bounds.minClues) continue;
 
-      final saved = [for (final cell in pair) puzzle[cell]];
-      for (final cell in pair) {
-        puzzle[cell] = 0;
-      }
-
-      void restore() {
-        for (var i = 0; i < pair.length; i++) {
-          puzzle[pair[i]] = saved[i];
+      // En fácil y medio, una vez dentro de la ventana de pistas y con el grado
+      // ya alcanzado, podemos detener el vaciado para preservar variedad.
+      if (clues <= bounds.maxClues) {
+        final curReport = solveLogically(puzzle);
+        if (gradeFor(curReport, clues) == target) {
+          return puzzle;
         }
       }
 
-      if (countSolutions(puzzle, limit: 2) != 1) {
-        restore();
-        continue;
+      final saved0 = puzzle[pair[0]];
+      final saved1 = puzzle[pair[1]];
+      puzzle[pair[0]] = 0;
+      puzzle[pair[1]] = 0;
+
+      void restore() {
+        puzzle[pair[0]] = saved0;
+        puzzle[pair[1]] = saved1;
       }
-      // El grado se mide con el solucionador lógico, no con las pistas: si
-      // esta retirada obliga a una técnica por encima del tope del grado (o a
-      // adivinar), la casilla se devuelve.
+
       final report = solveLogically(puzzle);
       if (!report.solved ||
-          (report.hardest?.rank ?? 0) > limits.maxTechnique.rank) {
+          (report.hardest?.rank ?? 0) > bounds.maxTechnique.rank) {
         restore();
         continue;
       }
+
       clues -= pair.length;
       progress = true;
     }
   }
+
   return puzzle;
 }
 

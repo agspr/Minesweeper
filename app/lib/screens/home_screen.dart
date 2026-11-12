@@ -24,6 +24,7 @@ import '../services/theme_controller.dart';
 import '../theme.dart';
 import '../widgets/difficulty_label.dart';
 import '../widgets/chip_de_racha_de_amigo.dart';
+import '../widgets/main_menu_title_tiles.dart';
 import '../widgets/sin_anuncios.dart';
 import 'game_screen.dart';
 import 'practice_screen.dart';
@@ -495,24 +496,19 @@ class _HomeScreenState extends State<HomeScreen>
         bottomNavigationBar: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // En pantallas muy bajas el banner se sacrifica: el tablero manda.
+            // En pantallas muy bajas o dentro de una partida (igual que CINCO,
+            // `pie_de_modo.dart`), el banner se desmonta por completo: el tablero
+            // manda y gana todo el espacio vertical para que las casillas sean
+            // grandes y cómodas al tacto.
             if (widget.banner != null &&
+                !_inGame &&
                 MediaQuery.sizeOf(context).height >= 700)
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // «Quitar anuncios», encima del banner, **solo fuera de la
-                  // partida**: en el menú y las pestañas, no debajo de un
-                  // tablero, que ya comparte el alto con el banner grande.
-                  //
-                  // Siempre montada, y siempre el primer hijo, con alto 0
-                  // cuando no toca: así el banner no cambia de sitio en la
-                  // columna al entrar en una partida. Cambiar de sitio lo
-                  // montaría de nuevo, sin hueco reservado, y el anuncio se
-                  // volvería a pedir (lo mismo en CINCO, `pie_de_modo.dart`).
                   FranjaSinAnuncios(
                     compras: widget.purchases,
-                    visible: !_inGame,
+                    visible: true,
                   ),
                   widget.banner!,
                 ],
@@ -585,143 +581,167 @@ class _Menu extends StatelessWidget {
             // terminado no es ni hoy ni ayer, ya está rota.
             final streak = progress.streakAsOf(DateTime.now());
 
-            return Center(
-              child: ConstrainedBox(
-                // 520 es el de CINCO (`Adaptive.gameMaxWidth`). En tablet el
-                // menú no se estira: se queda de este ancho y centrado.
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: LayoutBuilder(
-                  builder: (context, c) => SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(22, 12, 22, 16),
+            return LayoutBuilder(
+              builder: (context, c) {
+                final isWide =
+                    c.maxWidth >= 640 && c.maxWidth > c.maxHeight * 1.08;
+                final streakGap = (c.maxHeight * 0.026).clamp(14.0, 24.0);
+                final cardGap = (c.maxHeight * 0.020).clamp(12.0, 18.0);
+
+                final heroZone = Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MainMenuTitleTiles(
+                      tileSize: isWide
+                          ? (c.maxWidth * 0.048).clamp(42.0, 52.0)
+                          : null,
+                    ),
+                    if (streak > 0) ...[
+                      SizedBox(height: streakGap),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: NonaColors.accentChip,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          l.menuStreak(streak),
+                          style: TextStyle(
+                            fontSize: 18.5,
+                            fontWeight: FontWeight.w700,
+                            color: NonaColors.accent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+
+                final actionZone = Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _AvisoSiYaEstaba(
+                      versiones: versiones,
+                      onActualizar: onActualizar,
+                    ),
+                    _ModeCard(
+                      title: l.menuDaily,
+                      subtitle: daily.difficulty == null
+                          ? l.menuLoading
+                          : done
+                          ? l.menuDailyDone(
+                              difficultyLabel(context, daily.difficulty!),
+                            )
+                          : l.menuDailyToday(
+                              difficultyLabel(context, daily.difficulty!),
+                            ),
+                      icon: Icons.today_rounded,
+                      // La recomendada AHORA: la diaria si no se ha
+                      // jugado, el modo práctica si ya está hecha.
+                      primary: !done,
+                      trailing: done
+                          ? const Icon(
+                              Icons.check_circle_rounded,
+                              color: Color(0xFF3DDC84),
+                              size: 22,
+                            )
+                          : null,
+                      onTap: onDaily,
+                    ),
+                    SizedBox(height: cardGap),
+                    _ModeCard(
+                      title: l.menuPractice,
+                      subtitle: l.menuPracticeSubtitle,
+                      icon: Icons.all_inclusive_rounded,
+                      primary: done,
+                      onTap: onPractice,
+                    ),
+                  ],
+                );
+
+                if (isWide) {
+                  // Plegables abiertos en horizontal, tablets apaisadas,
+                  // portátiles y monitores de escritorio: reparto en dos
+                  // columnas equilibradas (identidad a la izquierda, tarjetas
+                  // de juego a la derecha).
+                  final colGap = (c.maxWidth * 0.045).clamp(28.0, 56.0);
+                  return Center(
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: c.maxHeight - 28),
-                      child: Column(
-                        // Centrado vertical, que es lo que hace que esto
-                        // funcione igual en un iPhone SE y en un iPad sin
-                        // casos especiales.
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 8),
-                          // El logo de Nona (Claude Design, 28-8-2026): Figtree
-                          // Light con tracking amplio, no una imagen — así sigue
-                          // coloreado por el acento del tema, igual que antes.
-                          //
-                          // letterSpacing e fontWeight leídos del diseño: la
-                          // fuente y los valores de tracking (32px sobre el
-                          // título, 11px sobre el subtítulo) los dio la propia
-                          // sesión de diseño, a la escala en la que se dibujó el
-                          // logo (~195px de título) — proporción
-                          // letterSpacing/fontSize ≈0.1636. Al agrandar el
-                          // título (pedido de André, 28-8-2026) el tracking
-                          // escala CON él para no perder esa proporción; la
-                          // banda de alto crece igual para que el texto no se
-                          // recorte contra el borde.
-                          SizedBox(
-                            // 80 y no 112: el doble del original se probó y se
-                            // descartó por tamaño (André, 3-9-2026). Éste sube
-                            // el logo sin que se coma el menú.
-                            height: 118,
-                            child: Center(
-                              child: Text(
-                                // En VERSALES, como el diseño: no es un
-                                // adorno tipográfico — con Figtree Light el
-                                // contraste mayúscula/minúscula queda débil, y
-                                // todo en mayúsculas es lo que sostiene la
-                                // lectura del logo a este tamaño.
-                                l.appName.toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 80,
-                                  fontWeight: FontWeight.w300,
-                                  letterSpacing: 13.1,
-                                  color: NonaColors.accent,
-                                ),
-                              ),
-                            ),
+                      constraints: const BoxConstraints(maxWidth: 1040),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: (c.maxHeight - 32).clamp(0.0, double.infinity),
                           ),
-                          const SizedBox(height: 18),
-                          Text(
-                            // En VERSALITAS como CINCO. Se hace aquí y no en
-                            // el ARB para no obligar a cada traducción a
-                            // acordarse de las mayúsculas.
-                            l.appTagline.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 3.6,
-                              color: NonaColors.muted,
-                            ),
-                          ),
-                          if (streak > 0) ...[
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 7,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 10,
+                                child: Center(child: heroZone),
                               ),
-                              decoration: BoxDecoration(
-                                color: NonaColors.accentChip,
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: Text(
-                                l.menuStreak(streak),
-                                style: TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w700,
-                                  color: NonaColors.accent,
-                                ),
-                              ),
-                            ),
-                          ],
-                          const SizedBox(height: 40),
-                          _AvisoSiYaEstaba(
-                            versiones: versiones,
-                            onActualizar: onActualizar,
-                          ),
-                          _ModeCard(
-                            title: l.menuDaily,
-                            subtitle: daily.difficulty == null
-                                ? l.menuLoading
-                                : done
-                                ? l.menuDailyDone(
-                                    difficultyLabel(context, daily.difficulty!),
-                                  )
-                                : l.menuDailyToday(
-                                    difficultyLabel(context, daily.difficulty!),
+                              SizedBox(width: colGap),
+                              Expanded(
+                                flex: 11,
+                                child: Center(
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 480,
+                                    ),
+                                    child: actionZone,
                                   ),
-                            icon: Icons.today_rounded,
-                            // La recomendada AHORA: la diaria si no se ha
-                            // jugado, el modo práctica si ya está hecha.
-                            primary: !done,
-                            trailing: done
-                                ? const Icon(
-                                    Icons.check_circle_rounded,
-                                    color: Color(0xFF3DDC84),
-                                    size: 22,
-                                  )
-                                : null,
-                            onTap: onDaily,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 12),
-                          _ModeCard(
-                            title: l.menuPractice,
-                            subtitle: l.menuPracticeSubtitle,
-                            icon: Icons.all_inclusive_rounded,
-                            primary: done,
-                            onTap: onPractice,
-                          ),
-                          // 8 de separación + 40 de sesgo. La columna va
-                          // centrada, así que un hueco al final empuja el
-                          // bloque visible hacia arriba la MITAD: 20 pt.
-                          // Centrado óptico — el contenido centrado de verdad
-                          // se lee un poco bajo. Copiado de CINCO con su
-                          // motivo.
-                          const SizedBox(height: 8 + 40),
-                        ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Teléfonos, plegables verticales y tablets en vertical:
+                // distribución proporcional sin texto redundante ni empuje
+                // artificial inferior, equilibrando el aire sobre el rótulo,
+                // entre el rótulo y las tarjetas, y sobre el banner inferior.
+                final maxCardWidth = c.maxWidth >= 540 ? 560.0 : 500.0;
+                final heroToCardsGap = (c.maxHeight * 0.095).clamp(24.0, 76.0);
+                final topOpticalBalance = (c.maxHeight * 0.022).clamp(4.0, 20.0);
+
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxCardWidth),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 22,
+                        vertical: 14,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: (c.maxHeight - 28).clamp(0.0, double.infinity),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: topOpticalBalance),
+                            heroZone,
+                            SizedBox(height: heroToCardsGap),
+                            actionZone,
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         ),

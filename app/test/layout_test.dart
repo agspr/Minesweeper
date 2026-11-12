@@ -10,7 +10,7 @@ import 'package:nona/nona_config.dart';
 import 'package:nona/screens/game_screen.dart';
 import 'package:nona/screens/home_screen.dart';
 import 'package:nona/screens/practice_screen.dart';
-import 'package:nona/widgets/numpad.dart';
+import 'package:nona/widgets/sudoku_board_view.dart';
 import 'package:nona/services/progress_controller.dart';
 import 'package:nona/services/theme_controller.dart';
 
@@ -57,6 +57,11 @@ void main() {
     // Split View: media pantalla de un 12.9". Sigue siendo "tablet" por el
     // lado corto, pero el ancho ya no da para el reparto de dos columnas.
     'iPad Pro 12.9" a media pantalla': Size(683, 1024),
+    // Plegables abiertos (vertical y horizontal) y pantallas de portátil / escritorio.
+    'Plegable abierto vertical': Size(585, 820),
+    'Plegable abierto apaisado': Size(820, 585),
+    'Portátil 13"': Size(1280, 800),
+    'Escritorio Full HD': Size(1920, 1080),
   };
 
   /// Las DOS escalas, cruzadas con todas las medidas.
@@ -228,7 +233,7 @@ void main() {
           isNull,
           reason: 'práctica desborda en ${entry.key} con ${escala.key}',
         );
-        expect(find.byType(Numpad), findsOneWidget);
+        expect(find.byType(SudokuBoardView), findsOneWidget);
       });
 
       testWidgets('sin desbordes en el menú · ${entry.key} · ${escala.key}', (

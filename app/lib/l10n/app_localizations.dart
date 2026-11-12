@@ -100,19 +100,19 @@ abstract class L {
   /// No description provided for @appName.
   ///
   /// In es, this message translates to:
-  /// **'Nona'**
+  /// **'Buscaminas'**
   String get appName;
 
   /// No description provided for @appTagline.
   ///
   /// In es, this message translates to:
-  /// **'Sudoku del día'**
+  /// **'Reto diario'**
   String get appTagline;
 
   /// No description provided for @menuDaily.
   ///
   /// In es, this message translates to:
-  /// **'Sudoku del día'**
+  /// **'Reto diario'**
   String get menuDaily;
 
   /// No description provided for @menuDailyToday.
@@ -448,7 +448,7 @@ abstract class L {
   /// No description provided for @aboutNona.
   ///
   /// In es, this message translates to:
-  /// **'Acerca de Nona'**
+  /// **'Acerca de Buscaminas'**
   String get aboutNona;
 
   /// No description provided for @aboutSubtitle.
@@ -460,7 +460,7 @@ abstract class L {
   /// No description provided for @aboutBody.
   ///
   /// In es, this message translates to:
-  /// **'Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.'**
+  /// **'Buscaminas es un juego diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.'**
   String get aboutBody;
 
   /// No description provided for @boardColourOn.
@@ -484,7 +484,7 @@ abstract class L {
   /// Rótulo de la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget.
   ///
   /// In es, this message translates to:
-  /// **'El sudoku de hoy'**
+  /// **'El buscaminas de hoy'**
   String get sceneTodaysSudoku;
 
   /// Rótulo del dato de errores en la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget.

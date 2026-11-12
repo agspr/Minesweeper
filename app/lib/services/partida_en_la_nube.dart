@@ -50,18 +50,20 @@ abstract interface class AlmacenDePartida {
 }
 
 class AlmacenDePartidaFirestore implements AlmacenDePartida {
-  const AlmacenDePartidaFirestore();
+  const AlmacenDePartidaFirestore([this.documento = kDocumento]);
 
   /// El nombre lleva el juego, como el de CINCO: el día que el servidor sepa
   /// borrarla al quitar un juego de la cuenta, la busca por ese nombre.
-  static const kDocumento = 'partidaEnCurso_nona';
+  static const kDocumento = 'partidaEnCurso_minesweeper';
+
+  final String documento;
 
   DocumentReference<Map<String, dynamic>> _doc(String uid) => FirebaseFirestore
       .instance
       .collection('users')
       .doc(uid)
       .collection('private')
-      .doc(kDocumento);
+      .doc(documento);
 
   @override
   Future<Map<String, dynamic>?> leer(String uid) async =>

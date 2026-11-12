@@ -12,8 +12,19 @@ void main() {
     dayKey: '2026-08-17',
     difficulty: d,
     completed: true,
+    lost: false,
     mistakes: mistakes,
     completionPercent: 100,
+    seconds: 0,
+  );
+
+  DailyOutcome lostGame(Difficulty d) => DailyOutcome(
+    dayKey: '2026-08-17',
+    difficulty: d,
+    completed: false,
+    lost: true,
+    mistakes: 3,
+    completionPercent: 40,
     seconds: 0,
   );
 
@@ -22,6 +33,7 @@ void main() {
         dayKey: '2026-08-17',
         difficulty: d,
         completed: false,
+        lost: false,
         mistakes: mistakes,
         completionPercent: percent,
         seconds: 0,
@@ -44,18 +56,16 @@ void main() {
     });
   });
 
-  group('la escalera completa del documento §4', () {
-    // Fila a fila, tal cual está impresa: fácil(50) · medio(100) · difícil(150).
+  group('la escalera completa de Buscaminas', () {
+    // Fila a fila: fácil(50) · medio(100) · difícil(150).
+    // Cada mina cuesta 15% de la base.
     const ladder = <String, (int, int, int)>{
       'limpia (100%)': (50, 100, 150),
-      '1 fallo (90%)': (45, 90, 135),
-      '2 fallos (80%)': (40, 80, 120),
-      '3 fallos (70%)': (35, 70, 105),
-      '4 fallos (60%)': (30, 60, 90),
-      '5+ fallos, suelo (50%)': (25, 50, 75),
+      '1 mina (-15%)': (42, 85, 127),
+      '2 minas (-30%)': (35, 70, 105),
     };
 
-    test('terminando, por número de fallos', () {
+    test('terminando con victoria, por número de fallos', () {
       var mistakes = 0;
       for (final row in ladder.entries) {
         final (easy, medium, hard) = row.value;
@@ -76,6 +86,12 @@ void main() {
         );
         mistakes++;
       }
+    });
+
+    test('derrota por 3 minas: 15% fijo de participación', () {
+      expect(scoreDaily(lostGame(Difficulty.easy)).points, 8);
+      expect(scoreDaily(lostGame(Difficulty.medium)).points, 15);
+      expect(scoreDaily(lostGame(Difficulty.hard)).points, 23);
     });
 
     test('los tramos parciales', () {
@@ -113,22 +129,16 @@ void main() {
   });
 
   group('fallos', () {
-    test('a partir de 5 ya no restan más', () {
+    test('a partir de 3 ya no restan más (tope de derrota)', () {
       for (final d in Difficulty.values) {
-        final floor = scoreDaily(finished(d, 5)).points;
-        for (final n in [6, 7, 12, 81, 999]) {
+        final floor = scoreDaily(finished(d, 3)).points;
+        for (final n in [4, 5, 7, 12, 81, 999]) {
           expect(
             scoreDaily(finished(d, n)).points,
             floor,
             reason: '$n fallos en $d deberían quedarse en el suelo',
           );
         }
-      }
-    });
-
-    test('el suelo es exactamente la mitad de la base', () {
-      for (final d in Difficulty.values) {
-        expect(scoreDaily(finished(d, 5)).points, baseFor(d) ~/ 2);
       }
     });
 
@@ -139,8 +149,6 @@ void main() {
     });
 
     test('los parciales NO descuentan por fallos', () {
-      // Regla del §4: el parcial va por avance y nada más. Se sostiene porque el
-      // avance solo cuenta casillas correctas.
       for (final d in Difficulty.values) {
         final limpio = scoreDaily(partial(d, 80)).points;
         final sucio = scoreDaily(partial(d, 80, mistakes: 40)).points;
@@ -203,11 +211,11 @@ void main() {
   });
 
   group('racha', () {
-    test('solo la da terminar (§1)', () {
+    test('la da terminar (victoria o derrota), nunca abandonar a medias', () {
       expect(scoreDaily(finished(Difficulty.easy, 0)).extendsStreak, isTrue);
-      expect(scoreDaily(finished(Difficulty.easy, 99)).extendsStreak, isTrue);
-      // Un parcial altísimo puntúa pero NO da racha: si la diera, una casilla al
-      // día mantendría una racha infinita.
+      expect(scoreDaily(finished(Difficulty.easy, 2)).extendsStreak, isTrue);
+      expect(scoreDaily(lostGame(Difficulty.easy)).extendsStreak, isTrue);
+      // Un parcial no alarga racha
       expect(scoreDaily(partial(Difficulty.hard, 99)).extendsStreak, isFalse);
       expect(scoreDaily(partial(Difficulty.hard, 0)).extendsStreak, isFalse);
     });
@@ -215,9 +223,9 @@ void main() {
 
   group('desglose para la pantalla de resultado (§4)', () {
     test('terminando trae base, fallos contados y lo restado', () {
-      final s = scoreDaily(finished(Difficulty.medium, 3));
+      final s = scoreDaily(finished(Difficulty.medium, 2));
       expect(s.base, 100);
-      expect(s.countedMistakes, 3);
+      expect(s.countedMistakes, 2);
       expect(s.mistakePenalty, 30);
       expect(s.points, 70);
       expect(
@@ -228,11 +236,13 @@ void main() {
       expect(s.partialFraction, isNull);
     });
 
-    test('el desglose topa los fallos igual que los puntos', () {
-      final s = scoreDaily(finished(Difficulty.easy, 9));
-      expect(s.countedMistakes, 5);
-      expect(s.mistakePenalty, 25);
-      expect(s.points, 25);
+    test('derrota trae participación fija del 15% y 3 minas', () {
+      final s = scoreDaily(lostGame(Difficulty.medium));
+      expect(s.lost, isTrue);
+      expect(s.points, 15);
+      expect(s.countedMistakes, 3);
+      expect(s.mistakePenalty, 85);
+      expect(s.extendsStreak, isTrue);
     });
 
     test('a medias trae el tramo aplicado y no penaliza', () {

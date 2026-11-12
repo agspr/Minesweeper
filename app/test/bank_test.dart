@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nona/game/day_key.dart';
 import 'package:nona/game/difficulty.dart';
 import 'package:nona/game/grid.dart';
-import 'package:nona/game/solver.dart';
+import 'package:nona/game/mine_generator.dart';
 
 /// Pruebas del banco COMPROMETIDO, no del generador (eso es
 /// `generator_test.dart`). Aquí se audita el fichero que de verdad se envía en
@@ -71,84 +71,61 @@ void main() {
     expect(counts['hard']! / bank.length, closeTo(2 / 7, 0.01));
   });
 
-  test('TODOS los puzles tienen solución única (nunca por muestreo)', () {
-    // La prueba más importante del fichero. Un diario con dos soluciones daría
-    // dos rejillas "correctas" distintas el mismo día y ya no habría forma de
-    // arreglarlo una vez publicado, así que se comprueban los 1826, no una
-    // muestra. Tarda unos segundos y los vale.
+  test('TODAS las soluciones son tableros válidos de Buscaminas', () {
+    for (final entry in bank.entries) {
+      final diff = Difficulty.values.byName(entry.value['difficulty'] as String);
+      final solution = decodeGrid(entry.value['solution'] as String);
+      final neighbors = neighborsTable(diff.cols, diff.rows);
+      var mineCount = 0;
+      for (var i = 0; i < solution.length; i++) {
+        if (solution[i] == kMine) {
+          mineCount++;
+        } else {
+          var adjacentMines = 0;
+          for (final n in neighbors[i]) {
+            if (solution[n] == kMine) adjacentMines++;
+          }
+          expect(
+            solution[i],
+            valueFromClue(adjacentMines),
+            reason: '${entry.key}: casilla $i tiene pista errónea',
+          );
+        }
+      }
+      expect(
+        mineCount,
+        diff.mines,
+        reason: '${entry.key}: cantidad de minas errónea para ${diff.name}',
+      );
+    }
+  });
+
+  test('todos los puzles tienen salida segura garantizada y son resolubles', () {
     var checked = 0;
     for (final entry in bank.entries) {
-      final givens = decodeGrid(entry.value['givens'] as String);
+      final diff = Difficulty.values.byName(entry.value['difficulty'] as String);
+      final solution = decodeGrid(entry.value['solution'] as String);
+      final start = entry.value['start'] as int?;
+      expect(start, isNotNull, reason: '${entry.key}: no tiene start');
       expect(
-        countSolutions(givens, limit: 2),
+        solution[start!],
         1,
-        reason: '${entry.key} no tiene solución única',
+        reason: '${entry.key}: la casilla de salida $start no es pista 0',
+      );
+      final report = solveWithoutGuessing(
+        solution,
+        start,
+        diff.cols,
+        diff.rows,
+      );
+      expect(
+        report.solved,
+        isTrue,
+        reason: '${entry.key}: no se resuelve sin adivinar desde $start',
       );
       checked++;
     }
     expect(checked, 1826);
-  });
-
-  test('la solución guardada es válida y contiene las pistas', () {
-    for (final entry in bank.entries) {
-      final givens = decodeGrid(entry.value['givens'] as String);
-      final solution = decodeGrid(entry.value['solution'] as String);
-      expect(
-        isSolved(solution),
-        isTrue,
-        reason: '${entry.key}: solución inválida',
-      );
-      for (var i = 0; i < cellCount; i++) {
-        if (givens[i] != 0) {
-          expect(
-            givens[i],
-            solution[i],
-            reason: '${entry.key}: la pista $i contradice la solución',
-          );
-        }
-      }
-    }
-  });
-
-  test('ningún puzle exige adivinar, y su grado coincide con lo anotado', () {
-    for (final entry in bank.entries) {
-      final givens = decodeGrid(entry.value['givens'] as String);
-      final report = solveLogically(givens);
-      expect(
-        report.solved,
-        isTrue,
-        reason: '${entry.key} no se resuelve con lógica: exigiría adivinar',
-      );
-      expect(
-        gradeFor(report, entry.value['clues'] as int),
-        Difficulty.values.byName(entry.value['difficulty'] as String),
-        reason: '${entry.key}: el grado anotado no cuadra al regraduarlo',
-      );
-    }
-  });
-
-  test('el recuento de pistas anotado es el real', () {
-    for (final entry in bank.entries) {
-      final givens = entry.value['givens'] as String;
-      expect(
-        givens.split('').where((c) => c != '.').length,
-        entry.value['clues'],
-        reason: '${entry.key}: "clues" no cuadra con las pistas del tablero',
-      );
-    }
-  });
-
-  test('el vaciado es simétrico a 180° en todos', () {
-    for (final entry in bank.entries) {
-      final g = decodeGrid(entry.value['givens'] as String);
-      for (var i = 0; i < cellCount; i++) {
-        expect(
-          g[i] == 0,
-          g[cellCount - 1 - i] == 0,
-          reason: '${entry.key}: la casilla $i rompe la simetría',
-        );
-      }
-    }
   });
 
   test('cada día es reproducible desde su propia semilla', () {

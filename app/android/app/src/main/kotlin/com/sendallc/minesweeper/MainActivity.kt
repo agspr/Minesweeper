@@ -1,4 +1,4 @@
-package com.nonaapp.nona
+package com.sendallc.minesweeper
 
 import io.flutter.embedding.android.FlutterActivity
 

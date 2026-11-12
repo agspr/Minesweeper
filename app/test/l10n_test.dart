@@ -55,11 +55,7 @@ void main() {
     });
 
     test('la fila "Acerca de" se llama igual en los dos juegos', () {
-      // El dueño pidió que esa fila sea IDÉNTICA en Nona y en CINCO, y CINCO
-      // es la referencia: allí pone "Acerca de CINCO". Es la clase de detalle
-      // que se vuelve a torcer sin que nadie lo note, porque cada app se mira
-      // por separado y por separado las dos parecen bien.
-      expect(es['aboutNona'], 'Acerca de Nona');
+      expect(es['aboutNona'], 'Acerca de Buscaminas');
       expect(en['aboutNona'], startsWith('About '));
     });
 
@@ -82,7 +78,7 @@ void main() {
       // así que cualquier OTRA que coincida sale a la luz.
       // "pts" es igual en los dos idiomas, igual que el nombre de la app y
       // "Total". Cualquier OTRA coincidencia es una traducción sin hacer.
-      const coincidenOk = {'appName', 'breakdownTotal', 'shareScore'};
+      const coincidenOk = {'breakdownTotal', 'shareScore'};
       final iguales = <String>[];
       for (final k in keysOf(es)) {
         if (coincidenOk.contains(k)) continue;
@@ -96,8 +92,10 @@ void main() {
     Future<L> load(Locale locale) => L.delegate.load(locale);
 
     test('el español y el inglés cargan', () async {
-      expect((await load(const Locale('es'))).appTagline, 'Sudoku del día');
-      expect((await load(const Locale('en'))).appTagline, 'Daily Sudoku');
+      expect((await load(const Locale('es'))).appName, 'Buscaminas');
+      expect((await load(const Locale('en'))).appName, 'Minesweeper');
+      expect((await load(const Locale('es'))).appTagline, 'Reto diario');
+      expect((await load(const Locale('en'))).appTagline, 'Daily Challenge');
     });
 
     test('los plurales concuerdan en los dos idiomas', () async {

@@ -1,8 +1,8 @@
 {
   "@@locale": "en",
-  "appName": "Nona",
-  "appTagline": "Daily Sudoku",
-  "menuDaily": "Daily sudoku",
+  "appName": "Minesweeper",
+  "appTagline": "Daily Challenge",
+  "menuDaily": "Daily challenge",
   "menuDailyToday": "{difficulty} · today",
   "menuDailyDone": "Done · {difficulty}",
   "menuLoading": "Loading…",
@@ -58,9 +58,9 @@
   "statsTotalPoints": "Points",
   "statsAvgMistakes": "Mistakes per day",
   "more": "More",
-  "aboutNona": "About Nona",
+  "aboutNona": "About Minesweeper",
   "aboutSubtitle": "Who we are, terms, privacy and contact",
-  "aboutBody": "Nona is a daily sudoku built by SENDA LLC in Puerto Rico. Every day brings a new puzzle, the same one for everyone, with difficulty set by the day of the week. There’s also a practice mode with unlimited puzzles that gives no points or streak, and a leaderboard to play alongside your friends.",
+  "aboutBody": "Minesweeper is a daily minesweeper built by SENDA LLC in Puerto Rico. Every day brings a new puzzle, the same one for everyone, with difficulty set by the day of the week. There’s also a practice mode with unlimited puzzles that gives no points or streak, and a leaderboard to play alongside your friends.",
   "boardColourOn": "Board in colour",
   "boardColourOff": "Board in grey",
   "menuStreak": "{count, plural, one{🔥 1 day streak} other{🔥 {count} day streak}}",
@@ -71,7 +71,7 @@
       }
     }
   },
-  "sceneTodaysSudoku": "Today's sudoku",
+  "sceneTodaysSudoku": "Today's minesweeper",
   "sceneMistakes": "Mistakes",
   "scenePoints": "Points",
   "sceneStreakDays": "{count, plural, one{day streak} other{day streak}}",

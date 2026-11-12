@@ -14,12 +14,12 @@ import 'package:nona/nona_config.dart';
 /// Lo que NO cubre está en `docs/NUEVO-JUEGO.md`, y lo primero de esa lista es
 /// lo que más caro sale: dar de alta el juego en `backend/functions/games.js`.
 void main() {
-  test('Nona conforma con la plataforma', () {
+  test('Minesweeper conforma con la plataforma', () {
     final incumple = SendaGameConformance.violations(nonaConfig);
     expect(
       incumple,
       isEmpty,
-      reason: 'Nona no conforma:\n${incumple.join('\n')}',
+      reason: 'Minesweeper no conforma:\n${incumple.join('\n')}',
     );
   });
   test('Android declara su icono de avisos', () {

@@ -137,15 +137,14 @@ void main() {
 
     test('no está resuelto mientras quede una casilla mal', () {
       final b = fresh();
-      int? last;
-      for (var cell = 0; cell < cellCount; cell++) {
-        if (!b.isGiven(cell)) {
-          last = cell;
+      final empties = [for (var i = 0; i < cellCount; i++) if (!b.isGiven(i)) i];
+      final last = empties.last;
+      for (final cell in empties) {
+        if (cell != last) {
           b.place(cell, b.solution[cell]);
         }
       }
-      final right = b.solution[last!];
-      b.erase(last);
+      final right = b.solution[last];
       b.place(last, right == 9 ? 1 : right + 1);
       expect(b.isComplete, isFalse);
       expect(b.isWrong(last), isTrue);
@@ -233,13 +232,15 @@ void main() {
   group('numpad', () {
     test('cuenta cuántas quedan de cada dígito', () {
       final b = fresh();
+      final totalOnes = b.solution.where((v) => v == 1).length;
       final placed = b.givens.where((v) => v == 1).length;
-      expect(b.remainingOf(1), 9 - placed);
+      expect(b.remainingOf(1), totalOnes - placed);
       final (cell, right) = firstEmpty(b);
+      final totalRight = b.solution.where((v) => v == right).length;
       b.place(cell, right);
       expect(
         b.remainingOf(right),
-        9 - b.givens.where((v) => v == right).length - 1,
+        totalRight - b.givens.where((v) => v == right).length - 1,
       );
     });
   });

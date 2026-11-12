@@ -138,10 +138,10 @@ void main() {
       // Mezclarlos daría una media engañosamente buena: quien abandona a los
       // dos minutos apenas tuvo ocasión de fallar.
       final p = ProgressController(prefs);
-      p.record(finished(Difficulty.easy, mistakes: 4), DateTime(2026, 8, 10));
-      p.record(finished(Difficulty.easy, mistakes: 2), DateTime(2026, 8, 11));
+      p.record(finished(Difficulty.easy, mistakes: 3), DateTime(2026, 8, 10));
+      p.record(finished(Difficulty.easy, mistakes: 1), DateTime(2026, 8, 11));
       p.record(partial(Difficulty.easy, 10), DateTime(2026, 8, 12));
-      expect(p.averageMistakes, 3.0);
+      expect(p.averageMistakes, 2.0);
     });
 
     test('sin días terminados no hay media', () {

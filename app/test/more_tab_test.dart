@@ -53,8 +53,8 @@ void main() {
     await montar(tester);
     // La fila vive al final de una lista larga: sin traerla a pantalla, el
     // ListView ni siquiera la construye.
-    await tester.scrollUntilVisible(find.text('Acerca de Nona'), 200);
-    expect(find.text('Acerca de Nona'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Acerca de Buscaminas'), 200);
+    expect(find.text('Acerca de Buscaminas'), findsOneWidget);
   });
 
   test('«Bloqueados» sale solo si hay alguien bloqueado, y la lista se carga', () {

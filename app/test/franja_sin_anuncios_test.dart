@@ -96,13 +96,18 @@ void main() {
       reason: 'justo encima del banner, sin taparlo',
     );
 
-    await tester.tap(find.text('Sudoku del día'));
+    await tester.tap(find.text('Reto diario'));
     await tester.pumpAndSettle();
+    // Dentro de una partida el banner y la franja se DESMONTAN por completo
+    // (igual que en CINCO), dando todo el espacio vertical al tablero.
     expect(enlace, findsNothing);
-    expect(tester.getSize(find.byType(FranjaSinAnuncios)).height, 0);
+    expect(find.byType(FranjaSinAnuncios), findsNothing);
+    expect(find.byType(_Banner), findsNothing);
 
-    // Y el banner es el mismo: entrar en la partida no lo volvió a montar.
-    expect(montados, [1], reason: 'el banner se montó de nuevo');
+    // Al volver al menú, el banner se vuelve a montar.
+    await tester.tap(find.byTooltip('Menú principal'));
+    await tester.pumpAndSettle();
+    expect(find.byType(_Banner), findsOneWidget);
   });
 
   testWidgets('su alto está desde el primer fotograma, haya producto o no', (

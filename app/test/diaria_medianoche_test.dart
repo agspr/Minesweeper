@@ -272,7 +272,7 @@ void main() {
         // lo estaba resolviendo.
         ahora = DateTime(2026, 9, 11, 22, 0);
         final daily = await montarMenu(tester);
-        await tester.tap(find.text('Sudoku del día'));
+        await tester.tap(find.text('Reto diario'));
         await tester.pump(const Duration(milliseconds: 300));
         expect(find.byType(GameScreen), findsOneWidget);
 
@@ -300,7 +300,7 @@ void main() {
         // 89 pruebas del menú en verde.
         ahora = DateTime(2026, 9, 11, 22, 0);
         final daily = await montarMenu(tester);
-        await tester.tap(find.text('Sudoku del día'));
+        await tester.tap(find.text('Reto diario'));
         await tester.pump(const Duration(milliseconds: 300));
 
         ahora = DateTime(2026, 9, 12, 8, 0);
@@ -309,7 +309,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 300));
         expect(find.byType(GameScreen), findsNothing);
 
-        await tester.tap(find.text('Sudoku del día'));
+        await tester.tap(find.text('Reto diario'));
         await tester.pump(const Duration(milliseconds: 300));
         final vacia = [
           for (var i = 0; i < cellCount; i++)
@@ -430,7 +430,7 @@ void main() {
         // al menú.
         ahora = DateTime(2026, 9, 11, 23, 59, 30);
         final daily = await montarMenu(tester);
-        await tester.tap(find.text('Sudoku del día'));
+        await tester.tap(find.text('Reto diario'));
         await tester.pump(const Duration(milliseconds: 300));
         final vacia = [
           for (var i = 0; i < cellCount; i++)
@@ -481,7 +481,7 @@ void main() {
           gameId: nonaGameId,
         );
         await montarMenu(tester, avisos: avisos);
-        await tester.tap(find.text('Sudoku del día'));
+        await tester.tap(find.text('Reto diario'));
         await tester.pump(const Duration(milliseconds: 300));
         avisos.abrirAmigosPara.value = '';
         await tester.pump(const Duration(milliseconds: 300));

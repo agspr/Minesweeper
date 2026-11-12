@@ -10,10 +10,10 @@ import 'package:juegos_senda/juegos_senda.dart';
 
 import 'theme.dart';
 
-/// Id del juego: espacio de nombres en Firestore (`users/{uid}/apps/nona`) y
+/// Id del juego: espacio de nombres en Firestore (`users/{uid}/apps/minesweeper`) y
 /// prefijo de sus Cloud Functions. Cambiarlo tras publicar significaría
 /// abandonar los datos de todo el mundo.
-const String nonaGameId = 'nona';
+const String nonaGameId = 'minesweeper';
 
 /// Las invitaciones cruzadas están ENCENDIDAS desde el 25-8-2026.
 ///
@@ -36,17 +36,17 @@ const bool kInvitesEnabled = true;
 
 final GameConfig nonaConfig = GameConfig(
   gameId: nonaGameId,
-  appName: 'Nona',
-  appleBundleId: 'com.nonaapp.nona',
-  // No es 'Nona'. El App ID de Nona esta agrupado bajo el primario de CINCO,
-  // y esta MEDIDO (2026-08-17) que quien solo tenga Nona ve *CINCO* en
-  // Ajustes -> Iniciar sesion con Apple. Poner aqui el nombre del juego
-  // mandaria a buscar una entrada que no existe, justo cuando esa persona ya
-  // borro su cuenta y no puede volver a preguntar.
+  appName: 'Minesweeper',
+  appleBundleId: 'com.sendallc.minesweeper',
+  // No es 'Minesweeper'. El App ID está agrupado bajo el primario de CINCO,
+  // y está MEDIDO (2026-08-17) que quien solo tenga esta app ve *CINCO* en
+  // Ajustes -> Iniciar sesión con Apple. Poner aquí el nombre del juego
+  // mandaría a buscar una entrada que no existe, justo cuando esa persona ya
+  // borró su cuenta y no puede volver a preguntar.
   appleSignInEntryName: 'CINCO',
 
   // Disposición LIMPIA, nunca la heredada de CINCO: los puntos van a
-  // users/{uid}/apps/nona y los días a .../days/{día}. Escribir en `games`
+  // users/{uid}/apps/minesweeper y los días a .../days/{día}. Escribir en `games`
   // metería documentos en la colección viva de CINCO (§3.2).
   dataLayout: const SendaDataLayout.namespaced(nonaGameId),
 
@@ -60,42 +60,35 @@ final GameConfig nonaConfig = GameConfig(
     interstitialIos: 'ca-app-pub-5030233210775781/2528033906',
   ),
 
-  iap: const IapConfig(removeAdsId: 'com.nonaapp.nona.removeads'),
+  iap: const IapConfig(removeAdsId: 'com.sendallc.minesweeper.removeads'),
 
   legal: LegalUrls(
     // Cada juego con las SUYAS: la política que enseña una ficha de tienda
     // tiene que ser la de esa app (§8). Las páginas las publica el agente de
-    // sendapr; estas URLs son las acordadas para Nona.
-    privacy: Uri.parse('https://sendapr.com/privacy/nona/'),
-    terms: Uri.parse('https://sendapr.com/terms/nona/'),
-    accountDeletion: Uri.parse('https://sendapr.com/delete-account/nona/'),
+    // sendapr; estas URLs son las acordadas para Minesweeper.
+    privacy: Uri.parse('https://sendapr.com/privacy/minesweeper/'),
+    terms: Uri.parse('https://sendapr.com/terms/minesweeper/'),
+    accountDeletion: Uri.parse(
+      'https://sendapr.com/delete-account/minesweeper/',
+    ),
   ),
 
   // Bilingüe desde el primer día (diseño §0). CINCO seguirá siendo solo
   // español; el paquete no supone ninguno de los dos.
   supportedLocales: const [Locale('es'), Locale('en')],
 
-  // Con qué color se abre Nona la primera vez. NO es Menta, que es el de
-  // CINCO: las dos ofrecen los mismos cuatro temas a propósito, pero arrancar
-  // las dos en el mismo hacía que las fichas de tienda parecieran la misma app.
-  // Cobalto es el más lejano en tono al menta, y el azul le sienta bien a un
-  // juego de números.
+  // Con qué color se abre Minesweeper la primera vez: Cobalto.
   defaultPalette: SendaPalettes.cobalto,
 
-  // El handle es de toda la familia, así que reservar "nona" aquí lo protege
-  // también dentro de CINCO.
-  reservedHandles: const {'nona', 'nonaapp'},
+  // El handle es de toda la familia, así que reservar "minesweeper" aquí lo
+  // protege también dentro de CINCO.
+  reservedHandles: const {'minesweeper', 'buscaminas'},
 
-  // A dónde manda «Actualizar» cuando hay una versión nueva publicada. Sin
-  // ellas el aviso no sale. La de Apple, por el id numérico y SIN país, como la
-  // de CINCO: un país fijo en el enlace no es el de quien lo toca, y Nona no
-  // está en todas las tiendas (la ficha en `/es/` da 404, medido el
-  // 19-9-2026). Y las dos son las de NONA: copiadas de CINCO, «Actualizar»
-  // mandaría a instalar el otro juego.
+  // A dónde manda «Actualizar» cuando hay una versión nueva publicada.
   tiendaAndroid: Uri.parse(
-    'https://play.google.com/store/apps/details?id=com.nonaapp.nona',
+    'https://play.google.com/store/apps/details?id=com.sendallc.minesweeper',
   ),
-  tiendaIos: Uri.parse('https://apps.apple.com/app/id6802670347'),
+  tiendaIos: Uri.parse('https://apps.apple.com/app/id6830734481'),
 
   // Claves locales que pertenecen a UNA cuenta. Si una se queda fuera, el
   // progreso de una persona se le atribuiría a quien entre después en el mismo

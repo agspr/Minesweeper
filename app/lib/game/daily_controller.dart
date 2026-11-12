@@ -35,6 +35,7 @@ class DailyOutcome {
     required this.dayKey,
     required this.difficulty,
     required this.completed,
+    this.lost = false,
     required this.mistakes,
     required this.completionPercent,
     required this.seconds,
@@ -43,8 +44,11 @@ class DailyOutcome {
   final String dayKey;
   final Difficulty difficulty;
 
-  /// Terminado del todo. Es lo ÚNICO que da racha (§1).
+  /// Terminado con victoria (todas las casillas seguras descubiertas).
   final bool completed;
+
+  /// Terminado con derrota (se detonaron 3 minas).
+  final bool lost;
 
   final int mistakes;
   final int completionPercent;
@@ -109,6 +113,8 @@ class DailyController extends ChangeNotifier {
   int get selected => _selected;
   bool get notesMode => _notesMode;
   bool get isComplete => _board?.isComplete ?? false;
+  bool get isLost => _board?.isLost ?? false;
+  bool get isFinished => _board?.isFinished ?? false;
 
   Duration get elapsed => Duration(
     seconds:
@@ -130,15 +136,18 @@ class DailyController extends ChangeNotifier {
       _dayKey = today;
       _difficulty = puzzle.difficulty;
       final saved = _readSaved(today);
+      final emptyGivens = '.' * puzzle.solution.length;
       _board = saved == null
           ? SudokuBoard.fromStrings(
-              givens: puzzle.givens,
+              givens: emptyGivens,
               solution: puzzle.solution,
+              safeStart: puzzle.start,
             )
           : SudokuBoard.restore(
-              givens: puzzle.givens,
+              givens: emptyGivens,
               solution: puzzle.solution,
               saved: saved,
+              safeStart: puzzle.start,
             );
       _accumulatedSeconds = (saved?['seconds'] as num?)?.toInt() ?? 0;
       _jugadas = (saved?['jugadas'] as num?)?.toInt() ?? 0;
@@ -170,8 +179,10 @@ class DailyController extends ChangeNotifier {
 
   // ── Reloj ────────────────────────────────────────────────
 
+  bool get isRunning => _runningSince != null && !isFinished;
+
   void startTimer() {
-    if (_runningSince != null || isComplete) return;
+    if (_runningSince != null || isFinished) return;
     _runningSince = _clock();
   }
 
@@ -182,10 +193,25 @@ class DailyController extends ChangeNotifier {
     _save();
   }
 
+  /// Reinicia el tablero del día de hoy a su estado inicial cubierto y limpio.
+  void restart() {
+    final b = _board;
+    if (b == null || isFinished) return;
+    b.entries.fillRange(0, b.entries.length, 0);
+    b.notes.fillRange(0, b.notes.length, 0);
+    _accumulatedSeconds = 0;
+    _runningSince = null;
+    _jugadas = 0;
+    _selected = -1;
+    _save();
+    notifyListeners();
+  }
+
   // ── Entrada ──────────────────────────────────────────────
 
   void select(int cell) {
-    if (cell < 0 || cell >= cellCount) return;
+    final limit = _board?.boardCellCount ?? cellCount;
+    if (cell < 0 || cell >= limit) return;
     // Volver a tocar la casilla ya seleccionada no cambia nada: ni repinta ni
     // vibra. Aquí es el único sitio que sabe si la selección se ha movido de
     // verdad, y por eso la háptica de selección sale de aquí y no del widget.
@@ -193,6 +219,116 @@ class DailyController extends ChangeNotifier {
     _selected = cell;
     NonaHaptics.select();
     notifyListeners();
+  }
+
+  /// Gestiona un toque en una casilla del tablero en Buscaminas:
+  /// - Si la casilla ya está descubierta, comprueba si puede hacer acorde
+  ///   (abrir vecinas no marcadas cuando las banderas coinciden con la pista);
+  ///   si no, la selecciona para visualizar sus vecinas.
+  /// - Si la casilla está oculta:
+  ///   - En modo Cavar: la descubre en el acto (1 toque).
+  ///   - En modo Bandera: coloca o quita la bandera en el acto (1 toque).
+  void tapCellOnBoard(int cell) {
+    final b = _board;
+    if (b == null || isFinished) return;
+    startTimer();
+
+    if (b.isRevealed(cell)) {
+      _selected = cell;
+      if (b.canChord(cell)) {
+        _jugadas++;
+        final fallo = b.chord(cell);
+        if (fallo) {
+          NonaHaptics.mistake();
+        } else {
+          NonaHaptics.tap();
+        }
+        if (b.isFinished) pauseTimer();
+        _save();
+        notifyListeners();
+      } else {
+        NonaHaptics.select();
+        notifyListeners();
+      }
+      return;
+    }
+
+    _selected = cell;
+    if (_notesMode) {
+      NonaHaptics.tap();
+      flagSelected();
+    } else {
+      if (b.isFlagged(cell)) {
+        NonaHaptics.select();
+        notifyListeners();
+        return;
+      }
+      NonaHaptics.tap();
+      revealSelected();
+    }
+  }
+
+  /// Pulsación larga sobre una casilla del tablero: alterna bandera directamente
+  /// con respuesta háptica distintiva.
+  void longPressCellOnBoard(int cell) {
+    final b = _board;
+    if (b == null || isFinished) return;
+    startTimer();
+    if (!b.isRevealed(cell)) {
+      _selected = cell;
+      NonaHaptics.select();
+      flagSelected();
+    }
+  }
+
+  /// Descubre la casilla seleccionada (o ejecuta acorde si es una pista con sus minas ya marcadas).
+  bool revealSelected() {
+    final b = _board;
+    if (b == null || _selected < 0 || isFinished) return false;
+    if (b.isRevealed(_selected)) {
+      if (b.canChord(_selected)) {
+        _jugadas++;
+        final fallo = b.chord(_selected);
+        if (fallo) NonaHaptics.mistake();
+        if (b.isFinished) pauseTimer();
+        _save();
+        notifyListeners();
+        return fallo;
+      }
+      return false;
+    }
+    if (b.isFlagged(_selected)) {
+      return false;
+    }
+    if (b.isGiven(_selected)) return false;
+    _jugadas++;
+    final fallo = b.reveal(_selected);
+    if (fallo) NonaHaptics.mistake();
+    if (b.isFinished) pauseTimer();
+    _save();
+    notifyListeners();
+    return fallo;
+  }
+
+  /// Alterna bandera sobre la casilla seleccionada.
+  void flagSelected() {
+    final b = _board;
+    if (b == null || _selected < 0 || isFinished) return;
+    if (b.isRevealed(_selected)) return;
+    if (b.isGiven(_selected)) return;
+    _jugadas++;
+    b.toggleFlag(_selected);
+    _save();
+    notifyListeners();
+  }
+
+  bool get isFlagMode => _notesMode;
+  bool get isDigMode => !_notesMode;
+
+  void setFlagMode(bool flagMode) {
+    if (_notesMode != flagMode) {
+      toggleNotesMode();
+    }
   }
 
   void toggleNotesMode() {
@@ -206,7 +342,7 @@ class DailyController extends ChangeNotifier {
   /// tecla, así que el veredicto ya no llega «después», al soltar.
   bool tapDigit(int digit) {
     final b = _board;
-    if (b == null || _selected < 0 || isComplete) return false;
+    if (b == null || _selected < 0 || isFinished) return false;
     if (b.ocupada(_selected) && (_notesMode || b.entries[_selected] != digit)) {
       // No es una jugada: ni cuenta, ni se guarda, ni cambia nada.
       intentosDeSobrescribir.value++;
@@ -221,7 +357,7 @@ class DailyController extends ChangeNotifier {
       fallo = b.place(_selected, digit);
       if (fallo) NonaHaptics.mistake();
       // Terminar para el reloj: la partida ya está cerrada.
-      if (b.isComplete) pauseTimer();
+      if (b.isFinished) pauseTimer();
     }
     _save();
     notifyListeners();
@@ -230,7 +366,7 @@ class DailyController extends ChangeNotifier {
 
   void erase() {
     final b = _board;
-    if (b == null || _selected < 0 || isComplete) return;
+    if (b == null || _selected < 0 || isFinished) return;
     _jugadas++;
     b.erase(_selected);
     _save();
@@ -239,7 +375,7 @@ class DailyController extends ChangeNotifier {
 
   void undo() {
     final b = _board;
-    if (b == null || isComplete) return;
+    if (b == null || isFinished) return;
     _jugadas++;
     b.undo();
     _save();
@@ -248,8 +384,8 @@ class DailyController extends ChangeNotifier {
 
   /// El resultado de hoy tal y como está ahora mismo.
   ///
-  /// Sirve tanto al terminar (crédito completo) como al abandonar a medias
-  /// (crédito parcial): la puntuación decide, esto solo informa.
+  /// Sirve tanto al terminar (crédito completo) como al perder (participación) o
+  /// abandonar a medias (crédito parcial): la puntuación decide, esto solo informa.
   DailyOutcome? get outcome {
     final b = _board;
     if (b == null || _dayKey == null || _difficulty == null) return null;
@@ -257,6 +393,7 @@ class DailyController extends ChangeNotifier {
       dayKey: _dayKey!,
       difficulty: _difficulty!,
       completed: b.isComplete,
+      lost: b.isLost,
       mistakes: b.mistakes,
       completionPercent: b.completionPercent,
       seconds: elapsed.inSeconds,
@@ -289,6 +426,7 @@ class DailyController extends ChangeNotifier {
       'seconds': elapsed.inSeconds,
       'jugadas': _jugadas,
       'completa': b.isComplete,
+      'perdida': b.isLost,
     };
   }
 
@@ -448,4 +586,5 @@ const clavesDeLaPartida = {
   'seconds',
   'jugadas',
   'completa',
+  'perdida',
 };

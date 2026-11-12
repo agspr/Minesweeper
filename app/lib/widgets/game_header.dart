@@ -37,6 +37,8 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/haptics.dart';
 import '../theme.dart';
+import 'minesweeper_hud.dart' show MinesweeperFaceState;
+export 'minesweeper_hud.dart' show MinesweeperFaceState;
 
 class GameHeader extends StatelessWidget {
   const GameHeader({
@@ -45,6 +47,11 @@ class GameHeader extends StatelessWidget {
     required this.onClose,
     this.subtitle,
     this.trailing,
+    this.remainingMines,
+    this.faceState,
+    this.onReset,
+    this.isRunning = false,
+    this.elapsedSeconds = 0,
   });
 
   /// Se pone en VERSALITAS aquí, no en el ARB: así ninguna traducción tiene que
@@ -59,9 +66,86 @@ class GameHeader extends StatelessWidget {
   /// El chip de estado: fallos en la diaria, pistas en el modo práctica.
   final Widget? trailing;
 
+  /// Minas pendientes por marcar (activa la barra minimalista de Buscaminas).
+  final int? remainingMines;
+
+  /// Se mantiene por compatibilidad de firma con las pantallas de juego.
+  final MinesweeperFaceState? faceState;
+  final VoidCallback? onReset;
+  final bool isRunning;
+  final int elapsedSeconds;
+
   @override
   Widget build(BuildContext context) {
     final l = L.of(context);
+
+    // Barra minimalista de partida en Buscaminas (Material 3 Expressive):
+    // [✕] a la izquierda, [💣 💣 💣] centrado y [🚩 28] a la derecha.
+    if (remainingMines != null) {
+      final tallScreen = MediaQuery.sizeOf(context).height >= 660;
+      return Padding(
+        padding: EdgeInsets.fromLTRB(
+          4,
+          tallScreen ? 14 : 4,
+          4,
+          tallScreen ? 8 : 4,
+        ),
+        child: Row(
+          children: [
+            // Izquierda: Botón de salida alineado al borde izquierdo del tablero
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  onPressed: () {
+                    NonaHaptics.tap();
+                    onClose();
+                  },
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    size: 28,
+                    color: NonaColors.muted,
+                  ),
+                  tooltip: l.closeGame,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 44,
+                    minHeight: 44,
+                  ),
+                  style: IconButton.styleFrom(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ),
+            ),
+
+            // Centro: Indicador expresivo de vidas / fallos (si aplica al modo)
+            Expanded(
+              flex: 2,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: trailing ?? const SizedBox.shrink(),
+                ),
+              ),
+            ),
+
+            // Derecha: Contador Material 3 Expressive de minas pendientes
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: MinesweeperMinesPill(count: remainingMines!),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Cabecera estándar (pantallas de carga, errores o vistas sin tablero)
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Row(
@@ -82,14 +166,8 @@ class GameHeader extends StatelessWidget {
                   color: NonaColors.muted,
                 ),
                 tooltip: l.closeGame,
-                // El tooltip ES el nombre accesible: añadir además un
-                // `Semantics(label:)` haría que se leyera dos veces.
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                // Sin esto, Material 3 envuelve el botón en 48 puntos de área
-                // de toque pase lo que pase con `constraints`, y la cabecera
-                // crece 4 puntos sin que nadie lo haya pedido. Con
-                // `shrinkWrap` manda el 44, que es el mínimo de Apple.
                 style: IconButton.styleFrom(
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -220,6 +298,122 @@ class HeaderChip extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Indicador de vidas / fallos en Buscaminas: 3 minas grises que se iluminan
+/// en rojo brillante al detonarse cada una. Al llegar a 3, se pierde la partida.
+class MinesweeperStrikesChip extends StatelessWidget {
+  const MinesweeperStrikesChip({
+    super.key,
+    required this.strikes,
+    this.maxStrikes = 3,
+    required this.semanticsLabel,
+  });
+
+  final int strikes;
+  final int maxStrikes;
+  final String semanticsLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final capped = strikes >= maxStrikes;
+    final anyStrike = strikes > 0;
+    final bg = capped
+        ? NonaColors.wrong.withValues(alpha: 0.18)
+        : anyStrike
+        ? const Color(0xFF26181B)
+        : NonaColors.surface;
+
+    return Semantics(
+      label: semanticsLabel,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: semanticsLabel,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(
+              color: capped
+                  ? NonaColors.wrong
+                  : anyStrike
+                  ? const Color(0xFF6B1D25)
+                  : const Color(0xFF2B2B38),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < maxStrikes; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Icon(
+                  Icons.brightness_7_rounded,
+                  size: 18,
+                  color: i < strikes
+                      ? const Color(0xFFFF4136)
+                      : const Color(0xFF56566C),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pastilla Material 3 Expressive para el contador de minas pendientes (`🚩 28`).
+class MinesweeperMinesPill extends StatelessWidget {
+  const MinesweeperMinesPill({
+    super.key,
+    required this.count,
+  });
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'Minas pendientes: $count',
+      excludeSemantics: true,
+      child: Tooltip(
+        message: 'Minas pendientes: $count',
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(
+            color: NonaColors.accentChip,
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(
+              color: NonaColors.accent.withValues(alpha: 0.35),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.flag_rounded,
+                size: 18,
+                color: NonaColors.accent,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '$count',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  height: 1.1,
+                  color: NonaColors.accent,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

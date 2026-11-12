@@ -63,7 +63,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('«Otros Juegos Senda» anuncia CINCO, con sus datos', (
+    testWidgets('«Otros Juegos Senda» anuncia CINCO y Nona, con sus datos', (
       tester,
     ) async {
       await montar(tester);
@@ -74,8 +74,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('La palabra del día'), findsOneWidget);
-      // Y no se anuncia a sí misma.
-      expect(find.text('El sudoku del día'), findsNothing);
+      expect(find.text('El sudoku del día'), findsOneWidget);
     });
 
     test('el icono de CINCO está en el binario', () async {
@@ -85,10 +84,10 @@ void main() {
       expect(icono.lengthInBytes, greaterThan(1000));
     });
 
-    testWidgets('«Califica Nona»', (tester) async {
+    testWidgets('«Califica Minesweeper»', (tester) async {
       await montar(tester);
-      await tester.scrollUntilVisible(find.text('Califica Nona'), 200);
-      expect(find.text('Califica Nona'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Califica Minesweeper'), 200);
+      expect(find.text('Califica Minesweeper'), findsOneWidget);
     });
 
     testWidgets('«Privacidad de los anuncios», donde Google dice que hace '

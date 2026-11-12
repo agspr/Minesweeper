@@ -1,45 +1,18 @@
-/// Numpad: los nueve dígitos y las cuatro acciones.
+/// Controles de Buscaminas: selector de modo (Cavar / Bandera), deshacer y contador de minas.
 ///
-/// **Sin contador debajo de cada tecla.** Lo llevaba, y era información que ya
-/// está en el tablero: quien quiere saber cuántos cincos faltan mira, no lee un
-/// número diminuto. Quitarlo devuelve la tecla a lo que es —un dígito grande y
-/// tocable— y baja el bloque entero. Cuando un dígito ya está las nueve veces,
-/// la tecla se apaga por BRILLO (fondo y tinta más oscuros); apagarla en vez de
-/// esconderla mantiene el numpad quieto, porque una fila de teclas que se
-/// reordena sola hace fallar el dedo.
-///
-/// **Las acciones son solo iconos.** Deshacer, borrar, notas y color no
-/// necesitan que se lo cuenten dos veces: el icono lo dice, y la etiqueta
-/// costaba alto en la pantalla más apretada. El nombre sigue estando para quien
-/// lo necesita —en el tooltip, que es además lo que leen los lectores de
-/// pantalla— y el estado activo se dice por DOS canales, relleno del icono y
-/// fondo, nunca solo por color: el acento lo elige quien juega y no puede ser
-/// el único que distinga un modo de otro.
-///
-/// **Todas las teclas actúan al BAJAR el dedo**, no al soltarlo, y **los huecos
-/// entre teclas son de la tecla más cercana** (André, 5-10-2026, el mismo
-/// arreglo que CINCO hizo en su teclado: «me salto demasiadas letras»). Antes la
-/// tecla vibraba al bajar pero la cifra entraba al LEVANTAR, y solo si el dedo
-/// no se había deslizado: con prisa, el dedo se desliza, vibraba y no entraba
-/// nada. Y los 4 puntos entre cifras, los 8 entre acciones y los 10 entre las
-/// dos filas no eran de nadie. Ahora cada mitad de hueco es de la tecla de su
-/// lado; se ven igual y el alto no cambia.
-///
-/// **Una cifra equivocada no da el golpe de la tecla, solo el de error.** Antes
-/// eran dos momentos —golpe al bajar, veredicto al soltar—; con la cifra entrando
-/// al bajar, los dos caerían a la vez, encabalgados. Así un acierto da un golpe
-/// corto y un fallo da el patrón de error, y se distinguen sin mirar. Ver
-/// `NonaHaptics`.
+/// Diseñado bajo Material 3 Expressive: controles táctiles ergonómicos situados
+/// en la zona cómoda del pulgar, con respuesta háptica y estados claramente
+/// diferenciados por forma, tono e icono.
 library;
 
 import 'package:flutter/material.dart';
 
-import '../l10n/app_localizations.dart';
-
-import '../game/grid.dart';
 import '../game/sudoku_board.dart';
+import '../l10n/app_localizations.dart';
 import '../services/haptics.dart';
 import '../theme.dart';
+
+typedef MinesweeperControls = Numpad;
 
 class Numpad extends StatelessWidget {
   const Numpad({
@@ -47,202 +20,231 @@ class Numpad extends StatelessWidget {
     required this.board,
     required this.notesMode,
     required this.enabled,
-    required this.onDigit,
-    required this.onErase,
+    this.onDigit,
+    this.onErase,
     required this.onToggleNotes,
-    required this.onUndo,
+    this.onUndo,
     required this.boardColourOn,
     required this.onToggleBoardColour,
   });
 
   final SudokuBoard board;
+
+  /// `true` = Modo Bandera; `false` = Modo Cavar / Descubrir.
   final bool notesMode;
 
-  /// `false` con la partida ya terminada: las teclas siguen visibles pero
-  /// apagadas, para que la pantalla no dé un salto al acabar.
+  /// `false` con la partida ya terminada.
   final bool enabled;
 
-  /// Pone la cifra y dice si contó como fallo (ver `DailyController.tapDigit`).
-  final bool Function(int digit) onDigit;
-  final VoidCallback onErase;
-  final VoidCallback onToggleNotes;
-  final VoidCallback onUndo;
+  /// Conservado por compatibilidad de firma.
+  final bool Function(int digit)? onDigit;
+  final VoidCallback? onErase;
 
-  /// Estado del color del tablero, para la cuarta tecla de acción.
+  final VoidCallback onToggleNotes;
+  final VoidCallback? onUndo;
   final bool boardColourOn;
   final VoidCallback onToggleBoardColour;
-
-  /// Medio hueco entre dos cifras, entre dos acciones y entre las dos filas.
-  /// Cada mitad es de la tecla de su lado.
-  static const _medioEntreCifras = 2.0;
-  static const _medioEntreAcciones = 4.0;
-  static const _medioEntreFilas = 5.0;
 
   @override
   Widget build(BuildContext context) {
     final l = L.of(context);
-    final acciones = <Widget Function(EdgeInsets)>[
-      (m) => _ActionKey(
-        margen: m,
-        icon: Icons.undo_rounded,
-        label: l.undo,
-        enabled: enabled && board.canUndo,
-        onTap: onUndo,
-      ),
-      (m) => _ActionKey(
-        margen: m,
-        icon: Icons.backspace_outlined,
-        label: l.erase,
-        enabled: enabled,
-        onTap: onErase,
-      ),
-      (m) => _ActionKey(
-        margen: m,
-        // Relleno cuando está activo, contorno cuando no: el modo notas no
-        // puede distinguirse solo por el color del fondo.
-        icon: notesMode ? Icons.edit_rounded : Icons.edit_outlined,
-        label: l.notes,
-        enabled: enabled,
-        active: notesMode,
-        onTap: onToggleNotes,
-      ),
-      // Apagar o encender el color del tablero, sin salir del tablero.
-      //
-      // Va aquí y no en ajustes porque es una decisión que se toma MIRÁNDOLO:
-      // quien lo encuentre chillón lo piensa jugando, y mandarle a otra
-      // pantalla para volver a comprobar el efecto sería pedirle que recuerde
-      // dos estados a la vez. Es el mismo criterio por el que el selector de
-      // color SÍ vive en Más: allí se elige identidad, aquí se ajusta lo que
-      // se está mirando.
-      //
-      // Sigue viva con la partida terminada: es una preferencia de VISTA, no
-      // una jugada, y el tablero se sigue viendo debajo del resultado.
-      (m) => _ActionKey(
-        margen: m,
-        // El icono dice en qué ESTADO está, no qué pasará al pulsarlo: un
-        // icono que anuncia la acción obliga a deducir el estado actual por
-        // descarte.
-        icon: boardColourOn ? Icons.palette_rounded : Icons.palette_outlined,
-        label: boardColourOn ? l.boardColourOn : l.boardColourOff,
-        enabled: true,
-        active: boardColourOn,
-        onTap: onToggleBoardColour,
-      ),
-    ];
-    return Column(
-      children: [
-        Row(
-          children: [
-            for (var digit = 1; digit <= boardSize; digit++)
-              Expanded(
-                child: _DigitKey(
-                  digit: digit,
-                  done: board.remainingOf(digit) <= 0,
-                  notesMode: notesMode,
-                  enabled: enabled,
-                  onTap: () => onDigit(digit),
-                  margen: const EdgeInsets.fromLTRB(
-                    _medioEntreCifras,
-                    0,
-                    _medioEntreCifras,
-                    _medioEntreFilas,
-                  ),
-                ),
-              ),
+    final isFlagMode = notesMode;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1B1B22),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: const Color(0xFF2C2C38),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.35),
+              offset: const Offset(0, 4),
+              blurRadius: 12,
+            ),
           ],
         ),
-        // Las cuatro acciones, iguales de ancho a la vista, con su hueco
-        // repartido a medias. Con márgenes sueltos las de los extremos —que
-        // solo tienen vecino por un lado— saldrían más anchas que las de en
-        // medio; por eso se mide.
-        LayoutBuilder(
-          builder: (context, c) {
-            const medio = _medioEntreAcciones;
-            final tecla = (c.maxWidth - 6 * medio) / 4;
-            return Row(
-              children: [
-                for (var i = 0; i < 4; i++)
-                  SizedBox(
-                    width: tecla + (i == 0 || i == 3 ? medio : 2 * medio),
-                    child: acciones[i](
-                      EdgeInsets.fromLTRB(
-                        i == 0 ? 0 : medio,
-                        _medioEntreFilas,
-                        i == 3 ? 0 : medio,
-                        0,
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Selector interactivo Cavar / Bandera (Material 3 Expressive Segmented Pill)
+            Expanded(
+              child: _ModeSelectorPill(
+                isFlagMode: isFlagMode,
+                enabled: enabled,
+                onToggle: onToggleNotes,
+              ),
+            ),
+
+            const SizedBox(width: 8),
+
+            // Contador de minas restantes
+            _MineCounterPill(
+              remainingMines: board.remainingMines,
+              isFlagMode: isFlagMode,
+            ),
+
+            const SizedBox(width: 6),
+
+            // Botón de color del tablero: permanece activo aun terminada la partida
+            _ControlButton(
+              icon: Icons.palette_outlined,
+              tooltip: boardColourOn ? l.boardColourOn : l.boardColourOff,
+              enabled: true,
+              active: boardColourOn,
+              onTap: onToggleBoardColour,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
 
-class _DigitKey extends StatelessWidget {
-  const _DigitKey({
-    required this.digit,
-    required this.done,
-    required this.notesMode,
+class _ModeSelectorPill extends StatelessWidget {
+  const _ModeSelectorPill({
+    required this.isFlagMode,
     required this.enabled,
-    required this.onTap,
-    required this.margen,
+    required this.onToggle,
   });
 
-  final int digit;
-
-  /// Ese dígito ya está las nueve veces en el tablero.
-  final bool done;
-
-  final bool notesMode;
+  final bool isFlagMode;
   final bool enabled;
-
-  /// Pone la cifra y dice si contó como fallo.
-  final bool Function() onTap;
-
-  /// El medio hueco que es de esta tecla: se toca, pero no se pinta.
-  final EdgeInsets margen;
-
-  /// La cifra entra, y el golpe solo si NO fue un fallo: el fallo trae su
-  /// propio patrón, y los dos a la vez se encabalgarían.
-  void _pulsar() {
-    if (!onTap()) NonaHaptics.tap();
-  }
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
-    final live = enabled && !done;
-    return _Pulsable(
-      activa: live,
-      onPulsar: _pulsar,
-      margen: margen,
-      child: Container(
-        height: 62,
-        alignment: Alignment.center,
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: const Color(0xFF141419),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFF282834),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Segmento CAVAR
+          Expanded(
+            child: _SegmentItem(
+              icon: Icons.explore_rounded,
+              label: 'Cavar',
+              isSelected: !isFlagMode,
+              enabled: enabled,
+              onTap: () {
+                if (isFlagMode && enabled) {
+                  NonaHaptics.select();
+                  onToggle();
+                }
+              },
+            ),
+          ),
+
+          // Segmento BANDERA
+          Expanded(
+            child: _SegmentItem(
+              icon: Icons.flag_rounded,
+              label: 'Marcar',
+              iconColor: isFlagMode ? const Color(0xFFFF5252) : null,
+              isSelected: isFlagMode,
+              enabled: enabled,
+              onTap: () {
+                if (!isFlagMode && enabled) {
+                  NonaHaptics.select();
+                  onToggle();
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SegmentItem extends StatelessWidget {
+  const _SegmentItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.enabled,
+    required this.onTap,
+    this.iconColor,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final bool enabled;
+  final VoidCallback onTap;
+  final Color? iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color bg = isSelected ? NonaColors.cellSelected : Colors.transparent;
+    final Color fg = !enabled
+        ? NonaColors.muted.withValues(alpha: 0.35)
+        : isSelected
+        ? NonaColors.text
+        : NonaColors.muted;
+
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+        margin: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-          color: done ? NonaColors.keyDone : NonaColors.keyBg,
-          borderRadius: BorderRadius.circular(10),
-          // En modo notas el numpad se enmarca en el acento: hay que poder
-          // saber en qué modo estás sin probar una tecla.
-          border: notesMode && live
-              ? Border.all(color: NonaColors.accent, width: 1.5)
+          color: bg,
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected
+              ? Border.all(
+                  color: NonaColors.cellSelectedBorder,
+                  width: 1.5,
+                )
+              : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    offset: const Offset(0, 2),
+                    blurRadius: 4,
+                  ),
+                ]
               : null,
         ),
-        // Nueve teclas en una fila es lo más apretado de la pantalla, así que
-        // el contenido se encoge antes que desbordar. Con el texto del sistema
-        // al máximo, un dígito a tamaño completo no cabe en 31 px de ancho.
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            '$digit',
-            style: TextStyle(
-              fontSize: 22,
-              height: 1,
-              fontWeight: FontWeight.w700,
-              color: done ? NonaColors.keyDoneFg : NonaColors.keyDigitFg,
+        alignment: Alignment.center,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 19,
+                  color: iconColor ?? fg,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    color: fg,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -251,104 +253,91 @@ class _DigitKey extends StatelessWidget {
   }
 }
 
-/// Una tecla de acción: solo el icono, con el nombre en el tooltip.
-///
-/// 40 de alto y no 48: sin etiqueta debajo no hace falta más, y los 8 puntos
-/// que sobran se los queda el tablero. De ancho pasan de 68, así que el área de
-/// toque sigue siendo cómoda aunque el alto baje del mínimo de Apple.
-class _ActionKey extends StatelessWidget {
-  const _ActionKey({
+class _ControlButton extends StatelessWidget {
+  const _ControlButton({
     required this.icon,
-    required this.label,
+    required this.tooltip,
     required this.enabled,
     required this.onTap,
-    required this.margen,
     this.active = false,
   });
 
   final IconData icon;
-
-  /// Nombre de la acción. No se pinta: es el tooltip y el nombre accesible.
-  final String label;
-
+  final String tooltip;
   final bool enabled;
-  final bool active;
   final VoidCallback onTap;
-
-  /// El medio hueco que es de esta tecla.
-  final EdgeInsets margen;
+  final bool active;
 
   @override
   Widget build(BuildContext context) {
-    final fg = !enabled
-        ? NonaColors.keyDoneFg
-        : active
-        ? NonaColors.accent
-        : NonaColors.keyFg;
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      // El estado, no el icono: un lector de pantalla tiene que poder decir si
-      // el modo notas está puesto.
-      toggled: active,
-      child: Tooltip(
-        message: label,
-        child: _Pulsable(
-          activa: enabled,
-          onPulsar: () {
-            NonaHaptics.tap();
-            onTap();
-          },
-          margen: margen,
-          child: Container(
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: active ? NonaColors.accentChip : NonaColors.keyBg,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 20, color: fg),
-          ),
+    return IconButton(
+      onPressed: enabled
+          ? () {
+              NonaHaptics.tap();
+              onTap();
+            }
+          : null,
+      tooltip: tooltip,
+      icon: Icon(icon, size: 22),
+      style: IconButton.styleFrom(
+        foregroundColor: active
+            ? NonaColors.accent
+            : enabled
+            ? NonaColors.text
+            : NonaColors.muted.withValues(alpha: 0.3),
+        backgroundColor: const Color(0xFF22222C),
+        minimumSize: const Size(44, 44),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
     );
   }
 }
 
-/// Una tecla que actúa al BAJAR el dedo, con su medio hueco incluido.
-///
-/// Un `Listener` y no un `GestureDetector`: un toque de gesto compite en la
-/// arena y se cancela si el dedo se desliza, que es justo como se perdían
-/// cifras. El `Listener` no compite: cada dedo que baja, cuenta, y en el orden
-/// en que bajan. El hueco es suyo porque el margen va DENTRO de la zona que
-/// escucha y el fondo se pinta solo en la tecla.
-///
-/// Los lectores de pantalla no mandan dedos que bajan: mandan la acción
-/// «tocar». Por eso la acción va también en la semántica, o con VoiceOver el
-/// numpad dejaría de funcionar.
-class _Pulsable extends StatelessWidget {
-  const _Pulsable({
-    required this.activa,
-    required this.onPulsar,
-    required this.margen,
-    required this.child,
+class _MineCounterPill extends StatelessWidget {
+  const _MineCounterPill({
+    required this.remainingMines,
+    required this.isFlagMode,
   });
 
-  final bool activa;
-  final VoidCallback onPulsar;
-  final EdgeInsets margen;
-  final Widget child;
+  final int remainingMines;
+  final bool isFlagMode;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: activa,
-      onTap: activa ? onPulsar : null,
-      child: Listener(
-        behavior: HitTestBehavior.opaque,
-        onPointerDown: activa ? (_) => onPulsar() : null,
-        child: Padding(padding: margen, child: child),
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF22222C),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isFlagMode
+              ? const Color(0xFFFF5252).withValues(alpha: 0.5)
+              : const Color(0xFF2E2E3C),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.flag_rounded,
+            size: 16,
+            color: Color(0xFFFF5252),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            '$remainingMines',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: NonaColors.text,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
       ),
     );
   }

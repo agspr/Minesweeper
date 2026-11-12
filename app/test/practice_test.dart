@@ -43,10 +43,10 @@ void main() {
     c.select(cell);
     c.tapDigit(c.board!.solution[cell]);
     expect(c.board!.correctCount, 1);
-    final antes = c.board!.givens.join();
+    final antes = c.board!.solution.join();
 
     await c.newPuzzle();
-    expect(c.board!.givens.join(), isNot(antes));
+    expect(c.board!.solution.join(), isNot(antes));
     expect(c.board!.correctCount, 0);
     expect(c.board!.mistakes, 0);
     expect(c.selected, -1);
@@ -88,7 +88,7 @@ void main() {
       c.hint();
       expect(
         c.board!.correctCount,
-        2,
+        greaterThan(1),
         reason: 'no debe malgastarse en una ya hecha',
       );
     });

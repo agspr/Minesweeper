@@ -1,25 +1,25 @@
 {
-  "generatorVersion": 1,
+  "generatorVersion": 2,
   "years": {
     "2026": {
       "days": 365,
-      "sha256": "29f4bc3f02aa23a26b3d03162ba4f351d628379139cbbf91e9a01396d5c1364c"
+      "sha256": "be05e14514e4a1c6b97f8a7abc34b7be91f6a792ce33c12090c0d7e1c8b5e2ea"
     },
     "2027": {
       "days": 365,
-      "sha256": "b85121e7801f10d5d9961f09bdff5460b60f0c547d9c44deae263df6baf581a9"
+      "sha256": "2f623a275f210934f3fbbc04c9367b3b96fc2c0919b02545f2fd075257edf83b"
     },
     "2028": {
       "days": 366,
-      "sha256": "9a8485d5cbfc9e613208a295c841bacbe3a39576c4d5f9669dbf8b5fcad1da90"
+      "sha256": "39d5ea5cb3636d8bcb9645c7ae8e1ab7f2b18d1cbe14f43d3aff6c391c5d1972"
     },
     "2029": {
       "days": 365,
-      "sha256": "feac36ee5c2df25ffd18b4ecfb4d588aaafc7c8a1f1440e10c826d4b035ae5ba"
+      "sha256": "285b0bb47d6dc16e047f9132582ffe5c7ae04129da8999516daf761357096f82"
     },
     "2030": {
       "days": 365,
-      "sha256": "f9d78b0621238a3d212d5b3eb0703abb5612a3e82453caa2ececf4749ea6f02b"
+      "sha256": "679e97415f4368bac6952d5791d75b90802df0e53ba0273d20538ccc06f2c9c2"
     }
   }
 }

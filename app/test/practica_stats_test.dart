@@ -32,7 +32,7 @@ void main() {
   int resolver(PracticeController c, {Duration porCasilla = Duration.zero}) {
     var puestas = 0;
     final b = c.board!;
-    for (var cell = 0; cell < 81 && !c.isComplete; cell++) {
+    for (var cell = 0; cell < b.boardCellCount && !c.isComplete; cell++) {
       if (b.isGiven(cell) || b.entries[cell] == b.solution[cell]) continue;
       now = now.add(porCasilla);
       c.select(cell);
@@ -53,7 +53,10 @@ void main() {
       );
 
       final b = c.board!;
-      final cell = List.generate(81, (i) => i).firstWhere((i) => !b.isGiven(i));
+      final cell = List.generate(
+        b.boardCellCount,
+        (i) => i,
+      ).firstWhere((i) => !b.isGiven(i));
       c.select(cell);
       c.tapDigit(b.solution[cell]);
       expect(c.statsFor(Difficulty.easy).played, 1);
@@ -93,7 +96,10 @@ void main() {
   test('sin completar ninguno, el mejor tiempo es null — nunca cero', () async {
     final c = await nuevo();
     final b = c.board!;
-    final cell = List.generate(81, (i) => i).firstWhere((i) => !b.isGiven(i));
+    final cell = List.generate(
+      b.boardCellCount,
+      (i) => i,
+    ).firstWhere((i) => !b.isGiven(i));
     c.select(cell);
     c.tapDigit(b.solution[cell]);
     final s = c.statsFor(Difficulty.easy);

@@ -132,7 +132,7 @@ void main() {
     // se juega es un estado y no una ruta, así que el gesto no tenía nada que
     // cerrar.
     await montar(tester);
-    await tester.tap(find.text('Sudoku del día'));
+    await tester.tap(find.text('Reto diario'));
     await tester.pumpAndSettle();
     expect(find.byType(GameScreen), findsOneWidget);
 

@@ -91,32 +91,15 @@ void main() {
     });
 
     test('detecta la ambigüedad al quitar una casilla de más', () {
-      // Quitando las cuatro esquinas de un "rectángulo" de dos dígitos, esos
-      // dos dígitos se pueden intercambiar: dos soluciones.
+      // Si se ocultan todas las pistas de una mitad del tablero, las minas de
+      // esa mitad admiten más de una disposición válida.
       final full = generateFullGrid(Prng(11));
       final g = List<int>.of(full);
-      // Busca dos filas y dos columnas cuyos cuatro cruces usen solo 2 dígitos.
-      var found = false;
-      outer:
-      for (var r1 = 0; r1 < 9 && !found; r1++) {
-        for (var r2 = r1 + 1; r2 < 9; r2++) {
-          for (var c1 = 0; c1 < 9; c1++) {
-            for (var c2 = c1 + 1; c2 < 9; c2++) {
-              final a = full[r1 * 9 + c1], b = full[r1 * 9 + c2];
-              final c = full[r2 * 9 + c1], d = full[r2 * 9 + c2];
-              if (a == d && b == c && a != b) {
-                g[r1 * 9 + c1] = 0;
-                g[r1 * 9 + c2] = 0;
-                g[r2 * 9 + c1] = 0;
-                g[r2 * 9 + c2] = 0;
-                found = true;
-                break outer;
-              }
-            }
-          }
+      for (var i = 0; i < cellCount; i++) {
+        if (g[i] == kMine || i >= cellCount ~/ 2) {
+          g[i] = 0;
         }
       }
-      expect(found, isTrue, reason: 'no se halló un rectángulo de prueba');
       expect(countSolutions(g, limit: 2), 2);
     });
   });
@@ -132,7 +115,7 @@ void main() {
         final givens = decodeGrid(p.givens);
         final solution = decodeGrid(p.solution);
         expect(isSolved(solution), isTrue);
-        for (var i = 0; i < cellCount; i++) {
+        for (var i = 0; i < givens.length; i++) {
           if (givens[i] != 0) expect(givens[i], solution[i]);
         }
       }
@@ -158,10 +141,10 @@ void main() {
     test('el vaciado es simétrico a 180°', () {
       final p = generate(seed: 8, target: Difficulty.hard)!;
       final g = decodeGrid(p.givens);
-      for (var i = 0; i < cellCount; i++) {
+      for (var i = 0; i < g.length; i++) {
         expect(
           g[i] == 0,
-          g[cellCount - 1 - i] == 0,
+          g[g.length - 1 - i] == 0,
           reason: 'casilla $i y su simétrica no coinciden',
         );
       }

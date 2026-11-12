@@ -23,9 +23,13 @@ class DailyPuzzle {
     required this.solution,
     required this.difficulty,
     required this.clues,
+    this.start = -1,
   });
 
   final String dayKey;
+
+  /// Casilla de salida segura del día (siempre un `0`), o -1 si no la hay.
+  final int start;
 
   /// 81 caracteres, '.' en las casillas vacías.
   final String givens;
@@ -40,7 +44,7 @@ class DailyPuzzle {
 
   /// Casillas que el jugador tiene que rellenar. Es el denominador del
   /// porcentaje de avance con el que se calcula el crédito parcial.
-  int get emptyCells => 81 - clues;
+  int get emptyCells => difficulty.cellCount - clues;
 }
 
 /// Un día pedido que no está en el banco. Pasa si el horizonte horneado se
@@ -72,12 +76,14 @@ abstract final class DailyBank {
     final raw = entries[dayKey];
     if (raw == null) throw DayNotInBankException(dayKey);
     final m = (raw as Map).cast<String, dynamic>();
+    final solution = m['solution'] as String;
     return DailyPuzzle(
       dayKey: dayKey,
-      givens: m['givens'] as String,
-      solution: m['solution'] as String,
+      givens: (m['givens'] as String?) ?? '.' * solution.length,
+      solution: solution,
       difficulty: Difficulty.values.byName(m['difficulty'] as String),
-      clues: (m['clues'] as num).toInt(),
+      clues: (m['clues'] as num?)?.toInt() ?? 0,
+      start: (m['start'] as num?)?.toInt() ?? -1,
     );
   }
 

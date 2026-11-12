@@ -8,7 +8,7 @@ publish_to: 'none'
 # pisa —primero se borra, y un aviso lo dice—, la letra de CINCO en todo
 # (paquete 0.89.1, Figtree solo en 400) y el cierre de sesión automático a
 # Sentry (paquete 0.88.2).
-version: 1.0.8+38
+version: 1.0.0+14
 
 environment:
   sdk: ^3.13.0

@@ -29,7 +29,7 @@ void main() {
       testApp(
         Scaffold(
           body: GameHeader(
-            title: 'Sudoku del día',
+            title: 'Reto diario',
             subtitle: subtitle,
             onClose: () {},
             trailing: trailing,
@@ -40,7 +40,7 @@ void main() {
   }
 
   double centroDelTitulo(WidgetTester tester) =>
-      tester.getCenter(find.text('SUDOKU DEL DÍA')).dx;
+      tester.getCenter(find.text('RETO DIARIO')).dx;
 
   testWidgets('el título va centrado en la PANTALLA, no en lo que sobre', (
     tester,

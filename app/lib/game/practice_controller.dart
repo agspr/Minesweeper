@@ -20,21 +20,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/haptics.dart';
 
 import 'difficulty.dart';
-import 'generator.dart';
 import 'grid.dart';
+import 'mine_generator.dart';
 import 'sudoku_board.dart';
 
-/// Genera en un isolate. La generación es Dart puro, así que se puede sacar del
-/// hilo de interfaz sin más: un difícil tarda unos milisegundos de media, pero
-/// el peor caso puede irse a bastante más y ahí se notaría el tirón justo al
-/// pulsar "otro puzle".
+enum PracticeGameMode {
+  senda,
+  classic,
+}
+
+/// Genera en un isolate un tablero de Buscaminas resoluble sin adivinar.
 Map<String, dynamic>? _generateInIsolate((int, int) args) {
   final (seed, difficultyIndex) = args;
-  final puzzle = generate(
+  final puzzle = generateMinePuzzle(
     seed: seed,
     target: Difficulty.values[difficultyIndex],
   );
-  return puzzle?.toJson();
+  if (puzzle == null) return null;
+  return {
+    'givens': puzzle.givens,
+    'solution': puzzle.solution,
+    'start': puzzle.start,
+    'difficulty': puzzle.difficulty.name,
+    'seed': puzzle.seed,
+  };
 }
 
 class PracticeController extends ChangeNotifier {
@@ -50,6 +59,7 @@ class PracticeController extends ChangeNotifier {
   static const _kState = 'game.nona.practice';
   static const _kDifficulty = 'game.nona.practice.difficulty';
   static const _kStats = 'game.nona.practice.stats';
+  static const _kMode = 'game.nona.practice.mode';
 
   final SharedPreferences _prefs;
   final int Function() _seedSource;
@@ -68,6 +78,7 @@ class PracticeController extends ChangeNotifier {
 
   SudokuBoard? _board;
   Difficulty _difficulty = Difficulty.easy;
+  PracticeGameMode _gameMode = PracticeGameMode.senda;
   bool _generating = false;
   int _selected = -1;
   bool _notesMode = false;
@@ -80,11 +91,15 @@ class PracticeController extends ChangeNotifier {
 
   SudokuBoard? get board => _board;
   Difficulty get difficulty => _difficulty;
+  PracticeGameMode get gameMode => _gameMode;
   bool get generating => _generating;
   int get selected => _selected;
   bool get notesMode => _notesMode;
   int get hintsUsed => _hintsUsed;
   bool get isComplete => _board?.isComplete ?? false;
+  bool get isLost => _board?.isLost ?? false;
+  bool get isFinished => _board?.isFinished ?? false;
+  bool get isRunning => _runningSince != null && !isFinished;
 
   Duration get elapsed => Duration(
     seconds:
@@ -162,6 +177,13 @@ class PracticeController extends ChangeNotifier {
 
   /// Recupera el puzle a medias que hubiera, o genera uno nuevo.
   Future<void> load() async {
+    final savedMode = _prefs.getString(_kMode);
+    if (savedMode != null) {
+      _gameMode = PracticeGameMode.values.firstWhere(
+        (m) => m.name == savedMode,
+        orElse: () => PracticeGameMode.senda,
+      );
+    }
     final savedDifficulty = _prefs.getString(_kDifficulty);
     if (savedDifficulty != null) {
       _difficulty = Difficulty.values.firstWhere(
@@ -173,10 +195,15 @@ class PracticeController extends ChangeNotifier {
     if (raw != null) {
       try {
         final data = jsonDecode(raw) as Map<String, dynamic>;
+        final strikes = _gameMode == PracticeGameMode.classic
+            ? 1
+            : SudokuBoard.kDefaultMaxStrikes;
         _board = SudokuBoard.restore(
           givens: data['givens'] as String,
           solution: data['solution'] as String,
           saved: data,
+          safeStart: (data['start'] as num?)?.toInt() ?? -1,
+          maxStrikes: strikes,
         );
         _hintsUsed = (data['hints'] as num?)?.toInt() ?? 0;
         _accumulatedSeconds = (data['seconds'] as num?)?.toInt() ?? 0;
@@ -188,6 +215,14 @@ class PracticeController extends ChangeNotifier {
         // Guardado corrupto: se genera uno limpio.
       }
     }
+    await newPuzzle();
+  }
+
+  Future<void> setGameMode(PracticeGameMode mode) async {
+    if (mode == _gameMode) return;
+    _gameMode = mode;
+    notifyListeners();
+    await _prefs.setString(_kMode, mode.name);
     await newPuzzle();
   }
 
@@ -210,19 +245,25 @@ class PracticeController extends ChangeNotifier {
     notifyListeners();
 
     Map<String, dynamic>? json;
-    // Se reintenta con semillas distintas: `generate` puede no converger al
-    // grado pedido, y en ese caso devuelve null en vez de entregar otra cosa.
-    for (var attempt = 0; attempt < 5 && json == null; attempt++) {
+    for (var attempt = 0; attempt < 10 && json == null; attempt++) {
       json = await compute(_generateInIsolate, (
-        _seedSource() + attempt,
+        _seedSource() + attempt * 7919,
         _difficulty.index,
       ));
     }
 
     if (json != null) {
+      final sol = json['solution'] as String;
+      final start = (json['start'] as num?)?.toInt() ?? -1;
+      final emptyGivens = '.' * sol.length;
+      final strikes = _gameMode == PracticeGameMode.classic
+          ? 1
+          : SudokuBoard.kDefaultMaxStrikes;
       _board = SudokuBoard.fromStrings(
-        givens: json['givens'] as String,
-        solution: json['solution'] as String,
+        givens: emptyGivens,
+        solution: sol,
+        safeStart: _gameMode == PracticeGameMode.senda ? start : -1,
+        maxStrikes: strikes,
       );
     }
     _generating = false;
@@ -231,13 +272,118 @@ class PracticeController extends ChangeNotifier {
   }
 
   void select(int cell) {
-    if (cell < 0 || cell >= cellCount) return;
-    // Igual que en la diaria: re-tocar la seleccionada no mueve nada, así que
-    // no repinta ni vibra. (El guardia de rango faltaba aquí.)
+    final limit = _board?.boardCellCount ?? cellCount;
+    if (cell < 0 || cell >= limit) return;
     if (cell == _selected) return;
     _selected = cell;
     NonaHaptics.select();
     notifyListeners();
+  }
+
+  /// Toque sobre una casilla del tablero en práctica:
+  /// - Si la casilla ya está descubierta, comprueba si puede hacer acorde;
+  ///   si no, la selecciona para visualizar sus vecinas.
+  /// - Si la casilla está oculta:
+  ///   - En modo Cavar: la descubre en el acto (1 toque).
+  ///   - En modo Bandera: coloca o quita bandera en el acto (1 toque).
+  void tapCellOnBoard(int cell) {
+    final b = _board;
+    if (b == null || isFinished) return;
+
+    if (b.isRevealed(cell)) {
+      _selected = cell;
+      if (b.canChord(cell)) {
+        _touch();
+        final fallo = b.chord(cell);
+        if (fallo) {
+          NonaHaptics.mistake();
+        } else {
+          NonaHaptics.tap();
+        }
+        if (b.isFinished) _finished();
+        _save();
+        notifyListeners();
+      } else {
+        NonaHaptics.select();
+        notifyListeners();
+      }
+      return;
+    }
+
+    _selected = cell;
+    if (_notesMode) {
+      NonaHaptics.tap();
+      flagSelected();
+    } else {
+      if (b.isFlagged(cell)) {
+        NonaHaptics.select();
+        notifyListeners();
+        return;
+      }
+      NonaHaptics.tap();
+      revealSelected();
+    }
+  }
+
+  /// Pulsación larga sobre una casilla: alterna bandera directamente con respuesta háptica.
+  void longPressCellOnBoard(int cell) {
+    final b = _board;
+    if (b == null || isFinished) return;
+    if (!b.isRevealed(cell)) {
+      _selected = cell;
+      NonaHaptics.select();
+      flagSelected();
+    }
+  }
+
+  /// Descubre la casilla seleccionada (o ejecuta acorde si procede).
+  bool revealSelected() {
+    final b = _board;
+    if (b == null || _selected < 0 || isFinished) return false;
+    if (b.isRevealed(_selected)) {
+      if (b.canChord(_selected)) {
+        _touch();
+        final fallo = b.chord(_selected);
+        if (fallo) NonaHaptics.mistake();
+        if (b.isFinished) _finished();
+        _save();
+        notifyListeners();
+        return fallo;
+      }
+      return false;
+    }
+    if (b.isFlagged(_selected)) {
+      return false;
+    }
+    if (b.isGiven(_selected)) return false;
+    _touch();
+    final fallo = b.reveal(_selected);
+    if (fallo) NonaHaptics.mistake();
+    if (b.isFinished) _finished();
+    _save();
+    notifyListeners();
+    return fallo;
+  }
+
+  /// Alterna bandera sobre la casilla seleccionada.
+  void flagSelected() {
+    final b = _board;
+    if (b == null || _selected < 0 || isFinished) return;
+    if (b.isRevealed(_selected)) return;
+    if (b.isGiven(_selected)) return;
+    _touch();
+    b.toggleFlag(_selected);
+    _save();
+    notifyListeners();
+  }
+
+  bool get isFlagMode => _notesMode;
+  bool get isDigMode => !_notesMode;
+
+  void setFlagMode(bool flagMode) {
+    if (_notesMode != flagMode) {
+      toggleNotesMode();
+    }
   }
 
   void toggleNotesMode() {
@@ -245,14 +391,11 @@ class PracticeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Devuelve si la cifra contó como FALLO. El numpad lo necesita para no
-  /// encabalgar su golpe con el patrón de error: la cifra entra al tocar la
-  /// tecla, así que el veredicto ya no llega «después», al soltar.
+  /// Devuelve si la cifra contó como FALLO.
   bool tapDigit(int digit) {
     final b = _board;
-    if (b == null || _selected < 0 || isComplete) return false;
+    if (b == null || _selected < 0 || isFinished) return false;
     if (b.ocupada(_selected) && (_notesMode || b.entries[_selected] != digit)) {
-      // No es una jugada: ni cuenta, ni se guarda, ni cambia nada.
       intentosDeSobrescribir.value++;
       return false;
     }
@@ -261,10 +404,9 @@ class PracticeController extends ChangeNotifier {
     if (_notesMode) {
       b.toggleNote(_selected, digit);
     } else {
-      // Un fallo se siente, no solo se ve: ver NonaHaptics.mistake.
       fallo = b.place(_selected, digit);
       if (fallo) NonaHaptics.mistake();
-      if (b.isComplete) _finished();
+      if (b.isFinished) _finished();
     }
     _save();
     notifyListeners();
@@ -273,7 +415,7 @@ class PracticeController extends ChangeNotifier {
 
   void erase() {
     final b = _board;
-    if (b == null || _selected < 0 || isComplete) return;
+    if (b == null || _selected < 0 || isFinished) return;
     _touch();
     b.erase(_selected);
     _save();
@@ -282,30 +424,25 @@ class PracticeController extends ChangeNotifier {
 
   void undo() {
     final b = _board;
-    if (b == null || isComplete) return;
+    if (b == null || isFinished) return;
     _touch();
     b.undo();
     _save();
     notifyListeners();
   }
 
-  /// Revela la casilla seleccionada (o la primera vacía si no hay ninguna).
-  ///
-  /// Solo existe en el modo libre, por decisión de André: aquí no hay puntos
-  /// que falsear. Se cuenta el número de pistas para poder mostrarlo, no para
-  /// penalizar nada.
+  /// Revela la primera casilla segura no resuelta.
   void hint() {
     final b = _board;
-    if (b == null || isComplete) return;
+    if (b == null || isFinished) return;
     var cell = _selected;
-    if (cell < 0 || b.isGiven(cell) || b.entries[cell] == b.solution[cell]) {
-      cell = _firstUnsolved(b);
+    if (cell < 0 || b.isRevealed(cell) || b.isMine(cell)) {
+      cell = _firstUnsolvedSafe(b);
       if (cell < 0) return;
     }
-    // Se coloca el dígito correcto, así que nunca cuenta como fallo.
     _touch();
-    b.place(cell, b.solution[cell], sobrescribir: true);
-    if (b.isComplete) _finished();
+    b.reveal(cell);
+    if (b.isFinished) _finished();
     _selected = cell;
     _hintsUsed++;
     _save();
@@ -318,9 +455,9 @@ class PracticeController extends ChangeNotifier {
     super.dispose();
   }
 
-  int _firstUnsolved(SudokuBoard b) {
-    for (var cell = 0; cell < cellCount; cell++) {
-      if (!b.isGiven(cell) && b.entries[cell] != b.solution[cell]) return cell;
+  int _firstUnsolvedSafe(SudokuBoard b) {
+    for (var cell = 0; cell < b.boardCellCount; cell++) {
+      if (!b.isMine(cell) && !b.isRevealed(cell)) return cell;
     }
     return -1;
   }

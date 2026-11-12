@@ -1,8 +1,8 @@
 {
   "@@locale": "es",
-  "appName": "Nona",
-  "appTagline": "Sudoku del día",
-  "menuDaily": "Sudoku del día",
+  "appName": "Buscaminas",
+  "appTagline": "Reto diario",
+  "menuDaily": "Reto diario",
   "menuDailyToday": "{difficulty} · hoy",
   "@menuDailyToday": {
     "placeholders": {
@@ -113,9 +113,9 @@
   "statsTotalPoints": "Puntos",
   "statsAvgMistakes": "Errores por día",
   "more": "Más",
-  "aboutNona": "Acerca de Nona",
+  "aboutNona": "Acerca de Buscaminas",
   "aboutSubtitle": "Quiénes somos, términos, privacidad y contacto",
-  "aboutBody": "Nona es un sudoku diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.",
+  "aboutBody": "Buscaminas es un juego diario desarrollado por SENDA LLC en Puerto Rico. Cada día hay un puzle nuevo, el mismo para todo el mundo, con la dificultad marcada por el día de la semana. Hay también un modo práctica con puzles ilimitados que no da puntos ni racha, y una clasificación para competir con tus amigos.",
   "boardColourOn": "Tablero en color",
   "boardColourOff": "Tablero en gris",
   "menuStreak": "{count, plural, one{🔥 1 día de racha} other{🔥 {count} días de racha}}",
@@ -126,7 +126,7 @@
       }
     }
   },
-  "sceneTodaysSudoku": "El sudoku de hoy",
+  "sceneTodaysSudoku": "El buscaminas de hoy",
   "@sceneTodaysSudoku": {
     "description": "Rótulo de la escena del resultado. Se escribe en caja normal: las mayúsculas las pone el widget."
   },
