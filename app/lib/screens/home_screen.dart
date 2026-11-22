@@ -573,7 +573,7 @@ class _Menu extends StatelessWidget {
             // anotar. Tras la medianoche no se queda pegada: el día de la marca
             // ya no es el de la diaria.
             final done =
-                daily.isComplete ||
+                daily.isFinished ||
                 (daily.dayKey != null &&
                     progress.lastCompletedDay == daily.dayKey);
             final l = L.of(context);

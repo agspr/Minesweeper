@@ -317,13 +317,15 @@ class SudokuBoard {
     // Cascada automática si la casilla no tiene minas adyacentes (solution == 1 -> clue 0)
     if (solution[cell] == 1) {
       final queue = <int>[cell];
-      final visited = <int>{cell};
+      final visited = List<bool>.filled(solution.length, false);
+      visited[cell] = true;
+      var head = 0;
 
-      while (queue.isNotEmpty) {
-        final current = queue.removeAt(0);
+      while (head < queue.length) {
+        final current = queue[head++];
         for (final n in _neighbors[current]) {
-          if (!visited.contains(n)) {
-            visited.add(n);
+          if (!visited[n]) {
+            visited[n] = true;
             if (!isGiven(n) && entries[n] == 0 && !isFlagged(n) && solution[n] != kMine) {
               openCell(n);
               if (solution[n] == 1) {

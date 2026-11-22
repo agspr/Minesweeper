@@ -31,6 +31,7 @@ class DayRecord {
     required this.dayKey,
     required this.points,
     required this.completed,
+    this.lost = false,
     required this.mistakes,
     required this.completionPercent,
     required this.difficulty,
@@ -40,14 +41,19 @@ class DayRecord {
   final String dayKey;
   final int points;
   final bool completed;
+  final bool lost;
   final int mistakes;
   final int completionPercent;
   final Difficulty difficulty;
   final int seconds;
 
+  /// ¿Se jugó hasta su conclusión (victoria o derrota)?
+  bool get finished => completed || lost;
+
   Map<String, dynamic> toJson() => {
     'points': points,
     'completed': completed,
+    if (lost) 'lost': true,
     'mistakes': mistakes,
     'percent': completionPercent,
     'difficulty': difficulty.name,
@@ -59,6 +65,7 @@ class DayRecord {
         dayKey: dayKey,
         points: (j['points'] as num?)?.toInt() ?? 0,
         completed: j['completed'] as bool? ?? false,
+        lost: j['lost'] as bool? ?? false,
         mistakes: (j['mistakes'] as num?)?.toInt() ?? 0,
         completionPercent: (j['percent'] as num?)?.toInt() ?? 0,
         difficulty: Difficulty.values.firstWhere(
@@ -233,7 +240,7 @@ class ProgressController extends ChangeNotifier {
     ).subtract(Duration(days: now.weekday - 1));
     return [
       for (var i = 0; i < 7; i++)
-        recordFor(dayKeyFor(lunes.add(Duration(days: i))))?.completed ?? false,
+        recordFor(dayKeyFor(lunes.add(Duration(days: i))))?.finished ?? false,
     ];
   }
 
@@ -252,7 +259,7 @@ class ProgressController extends ChangeNotifier {
     final dayKey = dayKeyFor(date);
     final previous = recordFor(dayKey);
 
-    if (previous != null && (previous.completed || !score.completed)) {
+    if (previous != null && (previous.finished || !score.extendsStreak)) {
       // Ya registrado y sin mejora que aplicar.
       return previous;
     }
@@ -261,6 +268,7 @@ class ProgressController extends ChangeNotifier {
       dayKey: dayKey,
       points: score.points,
       completed: score.completed,
+      lost: score.lost,
       mistakes: score.countedMistakes,
       completionPercent: score.completionPercent,
       difficulty: switch (score.base) {
@@ -298,7 +306,7 @@ class ProgressController extends ChangeNotifier {
     _prefs.setInt(_kPoints, totalPoints + delta);
     _prefs.setString(_kRecord(dayKey), jsonEncode(record.toJson()));
 
-    if (score.completed) _extendStreak(date);
+    if (score.extendsStreak) _extendStreak(date);
 
     notifyListeners();
     return record;

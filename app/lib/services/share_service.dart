@@ -50,7 +50,7 @@ String buildShareText({
     }} · ${l.shareScore(score.points)}',
   ];
 
-  if (score.completed) {
+  if (score.completed || score.lost) {
     lines.add(_mistakeRow(score.countedMistakes));
   } else {
     // Sin terminar: se dice el avance, que es lo que se puntuó. Nada de

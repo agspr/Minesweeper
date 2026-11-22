@@ -118,8 +118,9 @@ class PartidaEnLaNube with WidgetsBindingObserver {
 
   void _alGuardar() {
     _pendiente?.cancel();
-    // Terminada, en el acto: es justo cuando alguien coge el otro teléfono.
-    if (daily.estadoGuardado?['completa'] == true) {
+    // Terminada (por victoria o derrota), en el acto: es justo cuando alguien coge el otro teléfono.
+    final estado = daily.estadoGuardado;
+    if (estado?['completa'] == true || estado?['perdida'] == true) {
       unawaited(_subir());
       return;
     }

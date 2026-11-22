@@ -562,10 +562,13 @@ Map<String, dynamic>? partidaQueSeAdopta({
   };
   final localDeHoy = local != null && local['day'] == hoy ? local : null;
   if (localDeHoy == null) return remota;
-  if (localDeHoy['completa'] == true) return null;
+  if (localDeHoy['completa'] == true || localDeHoy['perdida'] == true) {
+    return null;
+  }
   int n(Object? x) => (x as num?)?.toInt() ?? 0;
   final adelante =
       remota['completa'] == true ||
+      remota['perdida'] == true ||
       n(remota['jugadas']) > n(localDeHoy['jugadas']);
   if (!adelante) return null;
   final fallos = n(remota['mistakes']) > n(localDeHoy['mistakes'])

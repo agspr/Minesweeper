@@ -109,7 +109,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     // bloquea el hilo principal, y caería bajo los dedos de quien empieza.
     _precarga = Timer(const Duration(seconds: 4), () {
       final c = widget.controller;
-      if (mounted && !c.isComplete && c.dayKey != null) {
+      if (mounted && !c.isFinished && c.dayKey != null) {
         unawaited(widget.ads?.preloadFor(c.dayKey!));
       }
     });
@@ -155,7 +155,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             _completaAlVer = null;
           });
         }
-        if (!c.isComplete) c.startTimer();
+        if (!c.isFinished) c.startTimer();
       });
     }
   }

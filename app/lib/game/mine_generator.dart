@@ -197,22 +197,30 @@ NoGuessResult solveWithoutGuessing(
     // Subconjuntos entre pares de pistas.
     for (var i = 0; i < constraints.length && !progress; i++) {
       final (a, needA) = constraints[i];
-      final setA = a.toSet();
       for (var j = 0; j < constraints.length && !progress; j++) {
         if (i == j) continue;
         final (b, needB) = constraints[j];
         if (b.length <= a.length) continue;
-        if (!setA.every(b.contains)) continue;
-        final diff = [for (final x in b) if (!setA.contains(x)) x];
+        // Las listas unknown están ordenadas en orden creciente, lo que permite
+        // comprobar si A es subconjunto de B sin crear conjuntos intermedios.
+        var isSubset = true;
+        for (var ai = 0; ai < a.length; ai++) {
+          if (!b.contains(a[ai])) {
+            isSubset = false;
+            break;
+          }
+        }
+        if (!isSubset) continue;
         final diffNeed = needB - needA;
+        final diffLen = b.length - a.length;
         if (diffNeed == 0) {
-          for (final x in diff) {
-            open(x);
+          for (final x in b) {
+            if (!a.contains(x)) open(x);
           }
           progress = true;
-        } else if (diffNeed == diff.length) {
-          for (final x in diff) {
-            mine[x] = true;
+        } else if (diffNeed == diffLen) {
+          for (final x in b) {
+            if (!a.contains(x)) mine[x] = true;
           }
           progress = true;
         }

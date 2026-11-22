@@ -177,12 +177,14 @@ class _SudokuBoardViewState extends State<SudokuBoardView> {
           rows: board.rows,
         );
         final total = board.boardCellCount;
+        final revealedSafeCount = board.revealedSafeCount;
+        final isLost = board.isLost;
         final selDigit = selected >= 0 && selected < total
             ? board.valueAt(selected)
             : 0;
         final selPeers = selected >= 0 && selected < total
-            ? board.neighborsOf(selected)
-            : const <int>[];
+            ? board.neighborsOf(selected).toSet()
+            : const <int>{};
 
         return MediaQuery(
           data: MediaQuery.of(
@@ -197,42 +199,46 @@ class _SudokuBoardViewState extends State<SudokuBoardView> {
             child: SizedBox(
               width: m.width,
               height: m.height,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: _GridPainter(
-                        board: board,
-                        revealedCount: board.revealedSafeCount,
-                        isLost: board.isLost,
-                        metrics: m,
-                        thin: NonaColors.gridThin,
-                        thick: NonaColors.gridThick,
-                        pixelRatio: MediaQuery.devicePixelRatioOf(context),
+              child: RepaintBoundary(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _GridPainter(
+                          board: board,
+                          revealedCount: revealedSafeCount,
+                          isLost: isLost,
+                          metrics: m,
+                          thin: NonaColors.gridThin,
+                          thick: NonaColors.gridThick,
+                          pixelRatio: MediaQuery.devicePixelRatioOf(context),
+                        ),
                       ),
                     ),
-                  ),
-                  for (var index = 0; index < total; index++)
-                    Positioned.fromRect(
-                      rect: m.rectOf(index),
-                      child: _Cell(
-                        board: board,
-                        index: index,
-                        metrics: m,
-                        isSelected: index == selected,
-                        isPressed: _pressedCells.contains(index),
-                        isPeer: selPeers.contains(index),
-                        isSameDigit:
-                            selDigit != 0 &&
-                            index != selected &&
-                            board.valueAt(index) == selDigit,
-                        onTap: () => widget.onTapCell(index),
-                        onLongPress: widget.onLongPressCell == null
-                            ? null
-                            : () => widget.onLongPressCell!(index),
+                    for (var index = 0; index < total; index++)
+                      Positioned.fromRect(
+                        rect: m.rectOf(index),
+                        child: _Cell(
+                          board: board,
+                          index: index,
+                          metrics: m,
+                          revealedSafeCount: revealedSafeCount,
+                          isLost: isLost,
+                          isSelected: index == selected,
+                          isPressed: _pressedCells.contains(index),
+                          isPeer: selPeers.contains(index),
+                          isSameDigit:
+                              selDigit != 0 &&
+                              index != selected &&
+                              board.valueAt(index) == selDigit,
+                          onTap: () => widget.onTapCell(index),
+                          onLongPress: widget.onLongPressCell == null
+                              ? null
+                              : () => widget.onLongPressCell!(index),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -247,6 +253,8 @@ class _Cell extends StatelessWidget {
     required this.board,
     required this.index,
     required this.metrics,
+    required this.revealedSafeCount,
+    required this.isLost,
     required this.isSelected,
     required this.isPressed,
     required this.isPeer,
@@ -258,6 +266,8 @@ class _Cell extends StatelessWidget {
   final SudokuBoard board;
   final int index;
   final BoardMetrics metrics;
+  final int revealedSafeCount;
+  final bool isLost;
   final bool isSelected;
   final bool isPressed;
   final bool isPeer;
@@ -284,11 +294,10 @@ class _Cell extends StatelessWidget {
     final value = board.valueAt(index);
     final wrong = board.isWrong(index);
     final flagged = board.isFlagged(index);
-    final revealed = board.isRevealed(index);
+    final revealed = value != 0;
     final unrevealed = !revealed && !flagged;
-    final isLost = board.isLost;
     final isMine = board.isMine(index);
-    final isSafeStart = board.revealedSafeCount == 0 &&
+    final isSafeStart = revealedSafeCount == 0 &&
         index == board.safeStart &&
         value == 0;
 
@@ -403,6 +412,8 @@ class _Cell extends StatelessWidget {
           value: value,
           wrong: wrong,
           flagged: flagged,
+          isMine: isMine,
+          isSafeStart: isSafeStart,
         ),
       ),
     );
@@ -413,10 +424,9 @@ class _Cell extends StatelessWidget {
     required int value,
     required bool wrong,
     required bool flagged,
+    required bool isMine,
+    required bool isSafeStart,
   }) {
-    final isMine = board.isMine(index);
-    final isLost = board.isLost;
-
     // 1. Mina detonada (en rojo carmesí)
     if (wrong && isMine) {
       return Icon(
@@ -464,9 +474,6 @@ class _Cell extends StatelessWidget {
     }
 
     // 5. Casilla de salida segura inicial (indicador táctil antes del primer toque)
-    final isSafeStart = board.revealedSafeCount == 0 &&
-        index == board.safeStart &&
-        value == 0;
     if (isSafeStart) {
       return Icon(
         Icons.adjust_rounded,

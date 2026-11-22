@@ -35,6 +35,18 @@ void main() {
     ),
   );
 
+  DailyScore lost(Difficulty d, {int percent = 80}) => scoreDaily(
+    DailyOutcome(
+      dayKey: 'x',
+      difficulty: d,
+      completed: false,
+      lost: true,
+      mistakes: 3,
+      completionPercent: percent,
+      seconds: 0,
+    ),
+  );
+
   group('registro idempotente', () {
     test('el mismo día no suma dos veces', () {
       // El caso real: se termina, la pantalla se reconstruye y se vuelve a
@@ -92,13 +104,22 @@ void main() {
       expect(p.bestStreak, 3);
     });
 
-    test('SOLO la extiende terminar (§1)', () {
+    test('SOLO la extiende terminar (victoria o derrota por 3 minas, §1)', () {
       // Es la regla que impide que una casilla al día sostenga una racha
       // infinita.
       final p = ProgressController(prefs);
       p.record(partial(Difficulty.hard, 99), DateTime(2026, 8, 10));
       expect(p.streak, 0);
       expect(p.totalPoints, 60, reason: 'puntúa igual, pero sin racha');
+
+      // Y una derrota por 3 minas SÍ concluye la partida, extiende la racha y
+      // serializa lost=true para que el servidor calcule el 15 % fijo.
+      final rec = p.record(lost(Difficulty.medium, percent: 80), DateTime(2026, 8, 11));
+      expect(p.streak, 1);
+      expect(p.lastCompletedDay, '2026-08-11');
+      expect(rec.lost, isTrue);
+      expect(rec.toJson()['lost'], isTrue);
+      expect(p.totalPoints, 60 + 15);
     });
 
     test('se muestra rota si el último día no es ni hoy ni ayer', () {

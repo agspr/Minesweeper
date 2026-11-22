@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import sys
@@ -9,12 +10,43 @@ import requests
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-KEY_PATH = r"C:\Users\gibra\Downloads\prende-3dd30-e5aab36c257d.json"
-PKG = "com.sendallc.minesweeper"
-AAB_PATH = r"c:\Users\gibra\OneDrive\Documents\Coding\Minesweeper\app\build\app\outputs\bundle\release\app-release.aab"
+DEFAULT_KEY_PATH = os.environ.get(
+    "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON",
+    os.path.join(os.path.expanduser("~"), "Downloads", "prende-3dd30-e5aab36c257d.json"),
+)
+DEFAULT_AAB_PATH = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "app",
+        "build",
+        "app",
+        "outputs",
+        "bundle",
+        "release",
+        "app-release.aab",
+    )
+)
+
+parser = argparse.ArgumentParser(description="Upload Minesweeper AAB to Google Play Internal Testing")
+parser.add_argument("--aab", default=DEFAULT_AAB_PATH, help="Path to the release .aab file")
+parser.add_argument("--key", default=DEFAULT_KEY_PATH, help="Path to Google Play Service Account JSON key")
+parser.add_argument("--pkg", default="com.sendallc.minesweeper", help="Android package name")
+args = parser.parse_args()
+
+KEY_PATH = args.key
+PKG = args.pkg
+AAB_PATH = os.path.abspath(args.aab)
 
 if not os.path.isfile(AAB_PATH):
-    print(f"Error: {AAB_PATH} not found!")
+    print(f"Error: AAB not found at {AAB_PATH}!")
+    sys.exit(1)
+
+if not os.path.isfile(KEY_PATH):
+    print(
+        f"Error: Service account key not found at {KEY_PATH}!\n"
+        "Pass --key /path/to/key.json or set GOOGLE_PLAY_SERVICE_ACCOUNT_JSON."
+    )
     sys.exit(1)
 
 print(f"Starting upload process for {PKG}...")
