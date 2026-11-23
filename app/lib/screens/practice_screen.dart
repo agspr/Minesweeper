@@ -326,7 +326,7 @@ class _DifficultyScreen extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Senda (3 vidas)',
+                  l.practiceModeSenda,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -351,7 +351,7 @@ class _DifficultyScreen extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Clásico (1 vida)',
+                  l.practiceModeClassic,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,

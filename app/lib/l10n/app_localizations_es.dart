@@ -88,18 +88,24 @@ class LEs extends L {
 
   @override
   String get practiceDifficultySubtitle =>
-      'Cambia cuántas pistas trae y qué técnicas pide. Todos tienen una sola solución.';
+      'Cambia el tamaño del tablero y cuántas minas esconde. Todos se resuelven con lógica, sin adivinar.';
 
   @override
-  String get difficultyEasyDesc =>
-      'Muchas pistas y siempre una jugada a la vista';
+  String get difficultyEasyDesc => 'El tablero más pequeño y con menos minas';
 
   @override
   String get difficultyMediumDesc =>
-      'Menos pistas: hay que rastrear el tablero';
+      'Más grande y con más minas: hay que rastrear el tablero';
 
   @override
-  String get difficultyHardDesc => 'Pide técnicas como pares y tríos';
+  String get difficultyHardDesc =>
+      'El más grande, y siempre pide cruzar dos pistas';
+
+  @override
+  String get practiceModeSenda => 'Senda (3 vidas)';
+
+  @override
+  String get practiceModeClassic => 'Clásico (1 vida)';
 
   @override
   String get keepPlaying => 'Seguir jugando';

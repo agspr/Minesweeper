@@ -50,10 +50,24 @@
   "erase": "Borrar",
   "notes": "Notas",
   "practiceDifficultyTitle": "Selecciona el nivel\nde dificultad",
-  "practiceDifficultySubtitle": "Cambia cuántas pistas trae y qué técnicas pide. Todos tienen una sola solución.",
-  "difficultyEasyDesc": "Muchas pistas y siempre una jugada a la vista",
-  "difficultyMediumDesc": "Menos pistas: hay que rastrear el tablero",
-  "difficultyHardDesc": "Pide técnicas como pares y tríos",
+  "practiceDifficultySubtitle": "Cambia el tamaño del tablero y cuántas minas esconde. Todos se resuelven con lógica, sin adivinar.",
+  "@practiceDifficultySubtitle": {
+    "description": "Lo que de verdad cambia el nivel (difficulty.dart: medidas y minas) y lo que garantiza el generador (mine_generator.dart: resoluble sin adivinar). Sin cifras a propósito: si cambian las medidas, la frase sigue siendo cierta."
+  },
+  "difficultyEasyDesc": "El tablero más pequeño y con menos minas",
+  "difficultyMediumDesc": "Más grande y con más minas: hay que rastrear el tablero",
+  "difficultyHardDesc": "El más grande, y siempre pide cruzar dos pistas",
+  "@difficultyHardDesc": {
+    "description": "«Cruzar dos pistas» es la deducción de subconjuntos: el generador descarta todo tablero difícil que no la necesite al menos una vez (mine_generator.dart, `usedSubset`). Por eso puede decir «siempre»."
+  },
+  "practiceModeSenda": "Senda (3 vidas)",
+  "@practiceModeSenda": {
+    "description": "Conmutador del modo de práctica. «Senda» es nombre propio del modo: no se traduce."
+  },
+  "practiceModeClassic": "Clásico (1 vida)",
+  "@practiceModeClassic": {
+    "description": "Conmutador del modo de práctica: el buscaminas de siempre, la primera mina acaba la partida."
+  },
   "keepPlaying": "Seguir jugando",
   "closeGame": "Menú principal",
   "hint": "Pista",

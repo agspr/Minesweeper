@@ -211,29 +211,41 @@ abstract class L {
   /// **'Selecciona el nivel\nde dificultad'**
   String get practiceDifficultyTitle;
 
-  /// No description provided for @practiceDifficultySubtitle.
+  /// Lo que de verdad cambia el nivel (difficulty.dart: medidas y minas) y lo que garantiza el generador (mine_generator.dart: resoluble sin adivinar). Sin cifras a propósito: si cambian las medidas, la frase sigue siendo cierta.
   ///
   /// In es, this message translates to:
-  /// **'Cambia cuántas pistas trae y qué técnicas pide. Todos tienen una sola solución.'**
+  /// **'Cambia el tamaño del tablero y cuántas minas esconde. Todos se resuelven con lógica, sin adivinar.'**
   String get practiceDifficultySubtitle;
 
   /// No description provided for @difficultyEasyDesc.
   ///
   /// In es, this message translates to:
-  /// **'Muchas pistas y siempre una jugada a la vista'**
+  /// **'El tablero más pequeño y con menos minas'**
   String get difficultyEasyDesc;
 
   /// No description provided for @difficultyMediumDesc.
   ///
   /// In es, this message translates to:
-  /// **'Menos pistas: hay que rastrear el tablero'**
+  /// **'Más grande y con más minas: hay que rastrear el tablero'**
   String get difficultyMediumDesc;
 
-  /// No description provided for @difficultyHardDesc.
+  /// «Cruzar dos pistas» es la deducción de subconjuntos: el generador descarta todo tablero difícil que no la necesite al menos una vez (mine_generator.dart, `usedSubset`). Por eso puede decir «siempre».
   ///
   /// In es, this message translates to:
-  /// **'Pide técnicas como pares y tríos'**
+  /// **'El más grande, y siempre pide cruzar dos pistas'**
   String get difficultyHardDesc;
+
+  /// Conmutador del modo de práctica. «Senda» es nombre propio del modo: no se traduce.
+  ///
+  /// In es, this message translates to:
+  /// **'Senda (3 vidas)'**
+  String get practiceModeSenda;
+
+  /// Conmutador del modo de práctica: el buscaminas de siempre, la primera mina acaba la partida.
+  ///
+  /// In es, this message translates to:
+  /// **'Clásico (1 vida)'**
+  String get practiceModeClassic;
 
   /// No description provided for @keepPlaying.
   ///

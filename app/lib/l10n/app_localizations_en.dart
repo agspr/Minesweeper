@@ -88,18 +88,24 @@ class LEn extends L {
 
   @override
   String get practiceDifficultySubtitle =>
-      'Changes how many givens you get and which techniques you need. Every puzzle has one solution.';
+      'Changes the board size and how many mines it hides. Every board can be solved with logic — no guessing.';
 
   @override
-  String get difficultyEasyDesc =>
-      'Plenty of givens, and always a move in plain sight';
+  String get difficultyEasyDesc => 'The smallest board, with the fewest mines';
 
   @override
   String get difficultyMediumDesc =>
-      'Fewer givens — you have to sweep the board';
+      'Bigger, with more mines — you have to sweep the board';
 
   @override
-  String get difficultyHardDesc => 'Needs techniques like pairs and triples';
+  String get difficultyHardDesc =>
+      'The biggest board, and it always takes combining two clues';
+
+  @override
+  String get practiceModeSenda => 'Senda (3 lives)';
+
+  @override
+  String get practiceModeClassic => 'Classic (1 life)';
 
   @override
   String get keepPlaying => 'Keep playing';
