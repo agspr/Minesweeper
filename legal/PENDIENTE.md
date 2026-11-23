@@ -1876,3 +1876,47 @@ el baremo día a día.
 - `tools/seed-legacy.js` no sirve para esto: calcula el residuo entre el
   resumen guardado y los días crudos, y aquí no lo había. Se escribió el campo
   con un script de una sola vez, con ensayo previo y relectura.
+
+---
+
+## PARA EL AGENTE DE SENDAPR.COM — las seis páginas de Minesweeper, listas para generar (23-11-2026, agente dev)
+
+**Nada publicado.** Las seis dan **404** (comprobado el 23-11) y la app ya enlaza
+a las tres en español (`app/lib/nona_config.dart:69-73`). Bloquean el envío a
+las dos tiendas.
+
+| Fuente | Destino |
+|---|---|
+| `privacy-policy.md` / `.en.md` | `sendapr.com/privacy/minesweeper/` y `.../en/` |
+| `terms-of-service.md` / `.en.md` | `sendapr.com/terms/minesweeper/` y `.../en/` |
+| `account-deletion.md` / `.en.md` | `sendapr.com/delete-account/minesweeper/` y `.../en/` |
+
+**Cómo:** `cd legal && node build-sendapr-legal.js` (la dependencia `marked` va
+en el repo). Escribe en `../sendapr-landing/public/{privacy,terms,delete-account}/minesweeper/{,en/}index.html`.
+Probado aquí: escribe las seis, y en lo generado no queda ni un «Nona» ni un
+«sudoku». **En `sendapr-landing` no he dejado nada**: lo generé para probar y lo
+deshice; el árbol quedó limpio.
+
+**Qué cambió respecto a lo que entregó la auditoría (`68ac502`):**
+
+- **§3.8 (ES+EN), sustancial**: `diaria_terminada` manda también `victoria`
+  (`app/lib/screens/game_screen.dart:361-365`), y la lista decía «estas y
+  ninguna más» sin ella. Ahora declara «si lo despejaste o perdiste». Por eso la
+  **privacidad** pasa a «Última actualización: 23 de noviembre de 2026». El tema
+  de color ya estaba declarado (§3.8, «como preferencia»).
+- **Cuatro «sudoku» que se habían quedado**, cambio de redacción: resumen de
+  privacidad («te lleva directo al buscaminas»), §3.12 ES+EN («no revela el
+  tablero: no incluye las casillas ni dónde estaban las minas») y términos §4
+  ES. Los **términos conservan el 22-11** — solo redacción.
+- Borrar cuenta: sin cambios.
+
+**Lo que no hace el generador y hace falta en el sitio:**
+
+- `public/privacy/index.html` y `public/terms/index.html`: no listan
+  Minesweeper. Iría detrás de Nona, con el mismo Cobalto `#4FA8FF`, y la
+  `description` del índice de privacidad nombra las apps una a una.
+- `public/sitemap.xml`: las seis URLs, con sus `hreflang` como las de Nona.
+- La portada no: la app no está publicada al público todavía.
+
+**Al terminar:** las seis URLs en 200 y lo servido idéntico a lo generado,
+como con las de Nona.

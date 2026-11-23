@@ -1,7 +1,7 @@
 # Política de Privacidad de Buscaminas (Minesweeper)
 
 **Vigente desde:** 11 de noviembre de 2026
-**Última actualización:** 22 de noviembre de 2026
+**Última actualización:** 23 de noviembre de 2026
 
 ---
 
@@ -29,7 +29,7 @@ Si tienes preguntas sobre esta Política, escríbenos a
 Para que esta política no requiera de un abogado para entenderse, estos son
 los puntos más importantes:
 
-- **Puedes jugar sin cuenta.** "Jugar sin cuenta" te lleva directo al sudoku
+- **Puedes jugar sin cuenta.** "Jugar sin cuenta" te lleva directo al buscaminas
   del día y al modo libre, sin darnos ningún dato personal. La cuenta hace
   falta solo para las funciones sociales —perfil, amigos y clasificación— y se
   crea con Google o con Apple; no creamos ni almacenamos contraseñas.
@@ -286,8 +286,8 @@ Por otro, registramos un conjunto acotado de **acciones concretas**, que son
 estas y ninguna más:
 
 - Terminar el buscaminas del día, indicando la **dificultad** de ese día y
-  **cuántos fallos** se te contaron (de 0 a 3 minas). No registramos ni el tiempo ni
-  la puntuación.
+  **cuántos fallos** se te contaron (de 0 a 3 minas) y si lo **despejaste o
+  perdiste**. No registramos ni el tiempo ni la puntuación.
 - Terminar un puzle del **modo libre**, indicando solo su dificultad.
 - Elegir "Jugar sin cuenta".
 - Iniciar sesión, indicando solo si fue con Google o con Apple.
@@ -361,8 +361,8 @@ fila de cuadros que resume cuántos fallos cometiste y, si la tienes, tu racha�
 y se lo entrega al menú de compartir de tu sistema operativo. Tú eliges a quién
 enviarlo y por qué aplicación.
 
-Ese texto nunca pasa por nuestros servidores, y **no revela el sudoku**: no
-incluye el tablero ni qué pusiste en cada casilla, para no arruinárselo a quien
+Ese texto nunca pasa por nuestros servidores, y **no revela el tablero**: no
+incluye las casillas ni dónde estaban las minas, para no arruinárselo a quien
 lo reciba. Tampoco incluye tu tiempo, porque el reloj no puntúa.
 
 ---

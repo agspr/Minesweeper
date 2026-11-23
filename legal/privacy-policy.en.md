@@ -1,7 +1,7 @@
 # Minesweeper Privacy Policy
 
 **Effective:** November 11, 2026
-**Last updated:** November 22, 2026
+**Last updated:** November 23, 2026
 
 ---
 
@@ -285,8 +285,8 @@ On the other, we record a limited set of **specific actions**, which are these
 and no others:
 
 - Finishing the daily minesweeper, recording that day's **difficulty** and **how
-  many mistakes** were counted against you (from 0 to 3 mines). We record neither the
-  time nor the score.
+  many mistakes** were counted against you (from 0 to 3 mines), and whether you
+  **cleared or lost** the board. We record neither the time nor the score.
 - Finishing a **free play** puzzle, recording only its difficulty.
 - Choosing "Play without an account".
 - Signing in, recording only whether it was with Google or with Apple.
@@ -361,7 +361,7 @@ streak — and hands it to your operating system's share menu. You choose who to
 send it to and through which app.
 
 That text never passes through our servers, and it **does not reveal the
-sudoku**: it includes neither the board nor what you put in each cell, so as
+board**: it includes neither the cells nor where the mines were, so as
 not to spoil it for whoever receives it. It does not include your time either,
 because the clock does not affect scoring.
 

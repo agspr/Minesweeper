@@ -60,7 +60,7 @@ funcione de forma ininterrumpida ni libre de errores.
 ## 4. Cuenta de Usuario
 
 **Jugar no exige cuenta.** Desde la pantalla de entrada puedes tocar "Jugar
-sin cuenta" y acceder al sudoku del día y al modo libre.
+sin cuenta" y acceder al buscaminas del día y al modo libre.
 
 La cuenta es opcional y desbloquea las funciones sociales: perfil con
 @usuario, amigos, clasificación e invitaciones. Se crea iniciando sesión con
