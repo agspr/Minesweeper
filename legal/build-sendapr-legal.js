@@ -1,20 +1,14 @@
-// Renders Nona's legal Markdown into the sendapr.com page template and writes
+// Renders Minesweeper's legal Markdown into the sendapr.com page template and writes
 // the result into the sendapr-landing repo, so the public pages are GENERATED
 // from the same source the app links to instead of hand-transcribed.
 //
 // Output (consumed by the sendapr-landing Vercel deploy):
-//   public/privacy/nona/index.html            (ES, privacy-policy.md)
-//   public/privacy/nona/en/index.html         (EN, privacy-policy.en.md)
-//   public/terms/nona/index.html              (ES, terms-of-service.md)
-//   public/terms/nona/en/index.html           (EN, terms-of-service.en.md)
-//   public/delete-account/nona/index.html     (ES, account-deletion.md)
-//   public/delete-account/nona/en/index.html  (EN, account-deletion.en.md)
-//
-// Descends from two earlier generators, and deliberately takes one thing from
-// each: the BILINGUAL structure (hreflang pairs, per-page language switcher)
-// from PRende's, and the LEDE-AWARE parseDoc from CINCO's. Cloning PRende's
-// alone would have silently eaten account-deletion's intro paragraph — see the
-// comment on parseDoc.
+//   public/privacy/minesweeper/index.html            (ES, privacy-policy.md)
+//   public/privacy/minesweeper/en/index.html         (EN, privacy-policy.en.md)
+//   public/terms/minesweeper/index.html              (ES, terms-of-service.md)
+//   public/terms/minesweeper/en/index.html           (EN, terms-of-service.en.md)
+//   public/delete-account/minesweeper/index.html     (ES, account-deletion.md)
+//   public/delete-account/minesweeper/en/index.html  (EN, account-deletion.en.md)
 //
 // NEVER hand-edit the generated HTML: the next run overwrites it without
 // warning. Edit the Markdown and re-run.
@@ -29,9 +23,8 @@ const { marked } = require('marked');
 const LEGAL_DIR = __dirname;
 const SENDAPR_PUBLIC = path.resolve(__dirname, '..', '..', 'sendapr-landing', 'public');
 
-// Cobalto — Nona's default palette (`nona_config.dart: defaultPalette`), so the
-// pages read as the same product as the app. If that default ever changes,
-// change it here too.
+// Cobalto — Minesweeper's default palette (`nona_config.dart: defaultPalette`), so the
+// pages read as the same product as the app.
 const ACCENT = '#4FA8FF';
 
 const STYLE = `
@@ -75,26 +68,19 @@ const STYLE = `
     hr { border: none; border-top: 1px solid #44464F; margin: 56px 0; }
 `;
 
-// Splits "# Title / **Effective:** … / **Last updated:** … / [lede] / --- / body".
-//
-// The `lede` exists because account-deletion.md puts an intro paragraph — plus
-// a bullet list and a blockquote — between the date lines and the first `---`.
-// PRende's version of this function treated everything before the separator as
-// "header" and kept only the `**`-bearing lines from it, which SILENTLY DROPPED
-// that paragraph while still producing a valid-looking page. Keep this shape.
 function parseDoc(md) {
   const sepIdx = md.indexOf('\n---');
   const header = md.slice(0, sepIdx);
   const body = md.slice(md.indexOf('\n', md.indexOf('\n---') + 1) + 1);
 
   const titleMatch = header.match(/^#\s+(.+)$/m);
-  const title = titleMatch ? titleMatch[1].trim() : 'Nona';
+  const title = titleMatch ? titleMatch[1].trim() : 'Minesweeper';
 
   const metaLines = [];
   const ledeLines = [];
   for (const line of header.split('\n')) {
-    if (/^#\s+/.test(line)) continue;                 // the H1, rendered separately
-    if (/^\*\*[^*]+:\*\*/.test(line)) {               // "**Effective:** …"
+    if (/^#\s+/.test(line)) continue;
+    if (/^\*\*[^*]+:\*\*/.test(line)) {
       metaLines.push(line.replace(/\*\*/g, '').trim());
       continue;
     }
@@ -145,63 +131,58 @@ ${bodyHtml}
 `;
 }
 
-// Both language variants of a section point at the same pair of URLs, so search
-// engines treat them as translations of each other rather than duplicates.
-const PRIVACY_HREF = { hreflangEs: 'https://sendapr.com/privacy/nona/', hreflangEn: 'https://sendapr.com/privacy/nona/en/' };
-const TERMS_HREF   = { hreflangEs: 'https://sendapr.com/terms/nona/',   hreflangEn: 'https://sendapr.com/terms/nona/en/' };
-const DELETE_HREF  = { hreflangEs: 'https://sendapr.com/delete-account/nona/', hreflangEn: 'https://sendapr.com/delete-account/nona/en/' };
+const PRIVACY_HREF = { hreflangEs: 'https://sendapr.com/privacy/minesweeper/', hreflangEn: 'https://sendapr.com/privacy/minesweeper/en/' };
+const TERMS_HREF   = { hreflangEs: 'https://sendapr.com/terms/minesweeper/',   hreflangEn: 'https://sendapr.com/terms/minesweeper/en/' };
+const DELETE_HREF  = { hreflangEs: 'https://sendapr.com/delete-account/minesweeper/', hreflangEn: 'https://sendapr.com/delete-account/minesweeper/en/' };
 
 const PAGES = [
   {
-    src: 'privacy-policy.md', out: 'privacy/nona/index.html', lang: 'es', ...PRIVACY_HREF,
-    pageTitle: 'Política de Privacidad — Nona',
-    canonical: 'https://sendapr.com/privacy/nona/',
-    description: 'Política de privacidad de Nona — el sudoku del día de SENDA LLC, parte de Juegos Senda.',
+    src: 'privacy-policy.md', out: 'privacy/minesweeper/index.html', lang: 'es', ...PRIVACY_HREF,
+    pageTitle: 'Política de Privacidad — Buscaminas (Minesweeper)',
+    canonical: 'https://sendapr.com/privacy/minesweeper/',
+    description: 'Política de privacidad de Buscaminas (Minesweeper) — el buscaminas del día de SENDA LLC, parte de Juegos Senda.',
     crumbHref: '/privacy/', crumbLabel: '← Políticas de Privacidad',
-    langCurrent: 'Español', langOtherHref: '/privacy/nona/en/', langOther: 'English',
+    langCurrent: 'Español', langOtherHref: '/privacy/minesweeper/en/', langOther: 'English',
   },
   {
-    src: 'privacy-policy.en.md', out: 'privacy/nona/en/index.html', lang: 'en', ...PRIVACY_HREF,
-    pageTitle: 'Privacy Policy — Nona',
-    canonical: 'https://sendapr.com/privacy/nona/en/',
-    description: "Privacy policy for Nona — SENDA LLC's daily sudoku, part of Juegos Senda.",
+    src: 'privacy-policy.en.md', out: 'privacy/minesweeper/en/index.html', lang: 'en', ...PRIVACY_HREF,
+    pageTitle: 'Privacy Policy — Minesweeper',
+    canonical: 'https://sendapr.com/privacy/minesweeper/en/',
+    description: "Privacy policy for Minesweeper — SENDA LLC's daily minesweeper, part of Juegos Senda.",
     crumbHref: '/privacy/', crumbLabel: '← Privacy Policies',
-    langCurrent: 'English', langOtherHref: '/privacy/nona/', langOther: 'Español',
+    langCurrent: 'English', langOtherHref: '/privacy/minesweeper/', langOther: 'Español',
   },
   {
-    src: 'terms-of-service.md', out: 'terms/nona/index.html', lang: 'es', ...TERMS_HREF,
-    pageTitle: 'Términos de Servicio — Nona',
-    canonical: 'https://sendapr.com/terms/nona/',
-    description: 'Términos de Servicio de Nona — el sudoku del día de SENDA LLC, parte de Juegos Senda.',
+    src: 'terms-of-service.md', out: 'terms/minesweeper/index.html', lang: 'es', ...TERMS_HREF,
+    pageTitle: 'Términos de Servicio — Buscaminas (Minesweeper)',
+    canonical: 'https://sendapr.com/terms/minesweeper/',
+    description: 'Términos de Servicio de Buscaminas (Minesweeper) — el buscaminas del día de SENDA LLC, parte de Juegos Senda.',
     crumbHref: '/terms/', crumbLabel: '← Términos de Servicio',
-    langCurrent: 'Español', langOtherHref: '/terms/nona/en/', langOther: 'English',
+    langCurrent: 'Español', langOtherHref: '/terms/minesweeper/en/', langOther: 'English',
   },
   {
-    src: 'terms-of-service.en.md', out: 'terms/nona/en/index.html', lang: 'en', ...TERMS_HREF,
-    pageTitle: 'Terms of Service — Nona',
-    canonical: 'https://sendapr.com/terms/nona/en/',
-    description: "Terms of Service for Nona — SENDA LLC's daily sudoku, part of Juegos Senda.",
+    src: 'terms-of-service.en.md', out: 'terms/minesweeper/en/index.html', lang: 'en', ...TERMS_HREF,
+    pageTitle: 'Terms of Service — Minesweeper',
+    canonical: 'https://sendapr.com/terms/minesweeper/en/',
+    description: "Terms of Service for Minesweeper — SENDA LLC's daily minesweeper, part of Juegos Senda.",
     crumbHref: '/terms/', crumbLabel: '← Terms of Service',
-    langCurrent: 'English', langOtherHref: '/terms/nona/', langOther: 'Español',
+    langCurrent: 'English', langOtherHref: '/terms/minesweeper/', langOther: 'Español',
   },
   {
-    // Play and Apple both expect a reachable account-deletion URL. Nona's is
-    // generated from Markdown like the rest, so refining it is an edit plus a
-    // re-run rather than a hand transcription.
-    src: 'account-deletion.md', out: 'delete-account/nona/index.html', lang: 'es', ...DELETE_HREF,
-    pageTitle: 'Eliminar tu cuenta — Nona',
-    canonical: 'https://sendapr.com/delete-account/nona/',
-    description: 'Cómo salir de Nona o eliminar tu cuenta de Juegos Senda entera, qué se borra en cada caso y cuánto tarda.',
-    crumbHref: '/privacy/nona/', crumbLabel: '← Política de Privacidad',
-    langCurrent: 'Español', langOtherHref: '/delete-account/nona/en/', langOther: 'English',
+    src: 'account-deletion.md', out: 'delete-account/minesweeper/index.html', lang: 'es', ...DELETE_HREF,
+    pageTitle: 'Eliminar tu cuenta — Buscaminas (Minesweeper)',
+    canonical: 'https://sendapr.com/delete-account/minesweeper/',
+    description: 'Cómo salir de Buscaminas (Minesweeper) o eliminar tu cuenta de Juegos Senda entera, qué se borra en cada caso y cuánto tarda.',
+    crumbHref: '/privacy/minesweeper/', crumbLabel: '← Política de Privacidad',
+    langCurrent: 'Español', langOtherHref: '/delete-account/minesweeper/en/', langOther: 'English',
   },
   {
-    src: 'account-deletion.en.md', out: 'delete-account/nona/en/index.html', lang: 'en', ...DELETE_HREF,
-    pageTitle: 'Delete your account — Nona',
-    canonical: 'https://sendapr.com/delete-account/nona/en/',
-    description: 'How to leave Nona or delete your whole Juegos Senda account, what is erased in each case, and how long it takes.',
-    crumbHref: '/privacy/nona/en/', crumbLabel: '← Privacy Policy',
-    langCurrent: 'English', langOtherHref: '/delete-account/nona/', langOther: 'Español',
+    src: 'account-deletion.en.md', out: 'delete-account/minesweeper/en/index.html', lang: 'en', ...DELETE_HREF,
+    pageTitle: 'Delete your account — Minesweeper',
+    canonical: 'https://sendapr.com/delete-account/minesweeper/en/',
+    description: 'How to leave Minesweeper or delete your whole Juegos Senda account, what is erased in each case, and how long it takes.',
+    crumbHref: '/privacy/minesweeper/en/', crumbLabel: '← Privacy Policy',
+    langCurrent: 'English', langOtherHref: '/delete-account/minesweeper/', langOther: 'Español',
   },
 ];
 

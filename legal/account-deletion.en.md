@@ -1,13 +1,13 @@
-# How to Delete Your Nona Account
+# How to Delete Your Minesweeper Account
 
-**Effective:** August 25, 2026
-**Last updated:** October 5, 2026
+**Effective:** November 11, 2026
+**Last updated:** November 22, 2026
 
-Nona is part of **Juegos Senda**, a family of games by SENDA LLC that share a
+Minesweeper is part of **Juegos Senda**, a family of games by SENDA LLC that share a
 single account. That is why deleting has **two distinct meanings**, and the App
 offers you both of them separately:
 
-- **Remove Nona from your account** — your Nona progress goes. You keep your
+- **Remove Minesweeper from your account** — your Minesweeper progress goes. You keep your
   account, your @username, your friends and your progress in the other games.
 - **Delete your Juegos Senda account** — everything goes, across **every** game
   in the family, including the ones you do not have installed on this phone.
@@ -23,7 +23,7 @@ how long it takes.
 
 ## How to reach the two options
 
-1. Open Nona and sign in.
+1. Open Minesweeper and sign in.
 2. Go to the **More** tab.
 3. Tap **your profile card** (the one showing your avatar and your @username).
 4. At the bottom of the sheet that opens, tap **Delete account**.
@@ -45,28 +45,28 @@ for any other reason, write to us at **support@sendapr.com** from the email
 address associated with your account, with the subject line:
 
 ```
-Account deletion request — Nona
+Account deletion request — Minesweeper
 ```
 
-Tell us whether you want to **leave Nona only** or **delete your entire Juegos
+Tell us whether you want to **leave Minesweeper only** or **delete your entire Juegos
 Senda account**. We process these requests **within 30 days** of receiving
 them, and usually within the first few. We confirm by email when it is done.
 
 ---
 
-## Option 1 — Remove Nona from your account
+## Option 1 — Remove Minesweeper from your account
 
-This is what the App calls **"Remove Nona from your account"**.
+This is what the App calls **"Remove Minesweeper from your account"**.
 
 ### What is deleted
 
-- **Your Nona progress**: your streak, your best streak, your points — total,
+- **Your Minesweeper progress**: your streak, your best streak, your points — total,
   weekly and monthly —, the record of every daily game you played, and today's
   if you left it half played.
-- **Your presence in the Nona leaderboard**: you stop appearing in your
+- **Your presence in the Minesweeper leaderboard**: you stop appearing in your
   friends' standings.
-- **The marker showing that you have Nona**: your friends stop seeing you as a
-  Nona player, and will be able to invite you again.
+- **The marker showing that you have Minesweeper**: your friends stop seeing you as a
+  Minesweeper player, and will be able to invite you again.
 - **Your session in this game**: when it finishes, the App signs you out here.
 
 ### What you keep
@@ -77,7 +77,7 @@ This is what the App calls **"Remove Nona from your account"**.
 - **Your friends**, across every game.
 - **Your progress in the other games** in the family.
 
-You can **come back to Nona whenever you want**. You would start from zero in
+You can **come back to Minesweeper whenever you want**. You would start from zero in
 this game, with the same identity as always.
 
 ---
@@ -120,7 +120,7 @@ That is the main difference from option 1: **only full deletion releases your
 
 If you signed in with Apple, there is a detail worth knowing so that it does not
 confuse you: under **Settings → your name → Sign in with Apple**, the
-authorization **does not appear as "Nona", but as "CINCO"**.
+authorization **does not appear as "Minesweeper", but as "CINCO"**.
 
 This is not a mistake. Juegos Senda games share a single Apple sign-in, and the
 system lists it under the name of the first game in the family. It is the same
@@ -129,7 +129,7 @@ same across every one.
 
 Normally you do not have to do anything: the App asks Apple to revoke it for
 you. If that revocation were to fail, the App tells you so and shows you how to
-remove it by hand — under that **CINCO** entry, not under a Nona one, because
+remove it by hand — under that **CINCO** entry, not under a Minesweeper one, because
 none exists.
 
 ---
@@ -167,11 +167,11 @@ at the time until we delete it.
 
 ## What happens to the data on your phone
 
-Nona also stores your progress on the device itself, so that you can play
+Minesweeper also stores your progress on the device itself, so that you can play
 offline: the streak, the points, the game in progress, your language and colour
 preferences, and the purchase marker.
 
-When you use either of the two options, the App **clears what Nona stores on
+When you use either of the two options, the App **clears what Minesweeper stores on
 this phone** for your account, so that the deletion does not undo itself on the
 next launch. Whatever local data remains **disappears entirely when you
 uninstall the App**.
@@ -212,11 +212,11 @@ applies.
 ## Questions?
 
 If you have questions about the process, about what data we keep, or about any
-other aspect of privacy in Nona, write to us at **support@sendapr.com**.
+other aspect of privacy in Minesweeper, write to us at **support@sendapr.com**.
 
 You can also read our
-[Privacy Policy](https://sendapr.com/privacy/nona/en/) and our
-[Terms of Service](https://sendapr.com/terms/nona/en/).
+[Privacy Policy](https://sendapr.com/privacy/minesweeper/en/) and our
+[Terms of Service](https://sendapr.com/terms/minesweeper/en/).
 
 ---
 

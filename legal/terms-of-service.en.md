@@ -1,7 +1,7 @@
-# Nona Terms of Service
+# Minesweeper Terms of Service
 
-**Effective:** August 25, 2026
-**Last updated:** September 25, 2026
+**Effective:** November 11, 2026
+**Last updated:** November 22, 2026
 
 ---
 
@@ -12,11 +12,11 @@ These Terms of Service (the "Terms") are an agreement between you and
 organized under the laws of the Commonwealth of Puerto Rico, with a mailing
 address at 410 Avenida Montesol, Ste 14 #2078, Fajardo, Puerto Rico 00738.
 
-By downloading, installing or using the **Nona** mobile application (the
+By downloading, installing or using the **Minesweeper** mobile application (the
 "App") you agree to these Terms. If you do not agree to them, do not use the
 App.
 
-You must be at least 13 years old to use Nona. If you are between 13 and 18,
+You must be at least 13 years old to use Minesweeper. If you are between 13 and 18,
 you represent that a parent or guardian has reviewed and accepted these Terms
 on your behalf.
 
@@ -24,11 +24,11 @@ on your behalf.
 
 ## 2. Important Notices — Please Read Them
 
-- **Nona is a game.** It is not a certified educational tool, nor an authority
-  on sudoku.
+- **Minesweeper is a game.** It is not a certified educational tool, nor an authority
+  on minesweeper.
 - **You can play without an account.** An account is only needed for the
   social features.
-- **Your account belongs to Juegos Senda, not just to Nona.** The same profile,
+- **Your account belongs to Juegos Senda, not just to Minesweeper.** The same profile,
   the same @username and the same friends apply across every game in the
   family. See Section 4.
 - **Your @username can be changed once every 60 days.** The previous one stays
@@ -41,13 +41,13 @@ on your behalf.
 
 ## 3. Description of the Service
 
-Nona offers **a different sudoku every day**, the same one for everybody, at a
+Minesweeper offers **a different minesweeper board every day**, the same one for everybody, at a
 difficulty that varies with the day of the week. The App flags mistakes as you
 make them, keeps count of your points and your streak, and shows a clock that
 **does not affect scoring**. It also includes an **offline free play mode**
 with unlimited puzzles, which awards neither points nor streak.
 
-The daily sudoku travels **inside the App**: no connection is needed to play
+The daily minesweeper travels **inside the App**: no connection is needed to play
 it. For anyone who creates an account, the App adds a profile with an
 @username, friendships, a friends leaderboard, and invitations to other games
 in the family.
@@ -61,7 +61,7 @@ error-free.
 ## 4. User Account
 
 **Playing does not require an account.** From the entry screen you can tap
-"Play without an account" and reach both the daily sudoku and free play.
+"Play without an account" and reach both the daily minesweeper and free play.
 
 An account is optional and unlocks the social features: a profile with an
 @username, friends, the leaderboard and invitations. It is created by signing
@@ -69,18 +69,18 @@ in with **Google** or **Apple**; we neither create nor store passwords.
 
 ### 4.1 One account for the whole family of games
 
-Nona is part of **Juegos Senda**, a family of games by Senda LLC. Creating your
-account in Nona creates your Juegos Senda account: if you install another game
+Minesweeper is part of **Juegos Senda**, a family of games by Senda LLC. Creating your
+account in Minesweeper creates your Juegos Senda account: if you install another game
 in the family and sign in with the same Google or Apple credentials, **it is
 the same account**. Your @username, display name, avatar, country and friends
 list are shared across all of them, and changing any of these in one game
 changes it in the others.
 
-**Your progress, by contrast, belongs to each game individually**: your Nona
+**Your progress, by contrast, belongs to each game individually**: your Minesweeper
 points and streak are never mixed with those of any other game.
 
 This has an important consequence when you leave, which is why the App offers
-**two distinct options**: leaving Nona only, or deleting your entire Juegos
+**two distinct options**: leaving Minesweeper only, or deleting your entire Juegos
 Senda account. See Section 12.
 
 ### 4.2 Your @username
@@ -97,13 +97,13 @@ believe someone has accessed it without your permission, write to us at
 support@sendapr.com.
 
 The handling of your data is governed by our
-[Privacy Policy](https://sendapr.com/privacy/nona/en/).
+[Privacy Policy](https://sendapr.com/privacy/minesweeper/en/).
 
 ---
 
 ## 5. Ads and Purchases
 
-Nona is free and is funded by advertising through **Google AdMob**. By using
+Minesweeper is free and is funded by advertising through **Google AdMob**. By using
 the App you accept that ads will be shown.
 
 We do not control the content of third-party ads and we do not endorse the
@@ -129,7 +129,7 @@ basis) that removes advertising from the App on your device.
 - The purchase is tied to the **store account** you paid with, not to your
   Juegos Senda account. Deleting your account does not cancel it, and changing
   your Apple or Google account does leave you without it.
-- It is a **per-game and per-platform** purchase: removing ads in Nona does not
+- It is a **per-game and per-platform** purchase: removing ads in Minesweeper does not
   remove them in another game in the family, and paying for it on Android does
   not remove them on iOS.
 
@@ -153,7 +153,7 @@ ones handling any return (see above).
 
 ## 6. Acceptable Use
 
-In using Nona, you agree **not** to:
+In using Minesweeper, you agree **not** to:
 
 - Cheat, automate play, or use bots, external solvers, scripts or modified
   clients to influence your score or the leaderboard.
@@ -171,7 +171,7 @@ In using Nona, you agree **not** to:
 You can **block** any player from their profile, which prevents them from
 sending you requests, and **report** conduct that breaks these rules. Reports
 are reviewed and may lead to suspension of the reported account. A block
-applies across the whole family of games, not only to Nona.
+applies across the whole family of games, not only to Minesweeper.
 
 ---
 
@@ -187,8 +187,8 @@ yours. You grant us a limited licence to display it to other players inside the
 App, and inside the other Juegos Senda games; which is exactly what the social
 features do.
 
-Nona is an independent development and is not affiliated with, sponsored by or
-endorsed by any other sudoku application or publication, nor by Apple, Google
+Minesweeper is an independent development and is not affiliated with, sponsored by or
+endorsed by any other minesweeper application or publication, nor by Apple, Google
 or the other companies named in these Terms.
 
 ---
@@ -213,7 +213,7 @@ of data, game progress, streaks or points.
 
 Our total, aggregate liability to you for any claim relating to the App will
 not exceed **the total amount you have paid us in the preceding twelve (12)
-months** or **US$25**, whichever is greater. Since Nona is free, in most cases
+months** or **US$25**, whichever is greater. Since Minesweeper is free, in most cases
 that amount will be US$25.
 
 Some jurisdictions do not allow certain warranty exclusions or liability
@@ -238,17 +238,17 @@ features — at any time.
 
 **11.2** We may update these Terms. When we do, we will change the "Last
 updated" date at the top of this document. If the change is significant, we
-will give notice inside the App. Continuing to use Nona after a change takes
+will give notice inside the App. Continuing to use Minesweeper after a change takes
 effect means that you accept it.
 
 ---
 
 ## 12. Termination
 
-You can stop using Nona whenever you want. The App offers **two distinct
+You can stop using Minesweeper whenever you want. The App offers **two distinct
 options**, and it is worth not confusing them:
 
-- **Leave Nona**: your Nona progress — streak, points and games — is deleted,
+- **Leave Minesweeper**: your Minesweeper progress — streak, points and games — is deleted,
   and you stop appearing in its leaderboard. **You keep your Juegos Senda
   account**, your @username, your avatar, your friends and your progress in the
   other games.
@@ -258,7 +258,7 @@ options**, and it is worth not confusing them:
   had before** for someone else.
 
 The full procedure is at
-[How to delete your account](https://sendapr.com/delete-account/nona/en/).
+[How to delete your account](https://sendapr.com/delete-account/minesweeper/en/).
 
 We may suspend or terminate your access if you breach these Terms, if your
 conduct harms other players, or if the law requires us to. Where circumstances

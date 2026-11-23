@@ -1,7 +1,7 @@
-# Política de Privacidad de Nona
+# Política de Privacidad de Buscaminas (Minesweeper)
 
-**Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 5 de octubre de 2026
+**Vigente desde:** 11 de noviembre de 2026
+**Última actualización:** 22 de noviembre de 2026
 
 ---
 
@@ -14,7 +14,7 @@ de Puerto Rico, con dirección postal en:
 > 410 Avenida Montesol, Ste 14 #2078
 > Fajardo, Puerto Rico 00738
 
-Senda LLC es responsable de la aplicación móvil **Nona** (la "App"), el sudoku
+Senda LLC es responsable de la aplicación móvil **Buscaminas / Minesweeper** (la "App"), el buscaminas
 del día. Esta Política de Privacidad explica qué información recopilamos
 cuando usas la App, cómo la usamos, con quién la compartimos, y qué derechos
 tienes sobre ella.
@@ -33,28 +33,28 @@ los puntos más importantes:
   del día y al modo libre, sin darnos ningún dato personal. La cuenta hace
   falta solo para las funciones sociales —perfil, amigos y clasificación— y se
   crea con Google o con Apple; no creamos ni almacenamos contraseñas.
-- **Nona funciona entera sin conexión.** El sudoku de cada día viaja dentro de
+- **Minesweeper funciona entera sin conexión.** El buscaminas de cada día viaja dentro de
   la App, no se descarga. Puedes jugar en un avión, y tu progreso vive en el
   teléfono.
-- **Tu cuenta es de Juegos Senda, no solo de Nona.** Nona forma parte de una
+- **Tu cuenta es de Juegos Senda, no solo de Minesweeper.** Minesweeper forma parte de una
   familia de juegos de Senda LLC. Tu @usuario, tu nombre visible, tu avatar,
   tu país y tu lista de amigos son **los mismos en todos**. Tu progreso de
-  Nona, en cambio, es solo de Nona (ver 3.1 y 3.3).
-- **Quién puede ver que juegas a Nona: solo tus amigos.** La App enseña a tus
-  amigos que ya tienes Nona, y a ti te enseña qué amigos tuyos todavía no la
+  Minesweeper, en cambio, es solo de Minesweeper (ver 3.1 y 3.3).
+- **Quién puede ver que juegas a Minesweeper: solo tus amigos.** La App enseña a tus
+  amigos que ya tienes Minesweeper, y a ti te enseña qué amigos tuyos todavía no la
   tienen, para que puedas invitarlos. Ese dato —qué juegos de la familia
   tienes— **solo lo pueden consultar tus amigos**, no cualquier persona con
   cuenta (ver 3.4).
 - **No vendemos tu información personal** a anunciantes ni a brokers de
   datos, y nunca lo haremos.
-- **Tus partidas son privadas.** El detalle de cada sudoku —qué pusiste en
+- **Tus partidas son privadas.** El detalle de cada tablero de buscaminas —qué pusiste en
   cada casilla, cuántos fallos, cuánto tardaste— sólo lo puede leer tu propia
   cuenta.
 - **No guardamos tu foto de perfil de Google ni de Apple.** Tu identidad
-  visible en Nona es el avatar que eliges dentro de la App.
+  visible en Minesweeper es el avatar que eliges dentro de la App.
 - **Con Apple puedes ocultar tu correo.** Si usas "Ocultar mi correo", Apple
   nos entrega una dirección de reenvío y nunca vemos la tuya real.
-- **En los ajustes de Apple, Nona aparece como "CINCO".** No es un error: los
+- **En los ajustes de Apple, Minesweeper aparece como "CINCO".** No es un error: los
   juegos de la familia comparten un mismo inicio de sesión de Apple, y el
   sistema lo lista bajo el nombre del primero (ver 3.2).
 - **La App es gratuita y muestra anuncios** (Google AdMob), que usan
@@ -72,11 +72,11 @@ los puntos más importantes:
   Reino Unido, esa transferencia se ampara en el Marco de Privacidad de Datos
   UE–EE. UU. y en Cláusulas Contractuales Tipo (ver 5.1).
 - **Comprobamos que la App sea legítima.** Al arrancar, Google o Apple
-  certifican que Nona se ejecuta en un dispositivo real y sin modificar. Solo
+  certifican que Minesweeper se ejecuta en un dispositivo real y sin modificar. Solo
   recibimos un sí/no, nunca las señales del dispositivo (ver 3.11).
-- **Puedes salir solo de Nona, o eliminar toda tu cuenta.** Son dos cosas
+- **Puedes salir solo de Minesweeper, o eliminar toda tu cuenta.** Son dos cosas
   distintas y las dos están en la App. Los detalles están en
-  [Cómo borrar tu cuenta](https://sendapr.com/delete-account/nona/).
+  [Cómo borrar tu cuenta](https://sendapr.com/delete-account/minesweeper/).
 
 ---
 
@@ -90,7 +90,7 @@ correo, ni identificador de usuario, y tu progreso vive solo en el teléfono
 los informes de fallos (3.9) y la comprobación de integridad (3.11), porque no
 dependen de que tengas cuenta.
 
-La cuenta es opcional y sirve para las funciones sociales. Nona no tiene
+La cuenta es opcional y sirve para las funciones sociales. Minesweeper no tiene
 registro con contraseña: inicias sesión con **Google** o con **Apple**, y el
 proveedor que elijas nos comunica un identificador de usuario y tu correo
 electrónico. Ese correo lo administra Firebase Authentication (Google) como
@@ -100,12 +100,12 @@ perfiles ni lo mostramos a otros jugadores.
 Si inicias sesión con Apple y eliges **"Ocultar mi correo"**, Apple genera una
 dirección de reenvío privada. En ese caso nunca conocemos tu correo real.
 
-**Tu cuenta es de Juegos Senda, no solo de Nona.** Si instalas otro juego de
+**Tu cuenta es de Juegos Senda, no solo de Minesweeper.** Si instalas otro juego de
 la familia y entras con la misma cuenta de Google o Apple, es **la misma
 cuenta y el mismo perfil**: tu @usuario, tu nombre visible, tu avatar, tu país
 y tu lista de amigos son los mismos en todos, y cambiarlos en un juego los
 cambia en los demás. **El progreso de cada juego es separado**: tus partidas,
-tu racha y tus puntos de Nona no aparecen en ningún otro juego, ni los de otro
+tu racha y tus puntos de Minesweeper no aparecen en ningún otro juego, ni los de otro
 juego aquí.
 
 Al crear la cuenta tomamos una sola vez el nombre que nos da el proveedor para
@@ -116,7 +116,7 @@ de perfil del proveedor no se guarda en ningún momento.**
 ### 3.2 "Iniciar sesión con Apple" aparece como CINCO
 
 Si entras con Apple, conviene que sepas esto porque de otro modo desconcierta:
-en **Ajustes → tu nombre → Iniciar sesión con Apple**, Nona **no aparece con su
+en **Ajustes → tu nombre → Iniciar sesión con Apple**, Minesweeper **no aparece con su
 propio nombre, sino como "CINCO"**.
 
 El motivo es técnico y no cambia nada de lo que hacemos con tus datos: los
@@ -127,9 +127,9 @@ juegos de la familia, que es justo lo que hace que tu cuenta sea la misma en
 todos ellos.
 
 Esto importa sobre todo al borrar la cuenta: si retiras el permiso desde los
-Ajustes de Apple, lo retiras para **toda la familia**, no solo para Nona.
+Ajustes de Apple, lo retiras para **toda la familia**, no solo para Minesweeper.
 
-### 3.3 Tu perfil y tu progreso en Nona
+### 3.3 Tu perfil y tu progreso en Minesweeper
 
 Guardamos en Firestore dos cosas distintas, y la diferencia importa:
 
@@ -144,7 +144,7 @@ Guardamos en Firestore dos cosas distintas, y la diferencia importa:
   decides indicarlo.
 - **Fecha** de creación de la cuenta.
 
-**Tu progreso de Nona**, guardado aparte y solo para este juego:
+**Tu progreso de Minesweeper**, guardado aparte y solo para este juego:
 
 - **Marcadores**: racha actual, mejor racha, puntos totales y los agregados
   por semana y por mes que alimentan la clasificación, más el último día que
@@ -155,8 +155,8 @@ Guardamos en Firestore dos cosas distintas, y la diferencia importa:
 
 Guardamos además, en una zona **privada que sólo tú puedes leer**, tu **última
 actividad**, tu **token de notificaciones** (ver 3.5) y **la diaria de hoy, si
-la tienes a medias**: el tablero tal como va —las cifras que pusiste, tus
-notas, los fallos, el tiempo de juego, cuántas jugadas llevas y si ya está
+la tienes a medias**: el tablero tal como va —las casillas descubiertas, tus
+banderas, las minas detonadas, el tiempo de juego, cuántas jugadas llevas y si ya está
 terminada—, para que puedas seguirla en otro teléfono o después de salir de tu
 cuenta y volver a entrar. Solo se guarda con la sesión iniciada, se actualiza un
 momento después de cada jugada y al salir de la App, y es **un único registro
@@ -184,8 +184,8 @@ Si usas las funciones sociales guardamos:
 
 #### Qué juegos de la familia tienes, y quién puede verlo
 
-Nona incluye una función de **invitación cruzada**: en tu lista de amigos
-puedes ver **qué amigos tuyos todavía no tienen Nona**, para invitarlos, y
+Minesweeper incluye una función de **invitación cruzada**: en tu lista de amigos
+puedes ver **qué amigos tuyos todavía no tienen Minesweeper**, para invitarlos, y
 ellos pueden verte a ti del mismo modo desde los otros juegos de la familia.
 
 Para que eso funcione guardamos, por cada juego de la familia, **si has
@@ -193,7 +193,7 @@ entrado en él con tu cuenta**.
 
 **Solo tus amigos pueden consultarlo.** Quien no sea amigo tuyo no puede
 averiguar a qué juegos de Juegos Senda juegas, aunque te encuentre por tu
-@usuario. Lo mismo vale para tus marcadores de Nona —racha y puntos—: los leen
+@usuario. Lo mismo vale para tus marcadores de Minesweeper —racha y puntos—: los leen
 tus amigos, para la clasificación entre amigos, y nadie más.
 
 **Qué juegos has DEJADO es solo tuyo.** Si sales de un juego desde su pantalla
@@ -210,7 +210,7 @@ posible que un amigo te busque antes de serlo.
 Conviene ser explícito sobre una consecuencia: **si además juegas a CINCO**,
 por cómo se guardaron sus datos desde el primer día, su puntuación y su racha
 viven en ese mismo perfil común. De ahí **se puede deducir que tienes CINCO**,
-y ver sus puntos, sin ser amigo tuyo. **Nona no funciona así**: su progreso
+y ver sus puntos, sin ser amigo tuyo. **Minesweeper no funciona así**: su progreso
 vive aparte y está cerrado a tus amigos. Estamos trabajando en corregir esa
 diferencia en CINCO.
 
@@ -231,7 +231,7 @@ teléfono, el anterior se descarta.
 
 ### 3.6 Publicidad
 
-Nona es gratuita y muestra anuncios de **Google AdMob**, en formato de banner y
+Minesweeper es gratuita y muestra anuncios de **Google AdMob**, en formato de banner y
 de pantalla completa entre partidas. Para servirlos, AdMob recibe el
 **identificador de publicidad de tu dispositivo** (IDFA en iOS, AAID en
 Android), tu **dirección IP** y eventos del anuncio (si se mostró, si lo
@@ -252,11 +252,11 @@ consentimiento; nosotros no construimos perfiles publicitarios por nuestra
 cuenta.
 
 Si compras **Quitar anuncios**, la App deja de pedir anuncios: a partir de ese
-momento AdMob ya no recibe nada desde tu dispositivo por parte de Nona.
+momento AdMob ya no recibe nada desde tu dispositivo por parte de Minesweeper.
 
 ### 3.7 Tu compra ("Quitar anuncios")
 
-Nona ofrece una sola compra opcional: un pago único que retira la publicidad.
+Minesweeper ofrece una sola compra opcional: un pago único que retira la publicidad.
 
 **No recibimos ni almacenamos tus datos de pago.** La transacción ocurre
 íntegramente dentro del App Store de Apple o de Google Play: ellos cobran,
@@ -265,10 +265,10 @@ tu tarjeta ni tu dirección de facturación.
 
 Lo único que la App guarda es una **marca de sí/no en tu propio dispositivo**
 que indica que la compra está activa. Esa marca no viaja a nuestros servidores
-ni se asocia a tu perfil: tu cuenta de Nona no sabe si has comprado.
+ni se asocia a tu perfil: tu cuenta de Minesweeper no sabe si has comprado.
 
 En consecuencia, la compra vive en la **cuenta de la tienda** con la que
-pagaste, no en tu cuenta de Nona. Si reinstalas la App o estrenas teléfono,
+pagaste, no en tu cuenta de Minesweeper. Si reinstalas la App o estrenas teléfono,
 usa **"Restaurar compras"** en la pantalla Más para que la tienda vuelva a
 confirmarla.
 
@@ -285,8 +285,8 @@ versión del sistema, idioma y país aproximado por IP).
 Por otro, registramos un conjunto acotado de **acciones concretas**, que son
 estas y ninguna más:
 
-- Terminar el sudoku del día, indicando la **dificultad** de ese día y
-  **cuántos fallos** se te contaron (de 0 a 5). No registramos ni el tiempo ni
+- Terminar el buscaminas del día, indicando la **dificultad** de ese día y
+  **cuántos fallos** se te contaron (de 0 a 3 minas). No registramos ni el tiempo ni
   la puntuación.
 - Terminar un puzle del **modo libre**, indicando solo su dificultad.
 - Elegir "Jugar sin cuenta".
@@ -328,7 +328,7 @@ usuarios, y no contienen tu perfil ni el contenido de tus partidas.
 
 ### 3.10 Datos que se quedan en tu teléfono
 
-Nona está pensada para funcionar sin conexión, así que **tu teléfono es la
+Minesweeper está pensada para funcionar sin conexión, así que **tu teléfono es la
 fuente principal de tu progreso**: la racha, los puntos, el estado de la
 partida en curso, tus preferencias de idioma y de color, y la marca de la
 compra descrita arriba se guardan en el propio dispositivo.
@@ -339,7 +339,7 @@ Esos datos no salen de tu teléfono salvo cuando se sincronizan con tu cuenta
 ### 3.11 Comprobación de integridad (App Check)
 
 Para que nuestros servidores no puedan usarse desde una copia modificada de la
-App ni desde un script automatizado, Nona usa **Firebase App Check**, que se
+App ni desde un script automatizado, Minesweeper usa **Firebase App Check**, que se
 apoya en **Play Integrity** (Android) y en **App Attest** (iOS).
 
 Al arrancar, la App le pide a Google o a Apple —según tu sistema— un
@@ -371,12 +371,12 @@ lo reciba. Tampoco incluye tu tiempo, porque el reloj no puntúa.
 
 Usamos la información descrita arriba únicamente para:
 
-- **Hacer funcionar el juego**: entregarte el sudoku del día, llevar la cuenta
+- **Hacer funcionar el juego**: entregarte el buscaminas del día, llevar la cuenta
   de tus fallos, calcular tu racha y tus puntos, y conservarlos si cambias de
   teléfono.
 - **Sostener las funciones sociales**: permitir que tus amigos te encuentren
   por tu @usuario, mostrar la clasificación entre amigos, entregar los
-  empujones y enseñarte a qué amigos puedes invitar a Nona.
+  empujones y enseñarte a qué amigos puedes invitar a Minesweeper.
 - **Enviarte notificaciones** relacionadas con esas funciones, si las
   aceptaste.
 - **Mostrar anuncios**, que son lo que paga el desarrollo de la App —y dejar
@@ -468,14 +468,14 @@ quede explícito porque es la parte que más suele sorprender:
   tu nombre visible, tu avatar y tu país si lo indicaste. Es lo que permite que
   un amigo te encuentre antes de serlo. (Si además juegas a CINCO, también sus
   puntos y su racha — ver 3.4.)
-- **Visible sólo para tus amigos**: que tienes Nona, y tus marcadores de Nona
+- **Visible sólo para tus amigos**: que tienes Minesweeper, y tus marcadores de Minesweeper
   (racha actual, mejor racha, puntos totales y los de la semana y el mes) para
   la clasificación entre amigos.
 - **Visible sólo para ti**: el detalle de cada partida, tu lista de bloqueos,
   tu correo electrónico, tu última actividad, tu token de notificaciones y qué
   juegos de la familia has dejado.
 - **Visible para la otra persona**: que le enviaste una solicitud de amistad,
-  un empujón o una invitación a Nona.
+  un empujón o una invitación a Minesweeper.
 - **Visible solo para nosotros**: los reportes. La persona a la que reportas
   no ve el reporte ni quién lo envió.
 
@@ -492,10 +492,10 @@ Puedes, en cualquier momento:
 - **Corregir** tu nombre visible, avatar y país desde la propia App, y tu
   @usuario una vez cada 60 días. Recuerda que los cuatro son comunes a todos
   los juegos de la familia.
-- **Salir solo de Nona**, conservando tu cuenta, tu @usuario y tus amigos.
+- **Salir solo de Minesweeper**, conservando tu cuenta, tu @usuario y tus amigos.
 - **Eliminar tu cuenta de Juegos Senda** y todos los datos asociados, en todos
   los juegos de la familia. Ambas opciones están en la App y se explican en
-  [Cómo borrar tu cuenta](https://sendapr.com/delete-account/nona/).
+  [Cómo borrar tu cuenta](https://sendapr.com/delete-account/minesweeper/).
 - **Solicitar una copia** de tus datos en formato legible por máquina.
 - **Revocar el consentimiento** de publicidad personalizada, desde los ajustes
   de privacidad de tu sistema operativo.
@@ -548,14 +548,14 @@ Con más detalle, por tipo de dato:
 | Dato | Cuánto lo conservamos |
 |---|---|
 | Perfil, @usuario, marcadores, partidas, amistades, bloqueos y token de notificaciones | Mientras la cuenta esté activa. Al eliminarla se borran **de inmediato** |
-| La diaria de hoy a medias | Un único registro, que reemplaza la partida del siguiente día que juegues. Se borra **de inmediato** al quitar Nona de tu cuenta o al eliminarla |
+| La diaria de hoy a medias | Un único registro, que reemplaza la partida del siguiente día que juegues. Se borra **de inmediato** al quitar Minesweeper de tu cuenta o al eliminarla |
 | Reportes | **Dos años** desde que se envían; después se borran solos. La copia que nos llega por correo la borramos nosotros, en el mismo plazo. Se conservan aunque se elimine alguna de las dos cuentas, para poder revisar lo que se reportó (ver 3.4) |
 | Informes de fallos (Crashlytics y Sentry) | El plazo de retención de cada servicio, **90 días por defecto**. No contienen tu perfil |
 | Datos de uso | **Un máximo de 400 días**, tanto en Google Analytics para Firebase como en la copia exportada a BigQuery. Pasado ese plazo se borran solos |
 | Datos guardados sólo en tu teléfono | Hasta que desinstales la App |
 | Registros que la ley nos obliga a conservar | El plazo que marque la norma aplicable |
 
-Si sales solo de Nona sin borrar la cuenta, se borra tu progreso de Nona y
+Si sales solo de Minesweeper sin borrar la cuenta, se borra tu progreso de Minesweeper y
 dejas de aparecer en su clasificación; tu perfil, tu @usuario y tus amigos
 siguen intactos.
 
@@ -570,7 +570,7 @@ mantener, típicamente por razones contables o fiscales.
 
 ## 10. Niños
 
-Nona no está dirigida a menores de 13 años y no recopilamos conscientemente
+Minesweeper no está dirigida a menores de 13 años y no recopilamos conscientemente
 información de menores de esa edad. Si descubrimos que hemos recibido
 información de un menor de 13 años, la eliminaremos de inmediato. Si eres
 madre, padre o tutor y crees que tu hijo nos ha dado información, escríbenos a
@@ -596,4 +596,4 @@ Fajardo, Puerto Rico 00738
 **Correo:** support@sendapr.com
 
 El uso de la App se rige además por nuestros
-[Términos de Servicio](https://sendapr.com/terms/nona/).
+[Términos de Servicio](https://sendapr.com/terms/minesweeper/).

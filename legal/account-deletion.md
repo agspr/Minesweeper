@@ -1,13 +1,13 @@
-# Cómo Borrar tu Cuenta en Nona
+# Cómo Borrar tu Cuenta en Buscaminas (Minesweeper)
 
-**Vigente desde:** 25 de agosto de 2026
-**Última actualización:** 5 de octubre de 2026
+**Vigente desde:** 11 de noviembre de 2026
+**Última actualización:** 22 de noviembre de 2026
 
-Nona forma parte de **Juegos Senda**, una familia de juegos de SENDA LLC que
+Minesweeper forma parte de **Juegos Senda**, una familia de juegos de SENDA LLC que
 comparten una misma cuenta. Por eso borrar tiene **dos significados distintos**,
 y la App te ofrece los dos por separado:
 
-- **Borrar Nona de tu cuenta** — se va tu progreso de Nona. Conservas tu
+- **Borrar Minesweeper de tu cuenta** — se va tu progreso de Minesweeper. Conservas tu
   cuenta, tu @usuario, tus amigos y tu progreso en los demás juegos.
 - **Eliminar tu cuenta de Juegos Senda** — se va todo, en **todos** los juegos
   de la familia, incluidos los que no tengas instalados en este teléfono.
@@ -23,7 +23,7 @@ sobrevive y cuánto tarda.
 
 ## Cómo llegar a las dos opciones
 
-1. Abre Nona e inicia sesión.
+1. Abre Minesweeper e inicia sesión.
 2. Ve a la pestaña **Más**.
 3. Toca **tu tarjeta de perfil** (la que muestra tu avatar y tu @usuario).
 4. Al final de la hoja que se abre, toca **Eliminar cuenta**.
@@ -45,29 +45,29 @@ por cualquier motivo, escríbenos a **support@sendapr.com** desde el correo
 asociado a tu cuenta, con el asunto:
 
 ```
-Solicitud de eliminación de cuenta — Nona
+Solicitud de eliminación de cuenta — Minesweeper
 ```
 
-Dinos si quieres **salir solo de Nona** o **eliminar tu cuenta de Juegos Senda
+Dinos si quieres **salir solo de Minesweeper** o **eliminar tu cuenta de Juegos Senda
 entera**. Procesamos estas solicitudes **dentro de los 30 días** de recibidas,
 y normalmente en los primeros días. Te confirmamos por correo cuando esté
 hecho.
 
 ---
 
-## Opción 1 — Borrar Nona de tu cuenta
+## Opción 1 — Borrar Minesweeper de tu cuenta
 
-Esto es lo que la App llama **"Borrar Nona de tu cuenta"**.
+Esto es lo que la App llama **"Borrar Minesweeper de tu cuenta"**.
 
 ### Qué se borra
 
-- **Tu progreso de Nona**: tu racha, tu mejor racha, tus puntos —totales, de la
+- **Tu progreso de Minesweeper**: tu racha, tu mejor racha, tus puntos —totales, de la
   semana y del mes—, el registro de cada partida diaria que jugaste y la de hoy
   si la dejaste a medias.
-- **Tu presencia en la clasificación de Nona**: dejas de aparecer en el
+- **Tu presencia en la clasificación de Minesweeper**: dejas de aparecer en el
   marcador de tus amigos.
-- **La marca de que tienes Nona**: tus amigos dejan de verte como jugador de
-  Nona, y volverán a poder invitarte.
+- **La marca de que tienes Minesweeper**: tus amigos dejan de verte como jugador de
+  Minesweeper, y volverán a poder invitarte.
 - **Tu sesión en este juego**: al terminar, la App te cierra la sesión aquí.
 
 ### Qué conservas
@@ -78,7 +78,7 @@ Esto es lo que la App llama **"Borrar Nona de tu cuenta"**.
 - **Tus amigos**, en todos los juegos.
 - **Tu progreso en los demás juegos** de la familia.
 
-Puedes **volver a entrar en Nona cuando quieras**. Empezarías de cero en este
+Puedes **volver a entrar en Minesweeper cuando quieras**. Empezarías de cero en este
 juego, con la misma identidad de siempre.
 
 ---
@@ -120,7 +120,7 @@ Es la diferencia principal con la opción 1: **solo el borrado total libera tus
 
 Si entraste con Apple, hay un detalle que conviene saber para no desconcertarse:
 en **Ajustes → tu nombre → Iniciar sesión con Apple**, la autorización **no
-aparece como "Nona", sino como "CINCO"**.
+aparece como "Minesweeper", sino como "CINCO"**.
 
 No es un error. Los juegos de Juegos Senda comparten un mismo inicio de sesión
 de Apple, y el sistema lo lista bajo el nombre del primer juego de la familia.
@@ -129,7 +129,7 @@ la misma en todos ellos.
 
 Normalmente no tienes que hacer nada: la App le pide a Apple que lo revoque por
 ti. Si esa revocación fallara, la App te lo dice y te indica cómo quitarlo a
-mano —en esa entrada de **CINCO**, no en una de Nona, porque no existe.
+mano —en esa entrada de **CINCO**, no en una de Minesweeper, porque no existe.
 
 ---
 
@@ -166,11 +166,11 @@ tenías entonces hasta que la borremos.
 
 ## Qué pasa con los datos en tu teléfono
 
-Nona guarda tu progreso también en el propio dispositivo, para que puedas jugar
+Minesweeper guarda tu progreso también en el propio dispositivo, para que puedas jugar
 sin conexión: la racha, los puntos, la partida en curso, tus preferencias de
 idioma y color, y la marca de la compra.
 
-Al usar cualquiera de las dos opciones, la App **limpia lo que Nona guarda en
+Al usar cualquiera de las dos opciones, la App **limpia lo que Minesweeper guarda en
 este teléfono** para tu cuenta, de modo que el borrado no se deshaga solo en el
 siguiente arranque. Lo que quede de datos locales **desaparece del todo cuando
 desinstalas la App**.
@@ -210,11 +210,11 @@ días.
 ## ¿Preguntas?
 
 Si tienes dudas sobre el proceso, sobre qué datos guardamos o sobre cualquier
-otro aspecto de la privacidad en Nona, escríbenos a **support@sendapr.com**.
+otro aspecto de la privacidad en Minesweeper, escríbenos a **support@sendapr.com**.
 
 Puedes consultar también nuestra
-[Política de Privacidad](https://sendapr.com/privacy/nona/) y nuestros
-[Términos de Servicio](https://sendapr.com/terms/nona/).
+[Política de Privacidad](https://sendapr.com/privacy/minesweeper/) y nuestros
+[Términos de Servicio](https://sendapr.com/terms/minesweeper/).
 
 ---
 
