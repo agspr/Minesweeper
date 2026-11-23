@@ -50,14 +50,18 @@ final GameConfig nonaConfig = GameConfig(
   // metería documentos en la colección viva de CINCO (§3.2).
   dataLayout: const SendaDataLayout.namespaced(nonaGameId),
 
-  // Sin cuenta de AdMob todavía: el paquete cae a las unidades de prueba de
-  // Google. Se cambia por las reales cuando el agente de listings las cree, y
-  // mientras tanto la app se puede construir y enseñar entera.
+  // Las unidades de Minesweeper, creadas el 23-11-2026 bajo sus dos apps de
+  // AdMob («Minesweeper — Daily Logic», Android ~7005873887 e iOS
+  // ~7754567513). Hasta entonces aquí iban las de Nona: los anuncios se
+  // servían, pero contaban como tráfico de OTRA app, que es justo lo que las
+  // políticas de AdMob tratan como inválido. Los ids de aplicación viven
+  // aparte, en AndroidManifest.xml e Info.plist, y tienen que ser de la misma
+  // app que estas unidades.
   ads: const AdConfig(
-    bannerAndroid: 'ca-app-pub-5030233210775781/8790973745',
-    bannerIos: 'ca-app-pub-5030233210775781/5154197249',
-    interstitialAndroid: 'ca-app-pub-5030233210775781/2444273423',
-    interstitialIos: 'ca-app-pub-5030233210775781/2528033906',
+    bannerAndroid: 'ca-app-pub-5030233210775781/9248893845',
+    bannerIos: 'ca-app-pub-5030233210775781/5128404174',
+    interstitialAndroid: 'ca-app-pub-5030233210775781/4707013608',
+    interstitialIos: 'ca-app-pub-5030233210775781/8865750461',
   ),
 
   iap: const IapConfig(removeAdsId: 'com.sendallc.minesweeper.removeads'),

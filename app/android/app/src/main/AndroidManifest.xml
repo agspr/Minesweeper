@@ -47,10 +47,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <!-- Identificador de aplicación de AdMob. Igual que en iOS: sin él la
-             app se cierra al arrancar. De prueba hasta que Nona tenga cuenta. -->
+             app se cierra al arrancar. El de Minesweeper (Android), creado el
+             23-11-2026; hasta entonces aquí iba el de Nona. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5030233210775781~4088527589" />
+            android:value="ca-app-pub-5030233210775781~7005873887" />
         <!-- Play Juegos, FUERA hasta que Nona adopte los logros. Llega con el
              paquete (juegos_senda 0.73+, por games_services →
              play-services-games-v2), y su proveedor arranca Play Juegos al

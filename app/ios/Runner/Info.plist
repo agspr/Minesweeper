@@ -4,10 +4,10 @@
 <dict>
 	<!-- Identificador de aplicación de AdMob. SIN ESTA CLAVE la app se CIERRA al
 	     arrancar: el SDK lanza GADInvalidInitializationException, no un aviso.
-	     Hoy es el identificador de PRUEBA público de Google porque Nona todavía
-	     no tiene cuenta de AdMob; se sustituye por el real cuando exista. -->
+	     El de Minesweeper (iOS), creado el 23-11-2026; hasta entonces aquí iba
+	     el de Nona. -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-5030233210775781~5728912318</string>
+	<string>ca-app-pub-5030233210775781~7754567513</string>
 	<!-- ATT: el prompt de seguimiento de iOS. Sin esta clave el sistema NO lo
 	     enseña nunca, lo da por denegado, y App Review rechaza la app por pedir
 	     seguimiento sin explicarlo.
