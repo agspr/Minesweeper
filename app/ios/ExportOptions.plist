@@ -6,10 +6,16 @@
 	     Existe porque las opciones que genera Flutter por su cuenta NO dicen
 	     qué perfil usar, y el exportador entonces elige uno cualquiera del
 	     equipo: la exportación fallaba con "requires a provisioning profile
-	     with the Sign In with Apple feature" aunque el perfil correcto —"Nona
-	     App Store"— estuviera instalado y sí llevara esa capacidad. Mapear el
-	     bundle id a su perfil a mano es lo que lo arregla. Mismo fichero y
-	     misma forma que en CINCO. -->
+	     with the Sign In with Apple feature" aunque el perfil correcto
+	     estuviera instalado y sí llevara esa capacidad. Mapear el bundle id a
+	     su perfil a mano es lo que lo arregla. Mismo fichero y misma forma que
+	     en CINCO.
+
+	     El perfil es «Minesweeper App Store», creado el 23-11-2026 por la API
+	     de App Store Connect (bundle ZXF5PV562K, certificado de distribución
+	     U9RBM8PB2M). Hasta entonces aquí y en el proyecto seguía el de Nona, y
+	     con él NO se podía firmar: es de otro bundle id. Caduca con el
+	     certificado, el 5-6-2027. -->
 	<key>method</key>
 	<string>app-store-connect</string>
 	<key>teamID</key>
@@ -20,8 +26,8 @@
 	<string>Apple Distribution</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>com.nonaapp.nona</key>
-		<string>Nona App Store</string>
+		<key>com.sendallc.minesweeper</key>
+		<string>Minesweeper App Store</string>
 	</dict>
 </dict>
 </plist>

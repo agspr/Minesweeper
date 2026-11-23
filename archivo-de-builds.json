@@ -175,6 +175,30 @@
       },
       "incidencia": "Subida a Google Play pruebas internas desde Windows; IPA pendiente de entorno macOS.",
       "tienda": "Play pruebas internas, 11-11-2026"
+    },
+    "15": {
+      "version": "1.0.0",
+      "fecha": "2026-11-23",
+      "commit": "f9c44b4b6ad1c59edac31b441cd81e47b48c377b",
+      "arbol_limpio": false,
+      "aab": {
+        "fichero": "minesweeper-1.0.0-15.aab",
+        "bytes": 67749039,
+        "sha256": "e6bd0a9c5d7dfc39eecae5947ffe4bf80e57eeb54438837e73b99fe846e60f7f"
+      },
+      "ipa": {
+        "fichero": "minesweeper-1.0.0-15.ipa",
+        "bytes": 53708324,
+        "sha256": "870e10cb54ca9727a4972187940e1ff6642df38abdbe586c2908b0fc26406e2b"
+      },
+      "simbolos": {
+        "fichero": "minesweeper-1.0.0-15-simbolos.zip",
+        "bytes": 7941637,
+        "sha256": "ba8fd68cb91ca34232508ceae2ff413135d09a99fe260d386e8109ae8b47279e"
+      },
+      "tienda": "Play pruebas internas, 23-11-2026"
     }
-  }
+  },
+  "paquete_android": "com.sendallc.minesweeper",
+  "paquete_ios": "com.sendallc.minesweeper"
 }

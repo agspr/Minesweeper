@@ -32,6 +32,10 @@ parser = argparse.ArgumentParser(description="Upload Minesweeper AAB to Google P
 parser.add_argument("--aab", default=DEFAULT_AAB_PATH, help="Path to the release .aab file")
 parser.add_argument("--key", default=DEFAULT_KEY_PATH, help="Path to Google Play Service Account JSON key")
 parser.add_argument("--pkg", default="com.sendallc.minesweeper", help="Android package name")
+# Las notas van POR BUILD. Antes estaban escritas aquí dentro con lo que traía
+# la 14, y cualquier subida posterior se las habría colgado a otro binario.
+parser.add_argument("--notes-es", help="Novedades de ESTA build (es-419); sin ella, solo la versión")
+parser.add_argument("--notes-en", help="What's new in THIS build (en-US); without it, just the version")
 args = parser.parse_args()
 
 KEY_PATH = args.key
@@ -107,17 +111,19 @@ try:
         "track": "internal",
         "releases": [
             {
-                "name": f"1.0.0 ({version_code}) — Buscaminas Material 3 Expressive",
+                "name": f"1.0.0 ({version_code})",
                 "versionCodes": [str(version_code)],
                 "status": "completed",
                 "releaseNotes": [
                     {
                         "language": "es-419",
-                        "text": f"Buscaminas 1.0.0 ({version_code}):\n• Rótulo expresivo táctil en dos líneas (BUSCA / MINAS) estilo CINCO.\n• Anuncio mostrado inmediatamente al terminar la partida de práctica.\n• Enfriamiento mínimo de 15 segundos entre anuncios."
+                        "text": f"Buscaminas 1.0.0 ({version_code})"
+                        + (f":\n{args.notes_es}" if args.notes_es else ""),
                     },
                     {
                         "language": "en-US",
-                        "text": f"Minesweeper 1.0.0 ({version_code}):\n• Two-line Material 3 Expressive title graphic (MINE / SWEEPER) matching CINCO.\n• Immediate ad presentation upon finishing practice mode games.\n• Minimum 15-second cooldown between interstitial ads."
+                        "text": f"Minesweeper 1.0.0 ({version_code})"
+                        + (f":\n{args.notes_en}" if args.notes_en else ""),
                     }
                 ]
             }
