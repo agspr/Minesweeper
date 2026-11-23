@@ -55,10 +55,27 @@ void main() {
   group('pistas (solo en el modo libre)', () {
     test('rellenan la casilla seleccionada con el dígito correcto', () async {
       final c = await make();
-      final cell = _firstEmpty(c);
+      // SEGURA, no la primera vacía: si el tablero —aleatorio— ponía una mina
+      // ahí, la pista se iba a otra casilla (ver la prueba de abajo) y esto
+      // fallaba de vez en cuando sin que nada estuviera roto.
+      final cell = _firstHiddenSafe(c);
       c.select(cell);
       c.hint();
       expect(c.board!.entries[cell], c.board!.solution[cell]);
+      expect(c.hintsUsed, 1);
+    });
+
+    test('sobre una mina seleccionada no la detona: abre otra segura', () async {
+      final c = await make();
+      final mina = _firstHiddenMine(c);
+      c.select(mina);
+      c.hint();
+      expect(c.board!.entries[mina], 0, reason: 'la mina sigue cubierta');
+      expect(c.board!.mistakes, 0);
+      expect(c.board!.isLost, isFalse);
+      expect(c.selected, isNot(mina));
+      expect(c.board!.isMine(c.selected), isFalse);
+      expect(c.board!.entries[c.selected], c.board!.solution[c.selected]);
       expect(c.hintsUsed, 1);
     });
 
@@ -146,4 +163,18 @@ int _firstEmpty(PracticeController c) {
     if (!c.board!.isGiven(i) && c.board!.entries[i] == 0) return i;
   }
   throw StateError('sin casillas vacías');
+}
+
+/// La primera casilla cubierta que es (o no es) mina. Recorre el tablero de
+/// verdad (`boardCellCount`) y no el `cellCount` de 81 heredado del sudoku: un
+/// fácil tiene 64.
+int _firstHiddenSafe(PracticeController c) => _firstHidden(c, mina: false);
+int _firstHiddenMine(PracticeController c) => _firstHidden(c, mina: true);
+
+int _firstHidden(PracticeController c, {required bool mina}) {
+  final b = c.board!;
+  for (var i = 0; i < b.boardCellCount; i++) {
+    if (!b.isGiven(i) && b.entries[i] == 0 && b.isMine(i) == mina) return i;
+  }
+  throw StateError(mina ? 'sin minas cubiertas' : 'sin casillas seguras cubiertas');
 }
