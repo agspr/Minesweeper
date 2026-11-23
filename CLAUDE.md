@@ -1,200 +1,155 @@
-# Nona — Sudoku del día
+# Minesweeper / Buscaminas — el buscaminas del día
 
-Daily sudoku app by SENDA LLC, part of the **Juegos Senda** family (alongside
-CINCO and Minigrama). PRende and transPRte are standalone non-game apps and are
-NOT in the family; neither is Leo. Flutter, iOS + Android. Bundle/package id
-`com.nonaapp.nona`. Current version at time of writing: `1.0.0+27`, first
-submission in review on both stores.
+Daily minesweeper by SENDA LLC, part of the **Juegos Senda** family (alongside
+CINCO, Nona and Minigrama). Flutter, iOS + Android. Bundle id and package
+`com.sendallc.minesweeper`; App Store ID `6830734481`. The name is
+**Buscaminas** in Spanish (home screen, store listings) and **Minesweeper** in
+English. Current version: `1.0.0+15` — on Google Play internal testing; the
+App Store has no submission yet.
 
-Written 2026-08-28. If this file feels stale, check `git log -5` and
-`legal/PENDIENTE.md` before trusting anything below — both move faster than
-this document will.
+Written 2026-11-23. If this feels stale, check `git log -5`,
+`LAUNCH_AUDIT.md` and `legal/PENDIENTE.md` before trusting anything below.
 
-## What the app actually is
+## Born from Nona — read this before renaming anything
 
-One new sudoku puzzle a day, the same for everyone, difficulty set by weekday
-(`app/lib/game/difficulty.dart`): Mon/Wed/Fri easy, Tue/Thu medium, weekends
-hard. Also an offline practice mode (unlimited puzzles, no points/streak). The
-clock never scores — only mistake count does. Works fully offline and without
-an account; signing in only unlocks social features (friends, leaderboard).
+The codebase is a conversion of Nona (the family's daily sudoku), and many
+**internal** names still say Nona or sudoku: the Dart package is `nona`, the
+config file is `lib/nona_config.dart` (`nonaConfig`, `nonaGameId`), colors are
+`NonaColors`, the board class is `SudokuBoard` in `sudoku_board.dart`, and the
+local pref keys are `game.nona.today`, `game.nona.practice*`. **Leave them.**
+The pref keys are players' saved progress — renaming them silently wipes every
+in-progress game and practice stat — and the rest is churn with no user-visible
+gain. What users see (strings, store, legal, ads, signing, Sentry) has been
+moved to Minesweeper; when you find a user-visible Nona/sudoku leftover, that
+*is* a bug.
+
+## What the game is
+
+- **One daily board**, the same for everyone, from the bank in
+  `app/assets/bank/<year>.json` (solution + safe start cell). Difficulty by
+  weekday (`lib/game/difficulty.dart`): Mon/Wed/Fri easy (8×8, 10 mines),
+  Tue/Thu medium (9×12, 18), weekends hard (10×14, 28). Every board is
+  solvable **without guessing** from its safe start; hard boards are rejected
+  by the generator unless they need at least one two-clue (subset) deduction.
+- **Three strikes**: the third detonated mine loses the board.
+- **Scoring** (`lib/game/scoring.dart`, mirrored server-side in
+  `Juegos Senda/backend/functions/scoring/minesweeper.json` + `scoring.js`):
+  cleared = base − 15 % per mine (capped at 3); **lost = fixed 15 % of base and
+  the streak is kept** (a loss is a finished game, not an abandoned one);
+  unfinished = partial tiers by % revealed. Bases 50/100/150. The clock never
+  scores.
+- **Practice**: unlimited boards, no points or streak; modes Senda (3 lives)
+  and Clásico (1 life); hints exist only here and never open a mine.
+- Works fully offline and without an account; an account (shared across the
+  family) unlocks friends, leaderboard and invitations.
 
 ## Repo layout
 
 ```
-app/          Flutter app (this is the actual game)
-  lib/game/         puzzle generation, scoring, difficulty, daily bank
-  lib/screens/       game_screen, home_screen, practice_screen, settings_tab
-  lib/services/      progress_controller, progress_sync, theme_controller
-  lib/nona_config.dart   everything that makes Nona not-CINCO (see below)
-  lib/main.dart          wiring order; heavily commented, read it before touching
-android/, app/ios/    platform projects
-legal/        privacy policy, ToS, account-deletion — ES + EN, plus PENDIENTE.md
-store/        icons, screenshots, store copy, IAP review assets
-docs/         CONSTRUIR.md — how a build is made, archived and pruned
-tools/        sembrar_demo.py, amigos_demo.py — simulator/Firestore seeding for screenshots
-              archivar_build.py — archives a build; refuses to archive half of one
-archivo-de-builds.json   the record of every build that exists, in git
+app/          Flutter app
+  lib/game/        board, generator, bank, scoring, difficulty, controllers
+  lib/screens/     game, home, practice, settings (Más)
+  lib/services/    progress, cloud sync of the in-progress daily, theme, share
+  lib/nona_config.dart   everything that makes this game not-CINCO (see below)
+android/, app/ios/ platform projects
+legal/        privacy, terms, account deletion — ES + EN — and PENDIENTE.md
+store/        icons, screenshots (+ LEEME.md), store copy, IAP review assets
+docs/         CONSTRUIR.md — how a build is made, archived and uploaded
+tools/        archivar_build.py, upload_play_internal.py, sembrar_demo.py, amigos_demo.py
+archivo-de-builds.json   the record of every build, in git
 ```
 
-## Construir y archivar
+## Building — read `docs/CONSTRUIR.md`
 
-**Un AAB sin su IPA no es una build.** Both platforms are built together, from
-the same `version:`, and archived to `~/Nona-releases/` with their sha256 by
-`tools/archivar_build.py archivar`, which refuses — loudly, exit 1, writing
-nothing — if either half is missing. Full procedure in `docs/CONSTRUIR.md`.
-Nothing is uploaded to a store from here; that's the listings agent's.
+**An AAB without its IPA is not a build.** Both halves from the same
+`version:`, archived to `~/Minesweeper-releases/` by
+`tools/archivar_build.py archivar` (builds 1–14 were archived on the Windows
+machine and are marked as such in the registry). Key facts that each cost time
+to find:
 
-The archive folder is outside the repo, so the repo's memory of it is
-`archivo-de-builds.json`, and `app/test/archivo_de_builds_test.dart` guards it:
-a half-archived build, an unexplained gap in build numbers, or a version that
-lived in `pubspec.yaml` and never got archived all turn it red. That test is
-there because archiving was done from memory and memory failed twice in a row —
-the IPA of build 28 is gone for good, and 29 came within two days of it.
-A build that never shipped must be written down (`saltar`), and a lost binary
-must be written down (`incidencia`); an unexplained absence stays red.
+- Android signs with **PRende's upload keystore** (`app/android/key.properties`,
+  not in git). Play uploads use **PRende's service account**
+  (`~/.playconsole/prende-publisher.json`), which has Minesweeper permissions
+  since 2026-11-23.
+- iOS signs with the **"Minesweeper App Store"** provisioning profile (expires
+  2027-06-05 with the distribution certificate).
+- **The IPA is André's to upload.** This session builds, verifies, archives and
+  uploads the AAB to Play internal testing.
+- Disk on this Mac is tight; Gradle's cache and booted simulators can empty it.
+  One heavy thing at a time.
 
-## Architecture: the shared package model
+## Architecture: the shared package
 
-Nona owns almost none of its own platform code. Accounts, friendships,
-leaderboard, invitations, purchases, ads, and the social UI all come from the
-`juegos_senda` git package, pinned by **tag, never branch**
-(`pubspec.yaml`: `ref: package-v0.30.1`). This matters: store builds depend on
-that tag meaning the same thing tomorrow that it means today. Don't move it to
-a branch ref for convenience.
+Accounts, friendships, leaderboard, invitations, purchases, ads and the
+platform screens (Más, sign-in, account deletion) come from the `juegos_senda`
+package, pinned **by tag, never by branch** (`ref: package-v0.89.2`). Moving
+the pin pulls in everything since; the 0.90.x line changes ads, so Minesweeper
+gets patch tags on its own line when it needs a fix (as with 0.89.2).
 
-`app/lib/nona_config.dart` is the single file that tells the shared platform
-what makes Nona *Nona* and not CINCO: game id (`'nona'` — Firestore namespace,
-**never change post-launch**, changing it orphans everyone's data), Apple
-bundle id, AdMob unit ids, IAP product id, legal URLs, default color palette
-(Cobalto — deliberately not CINCO's Menta, so store listings don't look like
-the same app), reserved handles, and which local pref-key prefixes belong to
-one account (`ownedPrefKeyPrefixes` — if a key is missing here, a new user on
-the same phone inherits the previous user's local progress).
+`lib/nona_config.dart` tells the package what this game is: `gameId:
+'minesweeper'` (Firestore namespace `users/{uid}/apps/minesweeper` — **never
+change it**, it orphans everyone's data), bundle id, AdMob units (Minesweeper's
+own since 2026-11-23), IAP id `com.sendallc.minesweeper.removeads`, legal URLs
+(`sendapr.com/{privacy,terms,delete-account}/minesweeper/`), palette (Cobalto),
+reserved handles, and `ownedPrefKeyPrefixes`. The package prints
+`config.appName` verbatim, so the screens that show it get
+`nonaConfigNamed(l.appName)` — "Buscaminas" in Spanish.
 
-**One account for the whole family.** Signing into Nona creates/uses a Juegos
-Senda account. @username, display name, avatar, country, friends list are
-shared across every game in the family; only game progress (streak, points,
-daily records) is per-game, stored under `users/{uid}/apps/nona/`.
+**One account for the whole family**, and Sign in with Apple shows up as
+"CINCO" in iOS settings for every family game (measured, not a bug; the
+account-deletion page says so).
 
-**Apple Sign In shows "CINCO", not "Nona".** All family games share one Apple
-App ID grouped under CINCO's, so `Settings → Sign in with Apple` lists the
-authorization as "CINCO" even for someone who only has Nona. This is measured
-behavior (2026-08-17), not a bug — see `nona_config.dart`'s
-`appleSignInEntryName` comment, and it's documented in the account-deletion
-legal page so it doesn't blindside anyone revoking access.
+Backend lives in the `Juegos Senda` repo (`agspr/juegos-senda`), Firebase
+project `cinco-fe5cc`. **Deploy Functions only from that repo's `main`.**
+`onDayRecorded` was deployed twice from a stale copy on another machine
+(2026-11-11 and -22) and lost six weeks of `main` each time; it was redeployed
+from `main` and verified byte-for-byte on 2026-11-23.
+
+Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
+`senda-6q`) from build 16 on; builds ≤ 15 reported to the `nona` project.
 
 ## Key conventions
 
-- **Spanish in commit messages, code comments, and internal docs.** English in
-  UI strings only where the ARB file calls for it (`app_en.arb` / `app_es.arb`,
-  both currently at parity — 64/64 keys, and the shared package at 128/128).
-- **Comments explain the non-obvious "why", not the "what".** Read `main.dart`
-  and `nona_config.dart` for the style — every non-trivial line has a comment
-  about what breaks silently if it's removed. Match that density; don't add
-  comments that just restate the code.
-- **Family-wide rules apply even when Nona's code doesn't obviously need
-  them.** Analytics/Crashlytics/Sentry are declared and initialized in *every*
-  game from day one, even before there's a DSN or a reason — because the
-  failure mode of skipping it is silent (compiles, runs, collects nothing).
-  Nona shipped this wrong once (SDKs present, `Analytics.init()` never called)
-  and it went unnoticed for a while.
-- **A cadena that looks like a typo may be a deliberate decision.** Example:
-  the app says "Anuncios removidos" (anglicism) instead of "Anuncios
-  eliminados/quitados" — André chose to keep it, deliberately, in both CINCO
-  and Nona, after the inconsistency was flagged. Ask before "fixing" copy;
-  don't just change it.
-- **Ownership split (as of 2026-09-17): there is no listings agent.** André
-  consolidated all marketing and store work into a single Senda session, and
-  **build uploads are this session's job**: build, verify, archive, and upload
-  the AAB to Play internal testing with
-  `python3 ~/.playconsole/nona-upload-internal.py <versionCode>`. That script
-  authenticates with **PRende's publisher key** (`~/.playconsole/prende-publisher.json`),
-  which does have access to `com.nonaapp.nona` — Nona has no service account of
-  its own. Keys live outside the repos and never enter git. **The IPA is André's
-  to upload to TestFlight.**
-- **The `legal/` docs describe what the code actually does, not what it's
-  aspirational to do.** Before widening what §3.8 of the privacy policy
-  declares (or any data-collection claim), verify the event actually fires in
-  code — line and file, not the description someone gave you. This has caught
-  real drift more than once.
-- **Never hand-edit `Nona/legal/*.md`'s "Última actualización" date for a
-  cosmetic change.** Only bump it for a substantive change to what's
-  collected/declared. Wording-only edits keep the old date.
+- **Spanish in commit messages, code comments and internal docs.** UI strings
+  in both languages via the ARB files (`app_es.arb` is the template).
+- **Comments explain the non-obvious "why"**, with what breaks silently if the
+  line goes. Match that density.
+- **Ask before "fixing" copy.** Some odd strings are deliberate (the family
+  keeps "Anuncios removidos" on purpose).
+- **`legal/` describes what the code actually does.** Before adding or widening
+  a data-collection claim, find the event in code (file and line). Bump
+  "Última actualización" / "Last updated" only for substantive changes.
+- **The website is the sendapr agent's.** Edit the Markdown in `legal/`, leave a
+  note in `legal/PENDIENTE.md`, and let that agent generate and publish.
 
-## Environment quirks (cost real time to discover)
+## Environment quirks
 
-- **Disk space is tight on this machine** — as of writing, ~9.5 GB free.
-  iOS builds and simulator data eat it fast. If Bash itself stops working,
-  that's the actual failure mode; clean iOS build caches first (they
-  regenerate), never touch anything unversioned without checking first.
-- **Seeding simulator local state (`SharedPreferences`) requires the
-  simulator to be *shut down* while you write the plist.** Editing the
-  container's `Library/Preferences/*.plist` with the device booted gets
-  silently overwritten by `cfprefsd` on next launch. `simctl spawn ... defaults
-  write` also doesn't work for this — it writes to the *system* domain
-  (`data/Library/Preferences/`), not the app's sandboxed container, which is
-  what the app actually reads. Shut down → edit plist directly → boot →
-  launch. `tools/sembrar_demo.py` does this correctly; read it before writing
-  a similar script.
-- **Firebase App Check debug tokens are per *installation*, not per app.** A
-  new simulator (or a reinstall) needs its own token registered in
-  App Check → nona (ios/android), or every Firestore call returns
-  `permission-denied` with no obvious cause once enforcement is on.
-- **`Info.plist` is a verification surface, not settled config.** Two
-  silent-failure bugs have shipped from missing keys there: `aps-environment`
-  absent (push notifications register but never arrive, no error anywhere),
-  and `CFBundleURLTypes` absent (Google Sign-In opens the browser, completes,
-  and the app never receives the callback — no error, just a dead button).
-  Both were caught late. If touching iOS auth or push, check this file
-  explicitly; don't assume "it built and installed" means it's wired.
-- **A URL scheme copied from CINCO's `Info.plist` would have been *worse*
-  than missing** — CINCO's `REVERSED_CLIENT_ID` differs from Nona's, so a
-  copy-paste leaves a present-but-wrong scheme that passes a casual glance and
-  still doesn't work.
+- **Simulator prefs must be seeded with the simulator shut down**
+  (`tools/sembrar_demo.py <udid> es|en`): with it booted, `cfprefsd` overwrites
+  the plist, and `simctl spawn … defaults write` writes the wrong domain.
+- **iPad screenshots need full-screen apps** (Settings → Multitasking): windowed
+  mode puts the app name in the status bar and a resize handle in the corner.
+- **Firebase App Check debug tokens are per installation**: a new simulator
+  needs its own token registered, or Firestore returns `permission-denied`.
+- **`Info.plist` is a verification surface.** Missing `aps-environment` or a
+  wrong `CFBundleURLTypes` scheme fail silently (no push; dead Google sign-in).
+- **`tools/amigos_demo.py` writes fake accounts to production** and must always
+  be paired with its `--borrar` cleanup.
 
-## Store/legal state (as of 2026-08-28)
+## State as of 2026-11-23
 
-- Both stores hold Nona's **first submission** — no prior rejection history.
-  Apple: `WAITING_FOR_REVIEW`, build 27. Play: `In review`, release 27
-  (1.0.0), 146 territories (EU-27 + Iceland/Liechtenstein/Norway/UK excluded,
-  Switzerland kept — territory list matches on both stores).
-- Six legal pages live at `sendapr.com/{privacy,terms,delete-account}/nona/`
-  and `.../en/` — ES + EN, published by the sendapr/PRende agent, sourced from
-  `legal/*.md` and `legal/*.en.md` in this repo.
-- Play promo codes and Apple promo codes are **not obtainable pre-approval**
-  — Apple's console says so outright ("Promo Codes can only be generated for
-  approved versions"). Don't promise them in App Review notes before the app
-  is approved once.
-- Store listing copy (`store/copy/listing-copy.md`) and all 20 screenshots
-  (`store/screenshots/{en,es}/{iphone69,ipad13}/`) are uploaded to both
-  consoles. Screenshot generation method — solved puzzle for the board shots
-  (so mistake count reads ×0, not invented), seeded progress via the
-  shutdown-plist method above, `tools/amigos_demo.py` for the populated
-  Social/leaderboard shot (writes and then *cleans up* fake friend accounts in
-  production Firestore — never run without a paired cleanup call).
+- Legal pages: all six live at `sendapr.com/{privacy,terms,delete-account}/minesweeper/{,en/}`.
+- AdMob: apps "Minesweeper — Daily Logic" (Android `~7005873887`, iOS
+  `~7754567513`) with their own units; **not linked to the stores yet** (the
+  app isn't public), so ad serving is limited until they are.
+- Store screenshots: 18 in `store/screenshots/` (see its `LEEME.md`); the
+  Social one is still missing.
+- Pending, André: upload the build 15 IPA, the Remove Ads IAP in both consoles,
+  the store listings (`store/copy/listing-copy.md`), the Social screenshot.
 
-## Open items (check `legal/PENDIENTE.md` for current status — it's the living doc)
+## Where to look
 
-- **Retention figure mismatch between apps**: Nona's privacy policy correctly
-  says 400 days (measured); CINCO's says "14 months" — CINCO's is the one that
-  needs fixing, not Nona's. Tracked in CINCO's own `PENDIENTE.md`.
-- **English legal-page format questions** for the sendapr agent were answered
-  once already; if a future generator run needs the format again, it's
-  recorded in `legal/PENDIENTE.md` under the "PARA EL AGENTE DE SENDAPR.COM"
-  section.
-- **App name across surfaces is intentionally inconsistent**: binaries say
-  "Nona Sudoku", store listings say "Nona — Daily Sudoku" / "Nona — Sudoku del
-  día", legal docs say plain "Nona". Confirmed as deliberate by André, not a
-  bug — each surface names what the product does at different levels of
-  formality.
-- **transPRte** was asked to get an English account-deletion page (CINCO and
-  PRende stay Spanish-only). That's transPRte's repo, not this one — noted
-  here so it isn't lost.
-
-## Where to look for more
-
-- `legal/PENDIENTE.md` — the actual up-to-the-minute handoff log between the
-  listings agent, the dev agent, and André. Longer and more current than this
-  file will ever be; read it first for anything store/legal/launch related.
-- `git log` — commit messages are written to be read later, in Spanish, and
-  usually explain the "why" not just the "what".
+- `LAUNCH_AUDIT.md` — the launch checklist and the audit that produced it.
+- `legal/PENDIENTE.md` — handoff log with the sendapr agent.
+- `docs/CONSTRUIR.md` — builds, signing, uploads, traps.
+- `git log` — commit messages explain the why, in Spanish.

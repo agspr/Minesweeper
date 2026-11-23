@@ -1,22 +1,13 @@
-# Construir Nona, de principio a fin
+# Construir Minesweeper, de principio a fin
 
-Todo lo que hay que hacer para que exista una build de Nona, en orden, con lo
-que se rompe en silencio en cada paso.
+Todo lo que hay que hacer para que exista una build de Minesweeper, en orden,
+con lo que se rompe en silencio en cada paso.
 
-La doctrina que hay detrás —por qué las dos plataformas a la vez, por qué la
-versión se lee dentro del binario, qué guarda el archivo— está en
-`tools/archivar_build.py`, que vive en este repositorio.
-
-El guion NO se copió al paquete compartido a propósito: hacer que construir
-Nona dependa de tener el repo hermano al lado es una atadura que no paga lo que
-cuesta. Está escrito para poder copiarse tal cual a otro juego —deduce la
-carpeta y el prefijo del repositorio donde vive—, y esa es la forma de
-compartirlo que no ata a nadie.
-Aquí van **las rutas y las trampas de Nona**.
-
-Antes de este documento, este procedimiento estaba disperso dentro de
-`legal/PENDIENTE.md`, que es el registro de traspaso con el agente de ficha: el
-sitio equivocado para algo que hay que releer cada vez que se construye.
+La doctrina —por qué las dos plataformas a la vez, por qué la versión se lee
+dentro del binario, qué guarda el archivo— está en `tools/archivar_build.py`.
+Este documento se heredó de Nona y se rehízo para Minesweeper el 23-11-2026,
+con la build 15, que fue la primera con AAB e IPA a la vez: las 1-14 se
+construyeron solo para Android, desde Windows.
 
 ---
 
@@ -27,40 +18,33 @@ df -h /                                        # una build de iOS puede llenar e
 python3 tools/archivar_build.py verificar
 ```
 
-Dos motivos, los dos con historia:
-
-- **El disco.** Esta máquina ha llegado a cero tres veces; cuando pasa, deja de
-  funcionar hasta Bash. Con menos de ~5 GB libres, limpia antes (`limpiar`,
-  paso 6) y **no construyas encima**: la segunda build se lleva por delante lo
-  que la primera dejó sin archivar. Así se perdió el IPA de la 28.
-- **La auditoría.** Contesta en un segundo la pregunta que nadie hizo durante
-  cinco días: *¿está todo lo que debería estar?* Si sale un `✖ FALTA EL IPA`,
-  resuélvelo o anótalo **antes** de crear una build nueva, porque la nueva borra
-  la evidencia de la anterior.
-
-Si hay otro agente vivo trabajando en el disco, pídele turno por mensaje. Las
-builds de iOS y las suyas no caben a la vez.
+- **El disco.** En el Mac llegó a 239 MB libres el 23-11-2026. Lo que se lo
+  come, medido: la caché de Gradle (~5 GB la primera vez que se construye el
+  AAB), DerivedData de Xcode (~4,5 GB), el swap (cada simulador encendido
+  empuja memoria a disco; con dos a la vez el disco se vació solo) y el primer
+  arranque de un simulador de iPad (~1,5 GB de recursos del sistema). Con
+  menos de ~5 GB libres, **no construyas encima**: limpia antes (paso 6) y
+  apaga los simuladores. Cuando el disco llega a cero deja de funcionar hasta
+  Bash.
+- **El orden.** AAB primero, IPA después, **nunca a la vez**. Al acabar el AAB,
+  `./gradlew --stop` dentro de `app/android` suelta la memoria de los daemons.
+- **La auditoría.** En este Mac `verificar` solo puede ver de la 15 en adelante:
+  las 1-14 se archivaron en la máquina de Windows y el registro lo dice en cada
+  fichero (`podado: … no está en este Mac`). Si sale un `FALTA` de la 15 o
+  posterior, resuélvelo **antes** de construir otra: la nueva pisa la anterior.
 
 ---
 
 ## 1. El número de versión
 
-Se sube en `app/pubspec.yaml`, línea `version:`, y **se sube el de versión, no
-solo el de build**, siempre que la versión anterior ya esté publicada:
+Se sube en `app/pubspec.yaml`, línea `version:`, con el porqué escrito al lado.
 
-- Apple **no deja reenviar una versión `READY_FOR_SALE`**. 1.0.1 salió a la
-  venta con el build 28, así que el 29 tuvo que ser 1.0.2. Un build solo se
-  adjunta a una entrada de versión cuyo número **coincida**: con el número mal
-  puesto, el build sube bien y **no se puede adjuntar** — media hora de
-  compilación tirada y el diagnóstico a kilómetros de la causa. Ya pasó.
-- En Play no hay este problema, pero el `versionName` de la release sale de aquí
-  igual, así que el agente de ficha tiene que saberlo antes de publicar.
-- El porqué del número concreto se escribe **en el propio pubspec**, junto al
-  número, para que nadie lo devuelva sin querer.
-
-Que Apple salga sola en cuanto apruebe (`releaseType: AFTER_APPROVAL`) es cosa
-del agente de ficha y hay que ponerlo **en cada versión nueva**; no es un ajuste
-de la app. Está en `legal/PENDIENTE.md`, regla del 4-9-2026.
+- Mientras Minesweeper **no esté a la venta**, se queda en `1.0.0` y solo sube
+  el número de build.
+- En cuanto una versión esté `READY_FOR_SALE` en Apple, la siguiente build tiene
+  que subir el de versión: Apple no deja reenviar una versión a la venta, y un
+  build cuyo número no coincide con la entrada de versión **sube bien y no se
+  puede adjuntar**. Le pasó a Nona con la 1.0.1.
 
 ---
 
@@ -78,37 +62,44 @@ flutter build ipa --release \
   --export-options-plist=ios/ExportOptions.plist
 ```
 
-**Las dos, siempre, seguidas.** Un AAB sin su IPA no es una build: es la mitad
-de una, y la mitad que falta ya no se puede reproducir igual (la firma no es
-determinista, y App Store Connect rechaza un número de build repetido, así que
-ese "28" reconstruido no podría subirse como 28 jamás).
+**Las dos, siempre.** Un AAB sin su IPA no es una build: la firma no es
+determinista y App Store Connect no acepta un número de build repetido, así que
+la mitad que falte ya no se puede rehacer igual.
 
-Las tres cosas que no son obvias:
+Lo que no es obvio:
 
 - **`export LANG=en_US.UTF-8`.** Sin esto CocoaPods muere y Flutter cae a SPM
-  en silencio. Viene de CINCO, misma máquina y mismo montaje.
-- **`--export-options-plist` hace falta.** `flutter build ipa` a secas **falla**
-  al exportar: genera sus propias opciones, no dice qué perfil usar, el
-  exportador coge uno cualquiera del equipo y suelta `requires a provisioning
-  profile with the Push Notifications and Sign In with Apple features`. **El
-  perfil está bien** — no hay nada que tocar en el portal de Apple; lo que falta
-  es el fichero. Está comentado dentro de `ios/ExportOptions.plist`, pero el
-  comentario no impide lanzar el comando corto, así que también está aquí.
+  en silencio.
+- **Firma de Android: la llave de subida es la de PRende.** Minesweeper se
+  firma con `~/keystores/prende-upload-keystore.jks` (huella SHA-1
+  `35:50:18:4A:…:0F:F7`, la que Play tiene registrada como llave de subida de
+  `com.sendallc.minesweeper`). `app/android/key.properties` es una copia del de
+  PRende y **no va a git**. Sin ese fichero Gradle firma con la de depuración, y
+  Play rechaza el AAB.
+- **Firma de iOS: perfil «Minesweeper App Store».** Creado el 23-11-2026 por la
+  API de App Store Connect (bundle `ZXF5PV562K`, certificado de distribución
+  `U9RBM8PB2M`) e instalado en
+  `~/Library/Developer/Xcode/UserData/Provisioning Profiles/`. Lo nombran
+  `project.pbxproj` (Release) y `ios/ExportOptions.plist`. **Caduca con el
+  certificado, el 5-6-2027.** Hasta la build 15 los dos ficheros seguían
+  apuntando a «Nona App Store», que es de otro bundle id: con él la IPA no
+  podía existir.
+- **`--export-options-plist` hace falta.** `flutter build ipa` a secas falla al
+  exportar pidiendo un perfil con Push y Sign in with Apple: el perfil está
+  bien, lo que falta es decirle cuál es.
 - **`--obfuscate --split-debug-info` en las DOS.** Sin ellos no hay `.symbols`
-  de Dart que subir a Sentry, y las trazas de esa versión llegan ilegibles. No
-  falla nada: llegan, y no se entienden.
+  de Dart que subir a Sentry, y las trazas llegan ilegibles.
 
-Salen en rutas **fijas, sin número de build en el nombre**:
+Salen en rutas **fijas, sin número de build**:
 
 ```
 app/build/app/outputs/bundle/release/app-release.aab
-app/build/ios/ipa/nona.ipa
+app/build/ios/ipa/minesweeper.ipa
 app/build/symbols/*.symbols
 ```
 
-Que sean fijas es la causa de fondo de todo este documento: **la build
-siguiente las pisa sin avisar.** Hasta que no estén archivadas (paso 4), están a
-una compilación de desaparecer.
+La build siguiente las pisa sin avisar. Hasta que estén archivadas (paso 4),
+están a una compilación de desaparecer.
 
 ---
 
@@ -118,112 +109,89 @@ una compilación de desaparecer.
 cd app && dart run sentry_dart_plugin
 ```
 
-Lo lee todo de `pubspec.yaml` (`sentry: project: nona / org: senda-6q /
-upload_debug_symbols: true`) y necesita `SENTRY_AUTH_TOKEN`, que ya está
-exportado en `~/.zshenv` — por eso nadie se acuerda de él, y por eso su ausencia
-sería invisible hasta que alguien mirase la salida.
+Lo lee de `pubspec.yaml` (`sentry: project: minesweeper / org: senda-6q`) y
+necesita `SENTRY_AUTH_TOKEN`, exportado en `~/.zshenv`.
 
-**Qué no se puede comprobar después:** nadie guarda el código de salida de este
-comando, y no hay log ni `.sentryclirc`. De la build 28 lo único que quedó fue
-una huella indirecta —el `sentry-cli` que el plugin se descarga solo, creado un
-minuto después de exportarse el IPA— que **corrobora** que se ejecutó pero no
-prueba que terminara bien. Si te importa saberlo, mira Debug Files de esa
-liberación en Sentry, desde una sesión interactiva con el MCP autorizado (`/mcp`).
-
-Por eso los `.symbols` de Dart **también se guardan en el archivo local**
-(paso 4): Apple tiene los dSYMs, pero el mapa de ofuscación de Dart solo existe
-aquí y en Sentry.
+- **Proyecto propio desde la build 16.** Hasta la 15 incluida Minesweeper
+  informaba al proyecto `nona` (DSN copiado al convertir el juego): los fallos
+  de esas builds, y sus símbolos, están allí. El DSN de `lib/sentry_config.dart`
+  y el `project:` del pubspec tienen que ser **el mismo proyecto**;
+  `telemetria_test.dart` lo vigila.
+- **Sale con código 1 y no es un fallo de los símbolos.** Al final intenta
+  asociar commits a la release y dice `Could not find the SHA of the previous
+  release`: los símbolos ya se subieron antes (`☑ uploading debug symbols`).
+- **El mapa de ofuscación de Dart no se sube** (`no 'dart_symbol_map_path'
+  provided`): ni aquí ni en Nona está configurado. Los `.symbols` sí van, y
+  también se guardan en el archivo local (paso 4).
+- El token de `~/.zshenv` **solo** sirve para subir releases y símbolos: no
+  puede leer ni crear proyectos. Eso se hace en sentry.io.
 
 ---
 
-## 4. Archivar — esto es parte de construir, no lo que viene después
+## 4. Archivar — es parte de construir
 
 ```
 python3 tools/archivar_build.py archivar
 ```
 
-Verifica **dentro** de los dos binarios, los copia a `~/Nona-releases/` con su
-nombre numerado, escribe el `.sha256` con la procedencia y apunta la build en
-`archivo-de-builds.json` con su `commit` y si el árbol estaba limpio. Si algo no
-cuadra, no archiva y dice qué.
+Verifica **dentro** de los dos binarios (versión, identificador, que no haya
+slice de simulador, `aps-environment` de producción…), los copia a
+`~/Minesweeper-releases/` con su nombre numerado y su `.sha256`, y apunta la
+build en `archivo-de-builds.json` con su `commit` y si el árbol estaba limpio.
 
-**No crea etiquetas de git.** El vínculo binario↔commit vive en el registro, que
-va en git y lo vigila una prueba; una etiqueta lo repetiría en un segundo sitio
-que nada comprueba. Este párrafo prometió una etiqueta `v<version>+<build>`
-desde el primer día y el guion nunca la hizo: se notó el 10-10-2026 al intentar
-subir `v1.0.6+36`.
+- `✖ UN AAB SIN SU IPA NO ES UNA BUILD` (salida 2): falta una mitad. Constrúyela
+  desde el **mismo** pubspec y repite.
+- `No archivo: los binarios no son lo que este árbol dice` (salida 3): léelo
+  entero; cada comprobación existe porque ese fallo ya llegó a una tienda.
+- `✔ pareja completa archivada`: ahora, y solo ahora, se sube.
 
-Los tres finales posibles:
-
-- **`✖ UN AAB SIN SU IPA NO ES UNA BUILD` (salida 2).** Falta una mitad. No
-  archiva la otra: media pareja archivada es justo lo que hizo que la pérdida de
-  la 28 tardara cinco días en verse, porque *parecía* que había algo. Construye
-  la mitad que falta desde el **mismo** pubspec y repite.
-- **`No archivo: los binarios no son lo que este árbol dice` (salida 3).** La
-  versión no casa, o el identificador es de otro juego, o las dos mitades tienen
-  números distintos, o hay slice de simulador, o `aps-environment` no es
-  `production`, o el esquema de URL no es el `REVERSED_CLIENT_ID` de Nona. Léelo
-  entero: cada una de esas comprobaciones existe porque el fallo correspondiente
-  ya se envió a una tienda alguna vez, y **ninguno da error en ejecución** —
-  dan un botón muerto, un aviso que no llega, un rechazo tres días después.
-- **`✔ pareja completa archivada`.** Ahora, y solo ahora, se puede subir.
-
-Si el árbol está sucio lo avisa, pero **archiva igual**: un problema de
-metadatos no puede costar un binario. La regla vale para todo lo que hace este
-guion — nada que no sea «estas dos mitades no son la misma build» o «esto es de
-otro juego» llega a impedir el archivado. Un guion que se planta cuando más
-falta hace es un guion que alguien salta con `cp`, y entonces no queda registro
-de nada.
-
-> El registro ya está sembrado hacia atrás con `reconstruir`, leyendo los
-> binarios que había en el disco: cubre de la build 10 a la 29. No inventa el
-> commit de las viejas —deducirlo por marcas de tiempo sería adivinar—, pero fija
-> los bytes y el sha256 de cada una, y deja escrito **dentro del archivo** que a
-> la 28 le falta el IPA y por qué. Hasta ahora eso solo vivía en la cabeza de
-> alguien, y por eso se tardó cinco días en notarlo.
+Si el árbol está sucio lo avisa y **archiva igual**; el registro lo apunta
+(`arbol_limpio: false`). Después hay que commitear `archivo-de-builds.json`, o
+`archivo_de_builds_test.dart` no sabrá que la build existe.
 
 ---
 
 ## 5. Subir
 
-Desde el 17-9-2026 **las subidas de build son de esta sesión** (André eliminó al
-agente de ficha y consolidó tiendas y marketing en una sola sesión Senda).
+**Android, a pruebas internas de Play** — lo hace esta sesión:
 
 ```
-python3 ~/.playconsole/nona-upload-internal.py <versionCode>
+python3 tools/upload_play_internal.py \
+  --aab ~/Minesweeper-releases/minesweeper-<versión>-<build>.aab \
+  --key ~/.playconsole/prende-publisher.json \
+  --notes-es "• …" --notes-en "• …"
 ```
 
-Sube el AAB a **pruebas internas** de Play y comprueba el `versionCode` DENTRO
-del .aab antes de asignar la pista: `flutter build` escribe siempre
-`app-release.aab`, así que fiarse del nombre es cómo se sube el binario de otra
-build. La llave es la de PRende (`~/.playconsole/prende-publisher.json`), que
-tiene acceso a `com.nonaapp.nona`; Nona no tiene cuenta de servicio propia. Las
-llaves viven fuera de los repos y no entran en git.
+- Se sube **el AAB archivado**, no el de `app/build`: son los mismos bytes y no
+  depende de que nadie haya construido otra cosa entretanto.
+- **La cuenta de servicio es la de PRende** (`prende-play-publisher@prende-3dd30`).
+  Tiene sobre Minesweeper los mismos 9 permisos que sobre Nona **desde el
+  23-11-2026**. Antes solo tenía los de cuenta (leer y preparar ediciones), y
+  la subida caía en el último paso con un `403 PERMISSION_DENIED`, sin cambiar
+  nada en Play. Si vuelve a pasar: Play Console → Usuarios y permisos →
+  esa cuenta → Minesweeper.
+- **Las notas van por build** (`--notes-es` / `--notes-en`). Sin ellas la
+  release solo lleva el número.
+- La comprobación del `versionCode` la hace `archivar` dentro del binario, y
+  Play rechaza un número repetido. Después, apúntalo en el registro:
+  `python3 tools/archivar_build.py tienda <build> "Play pruebas internas, <fecha>"`.
 
-**El IPA lo sube André a TestFlight**, no esta sesión.
-
-Los ficheros quedan en `~/Nona-releases/nona-<version>-<build>.{aab,ipa}`.
+**iOS — la IPA la sube André** a App Store Connect (Transporter o `altool`),
+bajo la entrada de versión cuyo número coincida.
 
 ### Cuando ya está a la venta: publicar su número
 
-El aviso «Hay una versión nueva» compara la build del teléfono con la de
-`public/versiones`. Ese número se publica **cuando la versión YA se puede
-descargar de la tienda**, nunca al subirla a pruebas: avisar antes manda a la
-gente a una ficha que todavía enseña la versión vieja. Lo hace esta sesión
-cuando André dice que ya está a la venta, una vez por plataforma y con el mismo
-número (Nona usa el mismo en las dos):
+El aviso «Hay una versión nueva» compara la build del teléfono con
+`public/versiones`. Se publica **cuando la versión YA se puede descargar**,
+nunca al subirla a pruebas:
 
 ```
 cd ~/Documents/Coding/"Juegos Senda"/backend
-node tools/publicar-version.js nona android <build>
-node tools/publicar-version.js nona ios <build>
+node tools/publicar-version.js minesweeper android <build>
+node tools/publicar-version.js minesweeper ios <build>
 ```
 
-Escribe en producción con permisos de servidor, y se niega a bajar un número.
-
-Solo leen el aviso las builds que lo llevan, de la 31 en adelante. Con la
-primera que sale a la venta no hay nadie a quien avisar; sirve a partir de la
-segunda.
+Escribe en producción con permisos de servidor y se niega a bajar un número.
 
 ---
 
@@ -234,15 +202,15 @@ python3 tools/archivar_build.py limpiar               # dice cuánto
 python3 tools/archivar_build.py limpiar --de-verdad   # lo hace
 ```
 
-Se niega si la build que hay en `app/build` **no** está ya en el archivo con los
-mismos bytes. Es a propósito y es el cierre del círculo: en esta máquina el
-disco se llena, y cuando se llena alguien borra cosas con prisa. Que la única
-forma cómoda de liberar espacio sea *archivar primero* convierte la presión de
-disco en el motivo para archivar, en vez de en el motivo para perder un binario.
+Se niega si la build de `app/build` **no** está ya archivada con los mismos
+bytes: la única forma cómoda de liberar espacio es archivar primero.
 
-`app/build` ocupa ~2,1 GB de los que casi todo es reproducible. Lo único que no
-está en el archivo son los dSYMs del `.xcarchive` (519 MB), y esos están en
-Apple (`uploadSymbols => true` en `ios/ExportOptions.plist`) y en Sentry.
+Lo demás que se puede borrar sin perder nada, por orden de cuánto da:
+`~/.gradle/caches` (~5 GB; la próxima build de Android de cualquier juego
+vuelve a descargar), DerivedData de Xcode (`~/Library/Developer/Xcode/DerivedData`)
+y las carpetas `build/` de los demás juegos (todas en `.gitignore`).
+**Nunca** `~/Nona-releases` ni `~/Minesweeper-releases`: son binarios que no se
+pueden rehacer.
 
 ---
 
@@ -251,16 +219,15 @@ Apple (`uploadSymbols => true` en `ios/ExportOptions.plist`) y en Sentry.
 | Síntoma | Causa | Cómo se nota |
 |---|---|---|
 | `flutter build ipa` falla pidiendo un perfil con Push/Sign in with Apple | falta `--export-options-plist` | error al exportar; el perfil está bien |
+| La IPA no se puede firmar (23-11-2026) | Release y `ExportOptions.plist` apuntaban a «Nona App Store» | error de perfil al archivar |
+| Play rechaza el AAB por la firma | falta `app/android/key.properties` (firma de depuración) | rechazo al subir |
+| La subida a Play cae en el commit con 403 (23-11-2026) | la cuenta de servicio no tenía permisos sobre Minesweeper | todo sube bien y nada se publica |
 | CocoaPods muere, Flutter se pasa a SPM | falta `export LANG=en_US.UTF-8` | silencioso hasta que algo no enlaza |
-| Los avisos push se registran y no llegan nunca | `aps-environment` ausente del `Info.plist` | **nada**: no hay error en ninguna parte |
-| Google Sign-In abre el navegador, completa y la app no reacciona | `CFBundleURLTypes` ausente | **nada**: un botón muerto |
-| Igual, pero con el esquema puesto | esquema copiado de CINCO: su `REVERSED_CLIENT_ID` es otro | peor que ausente: pasa una mirada rápida |
-| App Store Connect rechaza el IPA (10-8-2026, CINCO) | slice `x86_64`/`i386` de simulador | rechazo días después de subir |
-| El build sube y no se puede adjuntar a la versión | el número del pubspec no coincide con la entrada de versión | media hora de compilación tirada |
-| El árbol `build/` dice un número y el AAB otro | metadatos rancios de `build/` | por eso la versión se lee **dentro** |
-
-Todas se comprueban solas en el paso 4, menos las dos primeras, que impiden que
-llegue a haber binario.
+| El disco se vacía durante la build (23-11-2026) | caché de Gradle + swap de simuladores encendidos | Bash deja de responder |
+| Los avisos push se registran y no llegan nunca | `aps-environment` ausente | **nada** |
+| Google Sign-In abre el navegador y la app no reacciona | `CFBundleURLTypes` ausente o copiado de otro juego | **nada**: un botón muerto |
+| App Store Connect rechaza la IPA | slice de simulador | rechazo días después |
+| Los fallos de Minesweeper salen en el proyecto de Nona (hasta la build 15) | DSN copiado de Nona | **nada**: llegan, mezclados |
 
 ---
 
@@ -275,17 +242,13 @@ cd app && xcodebuild -exportArchive \
   -exportPath build/ios/ipa
 ```
 
-Sirve mientras el `.xcarchive` sea el de esa build. En cuanto se construye otra
-cosa, deja de servir: `build/ios/archive/` también es una ruta fija y también se
-pisa. **Ese fue el segundo clavo del ataúd de la 28**: cuando se buscó su IPA,
-ni el IPA ni el archive eran ya suyos, y `~/Library/Developer/Xcode/Archives`
-estaba vacío.
+Sirve mientras el `.xcarchive` sea el de esa build: `build/ios/archive/` también
+es una ruta fija y la siguiente construcción lo pisa.
 
 ---
 
 ## Lo que esta sesión no hace
 
-Sube a **App Store Connect**: el IPA lo lleva André a TestFlight. Lo demás de
-tiendas y marketing —fichas, capturas, precios, AdMob— es de la sesión Senda.
-Aquí se construye, se verifica, se archiva y se sube el AAB a pruebas internas;
-y cuando una versión ya está a la venta, se publica su número (ver §5).
+Subir la IPA a App Store Connect: eso es de André. Aquí se construye, se
+verifica, se archiva y se sube el AAB a pruebas internas; y cuando una versión
+ya está a la venta, se publica su número (§5).
