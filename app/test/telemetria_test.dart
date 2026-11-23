@@ -100,7 +100,19 @@ void main() {
 
   test('los símbolos de Sentry saben a qué proyecto van', () {
     final pubspec = File('pubspec.yaml').readAsStringSync();
-    expect(pubspec, contains('project: nona'));
+    expect(pubspec, contains('project: minesweeper'));
+    // Hasta la build 15 Minesweeper informaba al proyecto `nona` (copiado al
+    // convertir el juego) y sus fallos se mezclaban con los de Nona. Si el DSN
+    // vuelve a ser el de Nona, los informes van a un sitio y los símbolos a
+    // otro, y las trazas llegan sin leer.
+    final cfg = _sinComentarios(
+      File('lib/sentry_config.dart').readAsStringSync(),
+    );
+    expect(
+      cfg,
+      isNot(contains('4511975097368576')),
+      reason: 'ese es el proyecto de Nona',
+    );
     expect(pubspec, contains('org: senda-6q'));
     expect(pubspec, contains('upload_debug_symbols: true'));
   });

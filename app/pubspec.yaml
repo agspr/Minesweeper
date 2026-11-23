@@ -28,7 +28,10 @@ dependencies:
   juegos_senda:
     git:
       url: https://github.com/agspr/juegos-senda.git
-      ref: package-v0.89.1
+      # 0.89.2 = 0.89.1 + «este dispositivo» en vez de «este teléfono»
+      # (23-11-2026). Parche sobre la misma línea a propósito: la 0.90.x trae
+      # cambios de anuncios que Minesweeper no ha probado.
+      ref: package-v0.89.2
       path: package
 
   # Firebase Core se declara aquí porque main() lo inicializa; el resto de la
@@ -81,12 +84,13 @@ flutter:
     # Los iconos de los otros Juegos Senda, para «Otros Juegos Senda» en Más.
     - assets/juegos/
 
-# Subida de símbolos a Sentry (org senda-6q / proyecto nona).
+# Subida de símbolos a Sentry (org senda-6q / proyecto minesweeper, el mismo
+# del DSN de lib/sentry_config.dart; hasta la build 15 era `nona`).
 # Requiere SENTRY_AUTH_TOKEN en el entorno; se ejecuta tras el build de release:
 #   flutter build ipa --obfuscate --split-debug-info=build/symbols
 #   dart run sentry_dart_plugin
 sentry:
-  project: nona
+  project: minesweeper
   org: senda-6q
   upload_debug_symbols: true
   upload_source_maps: false
