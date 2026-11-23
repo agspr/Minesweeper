@@ -138,7 +138,10 @@ class _SettingsTabState extends State<SettingsTab> {
     return ListenableBuilder(
       listenable: Listenable.merge([progress, widget.practice, widget.friends]),
       builder: (context, _) => SendaSettingsScreen(
-        config: nonaConfig,
+        // Con el nombre en el idioma de la pantalla: de aquí lo sacan
+        // «Califica…», «¡Gracias por apoyar a…!» y el borrado de cuenta
+        // (ver `nonaConfigNamed`).
+        config: nonaConfigNamed(l.appName),
         auth: widget.auth,
         friends: widget.friends,
         purchases: widget.purchases,
@@ -238,7 +241,7 @@ class _SettingsTabState extends State<SettingsTab> {
         onAbout: () => Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (_) => SendaAboutScreen(
-              config: nonaConfig,
+              config: nonaConfigNamed(l.appName),
               aboutTitle: l.aboutNona,
               aboutBody: l.aboutBody,
               website: Uri.parse('https://sendapr.com'),

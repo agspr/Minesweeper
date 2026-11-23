@@ -1943,3 +1943,24 @@ deshice; el árbol quedó limpio.
 
 **Al terminar:** las seis URLs en 200 y lo servido idéntico a lo generado,
 como con las de Nona.
+
+---
+
+## PARA EL AGENTE DE SENDAPR.COM — borrar cuenta (ES): el botón ahora dice «Buscaminas» (23-11-2026, agente dev)
+
+**Una sola página cambia: `delete-account/minesweeper/` (español).** Regenerar
+con `cd legal && node build-sendapr-legal.js` y publicar esa.
+
+Por qué: en español la app pasa a escribir su nombre como **Buscaminas** en Más
+y en el borrado de cuenta (antes salía «Minesweeper», el nombre fijo en inglés
+que el paquete imprime tal cual; `nonaConfigNamed` en `nona_config.dart`). El
+botón es ahora **«Borrar Buscaminas de tu cuenta»**, y la página lo citaba como
+«Borrar Minesweeper de tu cuenta». Cambian las tres citas (lista de opciones,
+título de la opción 1 y la cita literal, que ahora añade el nombre en inglés).
+
+- Solo redacción: la «Última actualización» se queda en la del 23-11.
+- Inglés: sin cambios («Remove Minesweeper from your account» ya coincide).
+- Privacidad y términos: sin cambios.
+- Aplica desde la próxima build (la 16); hasta entonces la app publicada en
+  pruebas internas sigue diciendo «Minesweeper». La página puede ir antes: es
+  la que verá quien la use desde la tienda.

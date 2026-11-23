@@ -34,9 +34,31 @@ const String nonaGameId = 'minesweeper';
 /// nadie la hereda apagada por olvido.
 const bool kInvitesEnabled = true;
 
-final GameConfig nonaConfig = GameConfig(
+/// La configuración de siempre, con el nombre en inglés: es la que usan los
+/// servicios (datos, anuncios, compras, tiendas), a los que el nombre les da
+/// igual.
+final GameConfig nonaConfig = nonaConfigNamed('Minesweeper');
+
+/// La misma configuración con el nombre del juego en el idioma de la pantalla
+/// (`L.appName`: «Buscaminas» en español).
+///
+/// Existe porque el paquete escribe `config.appName` tal cual en Más y en el
+/// borrado de cuenta: con el nombre fijo en inglés, la app en español decía
+/// «Califica Minesweeper» debajo de «Acerca de Buscaminas», y «Borrar
+/// Minesweeper de tu cuenta» en una app que en el teléfono y en las dos tiendas
+/// se llama Buscaminas. Lo que se le pasa a `SendaSettingsScreen` y a
+/// `SendaAboutScreen` sale de aquí.
+///
+/// Una instancia por nombre, y no una nueva en cada `build`: el que la recibe
+/// puede compararla para saber si cambió.
+GameConfig nonaConfigNamed(String appName) =>
+    _porNombre.putIfAbsent(appName, () => _configCon(appName));
+
+final Map<String, GameConfig> _porNombre = {};
+
+GameConfig _configCon(String appName) => GameConfig(
   gameId: nonaGameId,
-  appName: 'Minesweeper',
+  appName: appName,
   appleBundleId: 'com.sendallc.minesweeper',
   // No es 'Minesweeper'. El App ID está agrupado bajo el primario de CINCO,
   // y está MEDIDO (2026-08-17) que quien solo tenga esta app ve *CINCO* en

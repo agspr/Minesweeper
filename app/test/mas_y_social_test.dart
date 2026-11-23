@@ -84,10 +84,15 @@ void main() {
       expect(icono.lengthInBytes, greaterThan(1000));
     });
 
-    testWidgets('«Califica Minesweeper»', (tester) async {
+    testWidgets('«Califica Buscaminas»: el nombre en el idioma de la pantalla',
+        (tester) async {
+      // En español la app se llama Buscaminas (teléfono y tiendas), y Más
+      // decía «Califica Minesweeper» debajo de «Acerca de Buscaminas»
+      // (`nonaConfigNamed`).
       await montar(tester);
-      await tester.scrollUntilVisible(find.text('Califica Minesweeper'), 200);
-      expect(find.text('Califica Minesweeper'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Califica Buscaminas'), 200);
+      expect(find.text('Califica Buscaminas'), findsOneWidget);
+      expect(find.text('Califica Minesweeper'), findsNothing);
     });
 
     testWidgets('«Privacidad de los anuncios», donde Google dice que hace '

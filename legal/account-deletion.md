@@ -7,7 +7,7 @@ Minesweeper forma parte de **Juegos Senda**, una familia de juegos de SENDA LLC 
 comparten una misma cuenta. Por eso borrar tiene **dos significados distintos**,
 y la App te ofrece los dos por separado:
 
-- **Borrar Minesweeper de tu cuenta** — se va tu progreso de Minesweeper. Conservas tu
+- **Borrar Buscaminas de tu cuenta** — se va tu progreso de Minesweeper. Conservas tu
   cuenta, tu @usuario, tus amigos y tu progreso en los demás juegos.
 - **Eliminar tu cuenta de Juegos Senda** — se va todo, en **todos** los juegos
   de la familia, incluidos los que no tengas instalados en este teléfono.
@@ -55,9 +55,10 @@ hecho.
 
 ---
 
-## Opción 1 — Borrar Minesweeper de tu cuenta
+## Opción 1 — Borrar Buscaminas de tu cuenta
 
-Esto es lo que la App llama **"Borrar Minesweeper de tu cuenta"**.
+Esto es lo que la App llama **"Borrar Buscaminas de tu cuenta"** (en inglés,
+"Remove Minesweeper from your account").
 
 ### Qué se borra
 
