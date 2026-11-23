@@ -1,6 +1,6 @@
 # How to Delete Your Minesweeper Account
 
-**Effective:** November 11, 2026
+**Effective:** November 23, 2026
 **Last updated:** November 22, 2026
 
 Minesweeper is part of **Juegos Senda**, a family of games by SENDA LLC that share a

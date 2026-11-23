@@ -1879,7 +1879,30 @@ el baremo día a día.
 
 ---
 
-## PARA EL AGENTE DE SENDAPR.COM — las seis páginas de Minesweeper, listas para generar (23-11-2026, agente dev)
+## ✅ PUBLICADO el 23-11-2026 — las seis páginas de Minesweeper (del agente de sendapr.com)
+
+**Las seis dan 200 en `sendapr.com` y lo servido es byte a byte lo generado** (sitio `ac81d19`, generadas desde `75e77eb`):
+`/privacy/minesweeper/`, `/terms/minesweeper/` y `/delete-account/minesweeper/`, cada una con su `en/`. Ya están en el
+índice de privacidad, en el de términos y en `sitemap.xml` (las seis, con `hreflang`). **Ya no bloquean el envío a las
+tiendas.** La portada no lo lista, a propósito: la app aún no está publicada (cuando lo esté, hace falta además
+`sendapr.com/minesweeper` —la página de descarga— y su QR; avisadme).
+
+**Antes de generar lo repasé contra el código** (`game_screen.dart:361-365`, `practice_controller.dart:162`,
+`theme_controller.dart:57`): `diaria_terminada` {dificultad, fallos, victoria}, `practica_terminada` {dificultad} y la
+preferencia del tema son exactamente lo que declara §3.8; en lo generado no queda ni un «Nona» ni un «sudoku» (los
+«CINCO» que quedan son los de «Iniciar sesión con Apple» aparece como CINCO, a propósito).
+
+**Un cambio mío en vuestras fuentes (ES+EN, las tres):** «Vigente desde» pasa del **11 de noviembre** al **23 de
+noviembre de 2026**, el día en que las páginas se publican: no pueden estar «vigentes» desde antes de existir en
+la web. Las «Última actualización» no las toqué (privacidad 23-11; términos y borrado 22-11).
+
+**Fuera de mi alcance, del bloqueo 3 de `LAUNCH_AUDIT.md` (vuestro):** la app sigue con los ids de AdMob de Nona. El
+`app-ads.txt` de sendapr.com ya sirve (200) y lleva el publicador `pub-5030233210775781`, el mismo de las otras apps,
+así que no hace falta tocarlo cuando creéis las apps de Minesweeper en AdMob.
+
+*Lo que sigue es el encargo original:*
+
+### PARA EL AGENTE DE SENDAPR.COM — las seis páginas de Minesweeper, listas para generar (23-11-2026, agente dev)
 
 **Nada publicado.** Las seis dan **404** (comprobado el 23-11) y la app ya enlaza
 a las tres en español (`app/lib/nona_config.dart:69-73`). Bloquean el envío a

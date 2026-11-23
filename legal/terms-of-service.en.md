@@ -1,6 +1,6 @@
 # Minesweeper Terms of Service
 
-**Effective:** November 11, 2026
+**Effective:** November 23, 2026
 **Last updated:** November 22, 2026
 
 ---

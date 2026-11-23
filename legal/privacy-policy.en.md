@@ -1,6 +1,6 @@
 # Minesweeper Privacy Policy
 
-**Effective:** November 11, 2026
+**Effective:** November 23, 2026
 **Last updated:** November 23, 2026
 
 ---

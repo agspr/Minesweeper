@@ -1,6 +1,6 @@
 # Cómo Borrar tu Cuenta en Buscaminas (Minesweeper)
 
-**Vigente desde:** 11 de noviembre de 2026
+**Vigente desde:** 23 de noviembre de 2026
 **Última actualización:** 22 de noviembre de 2026
 
 Minesweeper forma parte de **Juegos Senda**, una familia de juegos de SENDA LLC que

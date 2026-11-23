@@ -1,6 +1,6 @@
 # Términos de Servicio de Buscaminas (Minesweeper)
 
-**Vigente desde:** 11 de noviembre de 2026
+**Vigente desde:** 23 de noviembre de 2026
 **Última actualización:** 22 de noviembre de 2026
 
 ---
