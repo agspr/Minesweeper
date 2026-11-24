@@ -2,7 +2,8 @@
 
 Redactada el 22-11-2026 para las fichas de Google Play y App Store Connect.
 Cada dato refleja fielmente el código y las reglas de `app/lib/game/`:
-- Mapa semanal (`difficulty.dart`): Fácil (8×8, 8 minas) lunes, miércoles y viernes; Medio (9×12, 16 minas) martes y jueves; Difícil (10×14, 28 minas) sábado y domingo.
+- Mapa semanal (`difficulty.dart`; las minas, corregidas el 24-11-2026: la primera
+  redacción decía 8 y 16, y el código siempre ha tenido 10 y 18): Fácil (8×8, 10 minas) lunes, miércoles y viernes; Medio (9×12, 18 minas) martes y jueves; Difícil (10×14, 28 minas) sábado y domingo.
 - Solucionador lógico sin adivinanzas (`mine_generator.dart`): casilla de salida segura (`0`) y resolución garantizada por pura deducción.
 - Dos modos en práctica (`practice_controller.dart`): Modo Senda (3 vidas) y Modo Clásico (1 vida).
 
@@ -33,8 +34,8 @@ Olvídate de perder al final por un 50/50 a cara o cruz. Todos los tableros est�
 
 EL RITMO DE LA SEMANA
 La dificultad cambia con el día de la semana:
-• Lunes, miércoles y viernes: Fácil (8×8 · 8 minas) para soltar la mano.
-• Martes y jueves: Medio (9×12 · 16 minas).
+• Lunes, miércoles y viernes: Fácil (8×8 · 10 minas) para soltar la mano.
+• Martes y jueves: Medio (9×12 · 18 minas).
 • Sábado y domingo: Difícil (10×14 · 28 minas), donde entran deducciones avanzadas.
 
 EL RETO DIARIO
@@ -65,8 +66,8 @@ SIN TRUCOS
 
 Hecho por SENDA LLC en Puerto Rico.
 
-### App Store — palabras clave (≤100 caracteres, sin espacios tras las comas)
-minas,puzle,lógica,diario,racha,clásico,tablero,amigos,estrategia,mental,cerebro,sin conexión,senda
+### App Store — palabras clave (≤100 BYTES —cada tilde cuenta dos—, sin espacios tras las comas)
+minas,puzle,lógica,diario,racha,clásico,tablero,amigos,estrategia,cerebro,sin conexión,senda
 
 ---
 
@@ -95,8 +96,8 @@ Forget losing a great run to a 50/50 coin flip on the last two tiles. Every sing
 
 A WEEKLY RHYTHM
 Difficulty follows the day of the week:
-• Monday, Wednesday & Friday: Easy (8×8 · 8 mines) to warm up.
-• Tuesday & Thursday: Medium (9×12 · 16 mines).
+• Monday, Wednesday & Friday: Easy (8×8 · 10 mines) to warm up.
+• Tuesday & Thursday: Medium (9×12 · 18 mines).
 • Saturday & Sunday: Hard (10×14 · 28 mines), requiring subset logic and deeper deduction.
 
 THE DAILY CHALLENGE
@@ -127,5 +128,5 @@ NO TRICKS
 
 Made by SENDA LLC in Puerto Rico.
 
-### App Store — keywords (≤100 chars, no spaces after commas)
-mines,puzzle,logic,daily,streak,classic,grid,friends,strategy,brain,offline,no guess,buscaminas,senda
+### App Store — keywords (≤100 bytes, no spaces after commas)
+mines,puzzle,logic,daily,streak,classic,friends,strategy,brain,offline,no guess,buscaminas,senda

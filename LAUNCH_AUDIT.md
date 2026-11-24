@@ -46,6 +46,24 @@ The following vulnerabilities, multi-device sync bugs, and rendering/algorithmic
 
 ## 2. What Is Blocking Launch Right Now (Actionable Checklist by Owner)
 
+> **Estado al 24-11-2026** (lo de abajo es la auditoría tal como se entregó; el
+> estado vivo está en `CLAUDE.md` § State):
+> - **Bloqueo 1, páginas legales:** hecho. Las seis en 200; la de borrar cuenta
+>   (ES) republicada el 24-11 con «Borrar Buscaminas de tu cuenta».
+> - **Bloqueo 2, capturas e IPA:** hecho. 20 capturas (con `06-social`, solo
+>   iPhone), subidas a las dos tiendas. Builds 15 y 16 con sus dos mitades
+>   archivadas y en pruebas (Play interno y TestFlight); la 16, adjunta a la
+>   versión 1.0.0 de App Store, sin enviar a revisión.
+> - **Bloqueo 3, AdMob:** hecho el 23-11. Unidades propias; falta enlazar las
+>   apps de AdMob a las tiendas cuando la app sea pública.
+> - **Bloqueo 4:** backend desplegado y handles reservados (23-11). IAP en las
+>   dos tiendas (activa en Play; lista para enviar en App Store, con su captura
+>   de revisión nueva: la de `store/iap/` era de Nona). Fichas de las dos
+>   tiendas rellenas por API desde `store/copy/listing-copy.md`, con las minas
+>   corregidas (10 y 18, no 8 y 16). Faltan las declaraciones, que firma André:
+>   privacidad de la app (Apple); seguridad de datos, clasificación, público y
+>   anuncios (Play). Y enviar a revisión.
+
 ### Blocker 1: Publish Legal Pages on `sendapr.com` *(For the `sendapr` Website Agent)*
 **Status:** Markdown & generator are **100% ready in `legal/`**. Live URLs currently return `HTTP 404`.
 

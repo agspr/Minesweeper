@@ -4,10 +4,10 @@ Daily minesweeper by SENDA LLC, part of the **Juegos Senda** family (alongside
 CINCO, Nona and Minigrama). Flutter, iOS + Android. Bundle id and package
 `com.sendallc.minesweeper`; App Store ID `6830734481`. The name is
 **Buscaminas** in Spanish (home screen, store listings) and **Minesweeper** in
-English. Current version: `1.0.0+15` — on Google Play internal testing; the
-App Store has no submission yet.
+English. Current version: `1.0.0+16` — on Google Play internal testing and
+TestFlight; App Store version 1.0.0 is prepared with it, not yet submitted.
 
-Written 2026-11-23. If this feels stale, check `git log -5`,
+Written 2026-11-23, updated 2026-11-24. If this feels stale, check `git log -5`,
 `LAUNCH_AUDIT.md` and `legal/PENDIENTE.md` before trusting anything below.
 
 ## Born from Nona — read this before renaming anything
@@ -73,10 +73,16 @@ to find:
   since 2026-11-23.
 - iOS signs with the **"Minesweeper App Store"** provisioning profile (expires
   2027-06-05 with the distribution certificate).
-- **The IPA is André's to upload.** This session builds, verifies, archives and
-  uploads the AAB to Play internal testing.
-- Disk on this Mac is tight; Gradle's cache and booted simulators can empty it.
-  One heavy thing at a time.
+- **The IPA goes up with `tools/subir_testflight.sh <build>`** (the archived
+  IPA, checked against its sha256 and inside before uploading). André uploaded
+  it himself until build 15; on 2026-11-24 he had this session do it. The AAB
+  goes up with `tools/upload_play_internal.py`.
+- Disk on this Mac is tight; Gradle's cache, swap (a Gradle build grows it by
+  ~3 GB) and simulators can empty it. One heavy thing at a time.
+- **Deleting `app/build` alone breaks the next build's symbols.** The compiled
+  Dart is cached in `app/.dart_tool/flutter_build/`; with it alive, the next
+  build reuses it, writes no `.symbols`, and still says `✓ Built` (twice on
+  2026-11-24). Delete both, and check `app/build/symbols/` before archiving.
 
 ## Architecture: the shared package
 
@@ -136,16 +142,33 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
 - **`tools/amigos_demo.py` writes fake accounts to production** and must always
   be paired with its `--borrar` cleanup.
 
-## State as of 2026-11-23
+## State as of 2026-11-24
 
-- Legal pages: all six live at `sendapr.com/{privacy,terms,delete-account}/minesweeper/{,en/}`.
+- Legal pages: all six live at `sendapr.com/{privacy,terms,delete-account}/minesweeper/{,en/}`
+  (the Spanish delete-account page republished 2026-11-24 with «Borrar Buscaminas»).
 - AdMob: apps "Minesweeper — Daily Logic" (Android `~7005873887`, iOS
   `~7754567513`) with their own units; **not linked to the stores yet** (the
   app isn't public), so ad serving is limited until they are.
-- Store screenshots: 18 in `store/screenshots/` (see its `LEEME.md`); the
-  Social one is still missing.
-- Pending, André: upload the build 15 IPA, the Remove Ads IAP in both consoles,
-  the store listings (`store/copy/listing-copy.md`), the Social screenshot.
+- Build 16 (2026-11-24): AAB on Play internal testing, IPA on App Store
+  Connect (VALID; export compliance answered by its Info.plist) and **attached
+  to version 1.0.0**, which is ready but **not submitted**. Build 15 is also on
+  both (its IPA waits on the export-compliance answer; it doesn't matter now).
+- App Store Connect, filled through the API: version **1.0.0** (was "1.0", which
+  a 1.0.0 build can't attach to), en-US + es-MX name/subtitle/privacy URL,
+  description, keywords, promo text, support/marketing URLs, Games › Puzzle,
+  age rating (Nona's answers, 4+), free, Nona's 145 territories (no EEA/UK),
+  review contact and notes, 20 screenshots. IAP `…removeads` **ready to
+  submit** ($1.99, es-MX/en-US texts, Nona's territories, review screenshot of
+  the purchase sheet — the old one in `store/iap/` was Nona's).
+- Google Play, through the API: en-US + es-419 listing, icon, feature graphic
+  (Spanish; English one made from it, `store/icon/store-assets/play-feature-en-1024x500.png`),
+  6 phone + 4 tablet screenshots per language, contact details. One-time
+  product `…removeads` **active**, Nona's regional prices.
+- Declarations this session did not make (they're André's to sign): App
+  Privacy (App Store); Data safety, content rating, target audience and ads
+  (Play) — not checked whether any are already done. Then: submit for review.
+- Social screenshot done (iPhone, es + en) with a test account and
+  `tools/amigos_demo.py`, cleaned up and verified; how, in `store/screenshots/LEEME.md`.
 
 ## Where to look
 

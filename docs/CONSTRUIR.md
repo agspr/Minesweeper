@@ -26,6 +26,18 @@ python3 tools/archivar_build.py verificar
   menos de ~5 GB libres, **no construyas encima**: limpia antes (paso 6) y
   apaga los simuladores. Cuando el disco llega a cero deja de funcionar hasta
   Bash.
+- **El swap también es disco.** El 24-11-2026, con 8,8 GB libres y la caché de
+  Gradle vacía, el AAB se comió la caché (4,8 GB) y el swap creció otros ~3 GB:
+  falló por disco. Para que Gradle pida menos memoria (y menos swap) sin tocar
+  el `gradle.properties` del proyecto:
+  `export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1g"`.
+- **Si borras `app/build` a medias, borra también `app/.dart_tool/flutter_build`.**
+  Los `.symbols` los escribe el compilador de Dart en `app/build/symbols` como
+  efecto lateral, pero el Dart compilado se guarda en `.dart_tool/flutter_build/`.
+  Con `app/build` borrado y esa caché viva, la build siguiente reutiliza el
+  compilado, no recompila, **y sale `✓ Built` sin un solo `.symbols`** — un AAB
+  ofuscado que nadie podrá leer en Sentry. Pasó dos veces el 24-11-2026 (y se
+  culpó al disco, que no era). Mira `ls app/build/symbols` antes de archivar.
 - **El orden.** AAB primero, IPA después, **nunca a la vez**. Al acabar el AAB,
   `./gradlew --stop` dentro de `app/android` suelta la memoria de los daemons.
 - **La auditoría.** En este Mac `verificar` solo puede ver de la 15 en adelante:
@@ -176,8 +188,24 @@ python3 tools/upload_play_internal.py \
   Play rechaza un número repetido. Después, apúntalo en el registro:
   `python3 tools/archivar_build.py tienda <build> "Play pruebas internas, <fecha>"`.
 
-**iOS — la IPA la sube André** a App Store Connect (Transporter o `altool`),
-bajo la entrada de versión cuyo número coincida.
+**iOS, a App Store Connect (TestFlight):**
+
+```
+bash tools/subir_testflight.sh <build>
+```
+
+Sube la IPA **archivada** (comprueba su sha256 y, dentro, bundle id y número
+de build) con la llave del equipo (`VC5Y48T3Z4`, en
+`~/.appstoreconnect/private_keys/`). Hasta la 15 la subía André a mano; la 15
+la subió esta sesión a petición suya (24-11-2026). Después, el registro:
+`python3 tools/archivar_build.py tienda <build> "… · App Store Connect (TestFlight), <fecha>"`.
+
+- **La entrada de versión tiene que decir lo mismo que la IPA.** Se creó como
+  «1.0» y la IPA dice «1.0.0»: se cambió a 1.0.0 el 24-11-2026 (Nona aprendió
+  con la 1.0.1 que un número distinto sube bien y luego no se puede adjuntar).
+- **Cumplimiento de exportación:** desde la 16, `Info.plist` declara
+  `ITSAppUsesNonExemptEncryption = false` (como CINCO y Minigrama). La 15 no la
+  lleva y espera la respuesta a mano en App Store Connect.
 
 ### Cuando ya está a la venta: publicar su número
 
@@ -224,6 +252,7 @@ pueden rehacer.
 | La subida a Play cae en el commit con 403 (23-11-2026) | la cuenta de servicio no tenía permisos sobre Minesweeper | todo sube bien y nada se publica |
 | CocoaPods muere, Flutter se pasa a SPM | falta `export LANG=en_US.UTF-8` | silencioso hasta que algo no enlaza |
 | El disco se vacía durante la build (23-11-2026) | caché de Gradle + swap de simuladores encendidos | Bash deja de responder |
+| El AAB sale sin `.symbols` (24-11-2026) | se borró `app/build` y no `app/.dart_tool/flutter_build`: la build reutilizó el Dart compilado | `✓ Built`: solo se ve mirando `app/build/symbols/` |
 | Los avisos push se registran y no llegan nunca | `aps-environment` ausente | **nada** |
 | Google Sign-In abre el navegador y la app no reacciona | `CFBundleURLTypes` ausente o copiado de otro juego | **nada**: un botón muerto |
 | App Store Connect rechaza la IPA | slice de simulador | rechazo días después |
@@ -249,6 +278,7 @@ es una ruta fija y la siguiente construcción lo pisa.
 
 ## Lo que esta sesión no hace
 
-Subir la IPA a App Store Connect: eso es de André. Aquí se construye, se
-verifica, se archiva y se sube el AAB a pruebas internas; y cuando una versión
-ya está a la venta, se publica su número (§5).
+Enviar a revisión ni publicar en producción: eso lo decide André. Aquí se
+construye, se verifica, se archiva y se sube a pruebas (AAB a pruebas internas
+de Play; la IPA a TestFlight cuando André lo pide); y cuando una versión ya está
+a la venta, se publica su número (§5).

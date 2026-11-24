@@ -249,6 +249,13 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Cifrado exento: solo el HTTPS del sistema (Firebase, Sentry, anuncios);
+	     `crypto` se usa para sha256, que es resumen y no cifrado. Sin esta
+	     clave App Store Connect deja CADA build en «Falta información de
+	     cumplimiento» hasta que alguien contesta a mano, y no se puede probar
+	     ni adjuntar. La misma declaración que CINCO y Minigrama (24-11-2026). -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

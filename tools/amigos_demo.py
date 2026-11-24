@@ -18,6 +18,12 @@ la legua y se limpian con una consulta.
 import json, subprocess, sys, urllib.request, datetime
 
 PROJ = "cinco-fe5cc"
+# El espacio de ESTE juego en Firestore (`nonaGameId` en lib/nona_config.dart).
+# El guion vino de Nona con `apps/nona` escrito a mano en cinco sitios: sembraba
+# los amigos en la clasificación de Nona, y `--borrar` se llevaba los días de
+# NONA de la cuenta del simulador — progreso real, si la cuenta es de verdad.
+# Corregido el 24-11-2026, antes de usarlo por primera vez en Minesweeper.
+JUEGO = "minesweeper"
 BASE = f"https://firestore.googleapis.com/v1/projects/{PROJ}/databases/(default)/documents"
 # Handles NATURALES a propósito. El primer intento usó un prefijo `zz_demo_`
 # para poder barrer restos... y se veía en la fila del marcador: arruinaba la
@@ -29,7 +35,7 @@ PREFIJO = ""
 # Nombres neutros e inventados: NUNCA gente real de la lista de André — sus
 # amigos son personas y no pueden acabar en una ficha de tienda.
 # Tres países hispanohablantes distintos (decisión de André): la clasificación
-# enseña de un vistazo que Nona es de toda Hispanoamérica y no solo de Puerto
+# enseña de un vistazo que el juego es de toda Hispanoamérica y no solo de Puerto
 # Rico. Los apellidos acompañan al país para que la fila no chirríe.
 AMIGOS = [
     # (uid falso,             @usuario,       nombre,          avatar,     país, puntos, racha)
@@ -72,7 +78,7 @@ def sembrar(mio):
         # El RESUMEN por juego: normalmente lo escribe el servidor desde los
         # días crudos, pero aquí no hay partidas que recalcular — son cuentas
         # de atrezo. Se escribe con administrador, que se salta las reglas.
-        pedir("PATCH", f"users/{uid}/apps/nona", {"fields": {
+        pedir("PATCH", f"users/{uid}/apps/{JUEGO}", {"fields": {
             "totalPoints": I(puntos), "streak": I(racha), "bestStreak": I(racha + 4),
             "weekPoints": I(puntos // 12), "weekId": S(lunes.isoformat()),
             "monthPoints": I(puntos // 4), "monthId": S(hoy.strftime("%Y-%m")),
@@ -88,7 +94,7 @@ def sembrar(mio):
 
 def borrar(mio):
     for uid, handle, *_ in AMIGOS:
-        pedir("DELETE", f"users/{uid}/apps/nona")
+        pedir("DELETE", f"users/{uid}/apps/{JUEGO}")
         pedir("DELETE", f"users/{uid}")
         pedir("DELETE", f"usernames/{handle}")
         pedir("DELETE", f"friendships/{par(mio, uid)}")
@@ -102,14 +108,14 @@ def borrar(mio):
     # progreso legítimo — que es exactamente su trabajo. Así que la cuenta se
     # quedaba con 33 días inventados dentro aunque los amigos desaparecieran.
     # Lo cazó el agente de ficha leyendo el log del iPad.
-    dias = pedir("GET", f"users/{mio}/apps/nona/days?pageSize=300")
+    dias = pedir("GET", f"users/{mio}/apps/{JUEGO}/days?pageSize=300")
     for doc in (dias or {}).get("documents", []):
         pedir("DELETE", "/".join(doc["name"].split("/documents/")[1:]))
     print(f"  borrados {len((dias or {}).get('documents', []))} días de pega")
     # Y el resumen que el servidor recalculó a partir de ellos: sin los días,
     # el número que quedaría no lo respalda nada.
-    pedir("DELETE", f"users/{mio}/apps/nona")
-    print("  borrado el resumen de nona de la cuenta de pruebas")
+    pedir("DELETE", f"users/{mio}/apps/{JUEGO}")
+    print(f"  borrado el resumen de {JUEGO} de la cuenta de pruebas")
 
 if __name__ == "__main__":
     if len(sys.argv) != 3 or sys.argv[1] not in ("--sembrar","--borrar"):

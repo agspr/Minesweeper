@@ -5,11 +5,12 @@ publish_to: 'none'
 # solo en pruebas internas, App Store sin enviar), así que no hay versión
 # READY_FOR_SALE que obligue a subirla (docs/CONSTRUIR.md §1).
 #
-# La 15 es la primera build de las DOS plataformas a la vez (las 11-14 fueron
-# solo AAB, desde Windows). Lleva respecto a la 14: las unidades de AdMob
-# propias (antes las de Nona), la copia del selector de nivel de la práctica
-# y la puntuación de la derrota ya en el servidor (23-11-2026).
-version: 1.0.0+15
+# La 15 fue la primera build de las DOS plataformas a la vez (las 11-14 fueron
+# solo AAB, desde Windows). La 16 lleva respecto a la 15 (24-11-2026): el
+# nombre en el idioma de la pantalla en Más y borrar cuenta («Buscaminas» en
+# español), el paquete 0.89.2 («este dispositivo»), Sentry propio (`minesweeper`
+# en vez de `nona`) y el cifrado declarado exento en Info.plist.
+version: 1.0.0+16
 
 environment:
   sdk: ^3.13.0

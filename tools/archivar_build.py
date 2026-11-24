@@ -521,14 +521,23 @@ def orden_limpiar(args):
         if not os.path.exists(p) or sha256(p) != e[ext]["sha256"]:
             sys.exit("ERROR: %s no está o no cuadra con su hash. No borro nada."
                      % e[ext]["fichero"])
-    ruta = os.path.join(raiz_, "app", "build")
+    # app/build y la caché del Dart compilado van JUNTAS. Los .symbols se
+    # escriben en app/build/symbols solo cuando el Dart se compila; si se borra
+    # app/build y la caché de .dart_tool/flutter_build sigue viva, la build
+    # siguiente reutiliza el compilado y sale «✓ Built» sin símbolos: un
+    # binario ofuscado que nadie puede leer en Sentry (dos veces, 24-11-2026).
+    rutas = [os.path.join(raiz_, "app", "build"),
+             os.path.join(raiz_, "app", ".dart_tool", "flutter_build")]
     tam = sum(os.path.getsize(os.path.join(d, n))
-              for d, _, fs in os.walk(ruta) for n in fs)
+              for ruta in rutas for d, _, fs in os.walk(ruta) for n in fs)
     if not args.de_verdad:
-        print("Borraría %s (%.1f GB). Añade --de-verdad." % (ruta, tam / 2**30))
+        print("Borraría %s (%.1f GB). Añade --de-verdad."
+              % (" y ".join(rutas), tam / 2**30))
         return
-    shutil.rmtree(ruta)
-    print("Borrado %s: %.1f GB libres." % (ruta, tam / 2**30))
+    for ruta in rutas:
+        if os.path.isdir(ruta):
+            shutil.rmtree(ruta)
+    print("Borrado %s: %.1f GB libres." % (" y ".join(rutas), tam / 2**30))
 
 
 def main():

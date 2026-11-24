@@ -215,7 +215,29 @@
         "bytes": 7941637,
         "sha256": "ba8fd68cb91ca34232508ceae2ff413135d09a99fe260d386e8109ae8b47279e"
       },
-      "tienda": "Play pruebas internas, 23-11-2026"
+      "tienda": "Play pruebas internas, 23-11-2026 · App Store Connect (TestFlight), 24-11-2026"
+    },
+    "16": {
+      "version": "1.0.0",
+      "fecha": "2026-11-24",
+      "commit": "6e4639258b0e71295c33b1429d6d5666ea9c0582",
+      "arbol_limpio": false,
+      "aab": {
+        "fichero": "minesweeper-1.0.0-16.aab",
+        "bytes": 67765542,
+        "sha256": "5d5619cd0f87e1d8ad64cf9bbe5db2e58395770a312f1b64d66657a84ff66863"
+      },
+      "ipa": {
+        "fichero": "minesweeper-1.0.0-16.ipa",
+        "bytes": 53709987,
+        "sha256": "863f059fc763531c71ec5bccc70e61aaac8247e95fd812c3b5b584d83ecab1a1"
+      },
+      "simbolos": {
+        "fichero": "minesweeper-1.0.0-16-simbolos.zip",
+        "bytes": 7943115,
+        "sha256": "2b97ad96ff770b9258dfb4c8d8afb8ec98f9b82f68031341b1581a86410d1430"
+      },
+      "tienda": "Play pruebas internas, 24-11-2026 · App Store Connect (TestFlight), 24-11-2026"
     }
   },
   "paquete_android": "com.sendallc.minesweeper",
