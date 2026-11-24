@@ -152,7 +152,7 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
 - Build 16 (2026-11-24): AAB on Play internal testing, IPA on App Store
   Connect (VALID; export compliance answered by its Info.plist) and **attached
   to version 1.0.0**, which is ready but **not submitted**. Build 15 is also on
-  both (its IPA waits on the export-compliance answer; it doesn't matter now).
+  both (export compliance answered by hand, exempt).
 - App Store Connect, filled through the API: version **1.0.0** (was "1.0", which
   a 1.0.0 build can't attach to), en-US + es-MX name/subtitle/privacy URL,
   description, keywords, promo text, support/marketing URLs, Games › Puzzle,
@@ -164,9 +164,27 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
   (Spanish; English one made from it, `store/icon/store-assets/play-feature-en-1024x500.png`),
   6 phone + 4 tablet screenshots per language, contact details. One-time
   product `…removeads` **active**, Nona's regional prices.
-- Declarations this session did not make (they're André's to sign): App
-  Privacy (App Store); Data safety, content rating, target audience and ads
-  (Play) — not checked whether any are already done. Then: submit for review.
+- **Declarations, made 2026-11-24 at André's request, copying Nona's** (same
+  package and SDKs; checked against `legal/privacy-policy.en.md`):
+  - App Store **App Privacy, published**: name, email, user ID and gameplay
+    content linked to the account, for app functionality; device ID and
+    advertising data used for tracking (AdMob); product interaction for
+    analytics; crash and performance data — the last three not linked.
+  - Play App content: privacy policy, ads (yes), sign-in details (no login
+    needed; instructions for the reviewer), advertising ID (advertising), not
+    a government app, no financial or health features, target audience 13+,
+    content rating (IARC: Game; digital purchases; users interact, blockable,
+    reportable, friends only — same ratings as Nona), Data safety (same
+    answers as Nona, with the `delete-account/minesweeper/` URLs), and store
+    settings Game › Puzzle.
+  - **Left for André: Play's app-level trader status** (EU DSA). The Play
+    account is declared a trader, the Apple one a non-trader, and Nona hasn't
+    answered it either; it shows contact details publicly in the EU. Until
+    it's answered, Play won't let the saved changes be sent for review
+    (dashboard: 11 of 12).
+  - Next, André's: trader status, then send for review in both stores.
+  App Store "App Compliance" lists China-mainland items as missing info; Nona
+  has the same and leaves them.
 - Social screenshot done (iPhone, es + en) with a test account and
   `tools/amigos_demo.py`, cleaned up and verified; how, in `store/screenshots/LEEME.md`.
 

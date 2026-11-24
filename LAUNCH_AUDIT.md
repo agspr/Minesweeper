@@ -60,9 +60,11 @@ The following vulnerabilities, multi-device sync bugs, and rendering/algorithmic
 >   dos tiendas (activa en Play; lista para enviar en App Store, con su captura
 >   de revisión nueva: la de `store/iap/` era de Nona). Fichas de las dos
 >   tiendas rellenas por API desde `store/copy/listing-copy.md`, con las minas
->   corregidas (10 y 18, no 8 y 16). Faltan las declaraciones, que firma André:
->   privacidad de la app (Apple); seguridad de datos, clasificación, público y
->   anuncios (Play). Y enviar a revisión.
+>   corregidas (10 y 18, no 8 y 16). Declaraciones hechas el 24-11 a petición
+>   de André, copiando las de Nona: privacidad de la app publicada (Apple); en
+>   Play, las diez de contenido de la app y la categoría. Queda **el estado de
+>   comerciante (trader) de Play**, que Nona tampoco ha contestado y que bloquea
+>   enviar a revisión; después, enviar a revisión en las dos tiendas.
 
 ### Blocker 1: Publish Legal Pages on `sendapr.com` *(For the `sendapr` Website Agent)*
 **Status:** Markdown & generator are **100% ready in `legal/`**. Live URLs currently return `HTTP 404`.
