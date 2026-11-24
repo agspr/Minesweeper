@@ -162,7 +162,9 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
 - App Store Connect, filled through the API: version **1.0.0** (was "1.0", which
   a 1.0.0 build can't attach to), en-US + es-MX name/subtitle/privacy URL,
   description, keywords, promo text, support/marketing URLs, Games › Puzzle,
-  age rating (Nona's answers, 4+), free, Nona's 145 territories (no EEA/UK),
+  age rating (Nona's answers, 4+, plus "no" to the two questions Apple added
+  for new apps — location sharing and dating; Nona has them empty, which only
+  passes for existing apps until 2027-01-15), free, Nona's 145 territories (no EEA/UK),
   review contact and notes, 20 screenshots. IAP `…removeads` **ready to
   submit** ($1.99, es-MX/en-US texts, Nona's territories, review screenshot of
   the purchase sheet — the old one in `store/iap/` was Nona's).
