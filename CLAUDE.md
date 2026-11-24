@@ -171,7 +171,11 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
 - Google Play, through the API: en-US + es-419 listing, icon, feature graphic
   (Spanish; English one made from it, `store/icon/store-assets/play-feature-en-1024x500.png`),
   6 phone + 4 tablet screenshots per language, contact details. One-time
-  product `…removeads` **active**, Nona's regional prices.
+  product `…removeads` **active**, Nona's regional prices. Production
+  countries = **CINCO's** (André, 2026-11-24): 146 plus "Rest of world", no
+  EEA/UK — set in the Console (the API only reads them) and checked equal to
+  CINCO's through the API. No production release yet, and **managed
+  publishing is off**: once Google approves, it goes live by itself.
 - **Declarations, made 2026-11-24 at André's request, copying Nona's** (same
   package and SDKs; checked against `legal/privacy-policy.en.md`):
   - App Store **App Privacy, published**: name, email, user ID and gameplay
