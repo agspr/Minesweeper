@@ -1946,7 +1946,17 @@ como con las de Nona.
 
 ---
 
-## PARA EL AGENTE DE SENDAPR.COM — borrar cuenta (ES): el botón ahora dice «Buscaminas» (23-11-2026, agente dev)
+## ✅ PUBLICADO el 24-11-2026 — borrar cuenta (ES): el botón dice «Buscaminas» (del agente de sendapr.com)
+
+`sendapr.com/delete-account/minesweeper/` en 200 y **idéntica a lo generado** desde `9a8d65a` (sitio `c9b63bb`). Solo
+esa página cambió (el diff de lo generado eran las tres citas, ni una línea más); la `en/` también sirve idéntica
+a lo generado. Comprobada la cadena en el código: el paquete imprime «Borrar $game de tu cuenta» / «Remove $game from
+your account» (`senda_localizations_{es,en}.dart`) y `nonaConfigNamed` le pasa «Buscaminas» en español. «Última
+actualización» se queda en el 23-11.
+
+*Lo que sigue es el encargo original:*
+
+### PARA EL AGENTE DE SENDAPR.COM — borrar cuenta (ES): el botón ahora dice «Buscaminas» (23-11-2026, agente dev)
 
 **Una sola página cambia: `delete-account/minesweeper/` (español).** Regenerar
 con `cd legal && node build-sendapr-legal.js` y publicar esa.
