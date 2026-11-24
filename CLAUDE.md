@@ -116,6 +116,12 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
 
 ## Key conventions
 
+- **Commit and push after every change — a standing rule for every Senda app**
+  (André, 2026-11-24; CINCO already had it). Straight to `main`: no branches,
+  no worktrees, and without asking. Each finished change gets its own commit
+  (Spanish message, with the why) and is pushed at once; a turn never ends
+  with work uncommitted or unpushed. Secrets never go in
+  (`app/android/key.properties`, service-account JSON, `.p8` keys).
 - **Spanish in commit messages, code comments and internal docs.** UI strings
   in both languages via the ARB files (`app_es.arb` is the template).
 - **Comments explain the non-obvious "why"**, with what breaks silently if the
