@@ -177,7 +177,9 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
   CINCO's through the API. **Production release `16 (1.0.0)` created and
   confirmed** (es-419/en-US notes, no warnings, 14.6 MB): Publishing overview
   shows "Submit 14 changes for review", not sent. **Managed publishing is
-  off**: once Google approves, it goes live by itself. Create releases in the
+  off**: once Google approves, it goes live by itself — and the App Store
+  version is set to release automatically after approval too. Both on
+  purpose (André, 2026-11-24: "keep automatic"). Create releases in the
   Console, not the API: for this app `edits.commit` refuses
   `changesNotSentForReview` and would send every pending change for review.
 - **Declarations, made 2026-11-24 at André's request, copying Nona's** (same
