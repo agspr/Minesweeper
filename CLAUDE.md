@@ -183,12 +183,13 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
     reportable, friends only — same ratings as Nona), Data safety (same
     answers as Nona, with the `delete-account/minesweeper/` URLs), and store
     settings Game › Puzzle.
-  - **Left for André: Play's app-level trader status** (EU DSA). The Play
-    account is declared a trader, the Apple one a non-trader, and Nona hasn't
-    answered it either; it shows contact details publicly in the EU. Until
-    it's answered, Play won't let the saved changes be sent for review
-    (dashboard: 11 of 12).
-  - Next, André's: trader status, then send for review in both stores.
+  - Play **app-level trader status** (EU DSA), at André's request: **trader
+    status applies** — SENDA LLC is a company and the app earns from ads and
+    an in-app purchase; answering "no" would tell EEA/UK users consumer law
+    doesn't apply. Terms URL `sendapr.com/terms/minesweeper/`. (The Apple
+    account declares non-trader, which is why EEA/UK are off on the App
+    Store.) Play setup: 12 of 12.
+  - Next, André's: send for review in both stores.
   App Store "App Compliance" lists China-mainland items as missing info; Nona
   has the same and leaves them.
 - Social screenshot done (iPhone, es + en) with a test account and
