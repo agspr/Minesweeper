@@ -165,7 +165,11 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
   answers are in the review notes (`store/review/notas-app-review-en.txt`,
   saved 2026-11-26); the recording is André's, guided by
   `store/review/grabacion-app-review.md`. Then: attach the video, clean up
-  the demo friends, resubmit with Remove Ads. Build 15 is also on
+  the demo friends, resubmit with Remove Ads. **Demo friends are seeded in
+  production right now** (2026-11-26, @ana_rivera, @luis_mendez,
+  @marta_ortiz, friends of the test account @aistudio747): run
+  `tools/amigos_demo.py --borrar <uid of @aistudio747>` once the video
+  exists. Build 15 is also on
   both (export compliance answered by hand, exempt).
 - App Store Connect, filled through the API: version **1.0.0** (was "1.0", which
   a 1.0.0 build can't attach to), en-US + es-MX name/subtitle/privacy URL,

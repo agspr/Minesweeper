@@ -17,11 +17,12 @@ guardadas en App Store Connect el 26-11).
    es «Eliminar todo»: borra la cuenta de Juegos Senda entera, en todos los
    juegos. Con Iniciar sesión con Apple tu Apple ID ya es tu cuenta de la
    familia, así que **usa Google con una cuenta de Google desechable**.
-4. **Prepara la cuenta** (un minuto, sin grabar): abre la app, entra con esa
-   cuenta de Google, elige un @usuario y pásale el @usuario a la sesión de
-   desarrollo. Ella le siembra tres amigos de pega (`tools/amigos_demo.py`)
-   para que haya a quién reportar y bloquear. Luego **cierra sesión y borra la
-   app**, para que la grabación empiece desde la primera apertura.
+4. **La cuenta** es la de pruebas **@aistudio747** (Google ai.studio747). Ya
+   tiene tres amigos de pega sembrados el 26-11 (`tools/amigos_demo.py`) para
+   que haya a quién reportar y bloquear. Si la app ya está en el iPhone,
+   **bórrala**, para que la grabación empiece desde la primera apertura. Ojo:
+   el paso 9 la elimina entera, también sus datos de prueba de CINCO, y libera
+   el @aistudio747.
 5. Centro de control › Grabar pantalla a mano, y modo No molestar.
 
 ## Lo que se graba, de corrido (2-4 minutos)
