@@ -4,8 +4,9 @@ Daily minesweeper by SENDA LLC, part of the **Juegos Senda** family (alongside
 CINCO, Nona and Minigrama). Flutter, iOS + Android. Bundle id and package
 `com.sendallc.minesweeper`; App Store ID `6830734481`. The name is
 **Buscaminas** in Spanish (home screen, store listings) and **Minesweeper** in
-English. Current version: `1.0.0+16` — on Google Play internal testing and
-TestFlight; App Store version 1.0.0 is prepared with it, not yet submitted.
+English. Current version: `1.0.0+16` — **live on Google Play** (production,
+2026-11-26). App Store version 1.0.0 with it was submitted 2026-11-25 and
+**rejected**; see State below.
 
 Written 2026-11-23, updated 2026-11-24. If this feels stale, check `git log -5`,
 `LAUNCH_AUDIT.md` and `legal/PENDIENTE.md` before trusting anything below.
@@ -157,14 +158,21 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
   app isn't public), so ad serving is limited until they are.
 - Build 16 (2026-11-24): AAB on Play internal testing, IPA on App Store
   Connect (VALID; export compliance answered by its Info.plist) and **attached
-  to version 1.0.0**, which is ready but **not submitted**. Build 15 is also on
+  to version 1.0.0**, submitted with Remove Ads on 2026-11-25 and **rejected**
+  (the reason is in App Store Connect › App Review; not read yet — the browser
+  session had expired). Build 15 is also on
   both (export compliance answered by hand, exempt).
 - App Store Connect, filled through the API: version **1.0.0** (was "1.0", which
   a 1.0.0 build can't attach to), en-US + es-MX name/subtitle/privacy URL,
   description, keywords, promo text, support/marketing URLs, Games › Puzzle,
   age rating (Nona's answers, 4+, plus "no" to the two questions Apple added
   for new apps — location sharing and dating; Nona has them empty, which only
-  passes for existing apps until 2027-01-15), free, Nona's 145 territories (no EEA/UK),
+  passes for existing apps until 2027-01-15), free, Nona's territories minus
+  China mainland — **144** (no EEA/UK). China came out on 2026-11-25 for both
+  the app and the IAP: with it available, Apple refuses "Add for Review" until
+  a Security Assessment and an AIGC filing are provided, and a game there also
+  needs a Chinese game licence. Nona still lists it (existing apps have until
+  2027-01-31),
   review contact and notes, 20 screenshots. IAP `…removeads` **ready to
   submit** ($1.99, es-MX/en-US texts, Nona's territories, review screenshot of
   the purchase sheet — the old one in `store/iap/` was Nona's).
@@ -201,7 +209,8 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
     doesn't apply. Terms URL `sendapr.com/terms/minesweeper/`. (The Apple
     account declares non-trader, which is why EEA/UK are off on the App
     Store.) Play setup: 12 of 12.
-  - Next, André's: send for review in both stores.
+  - Sent for review in both stores on 2026-11-25 (André asked this session
+    to do it). Play approved: live 2026-11-26. App Store: rejected, pending.
   App Store "App Compliance" lists China-mainland items as missing info; Nona
   has the same and leaves them.
 - Social screenshot done (iPhone, es + en) with a test account and

@@ -64,7 +64,9 @@ The following vulnerabilities, multi-device sync bugs, and rendering/algorithmic
 >   de André, copiando las de Nona: privacidad de la app publicada (Apple); en
 >   Play, las once de contenido de la app (con el estado de comerciante: **sí
 >   aplica**, términos en `sendapr.com/terms/minesweeper/`) y la categoría.
->   Configuración de Play: 12 de 12. Queda enviar a revisión en las dos tiendas.
+>   Configuración de Play: 12 de 12. Enviadas a revisión las dos el 25-11:
+>   **Play aprobó y está publicada (26-11)**; **App Store la rechazó** (motivo
+>   por leer en App Review). China continental fuera de App Store (25-11).
 
 ### Blocker 1: Publish Legal Pages on `sendapr.com` *(For the `sendapr` Website Agent)*
 **Status:** Markdown & generator are **100% ready in `legal/`**. Live URLs currently return `HTTP 404`.
