@@ -1,0 +1,30 @@
+Minesweeper — Daily Logic (Buscaminas in Spanish), by SENDA LLC, Puerto Rico.
+
+1. SCREEN RECORDING
+Attached to this submission (App Review Information > Attachment). Recorded on a physical iPhone with the latest iOS, starting at app launch: guest play of the daily board and practice, Sign in with Apple, the Social tab, Report and Block on another player, buying and restoring "Remove ads" (sandbox), and the account deletion flow.
+
+2. PURPOSE AND AUDIENCE
+A daily logic puzzle. Every day there is one new minesweeper board, the same for every player, and every board is solvable by deduction alone from a marked safe starting cell: no guessing. Difficulty follows the weekday (easy Mon/Wed/Fri, medium Tue/Thu, hard on weekends). It is for teens and adults (13+) who like short puzzles: a 2-5 minute daily habit, a streak to keep, unlimited practice, and an optional friendly comparison with friends.
+
+3. HOW TO ACCESS THE MAIN FEATURES
+No login is needed. On first launch tap "Play without an account": the daily board, practice, statistics and settings all work as a guest, also offline.
+- Daily board: Play > Daily challenge. Tap a cell to reveal, long-press to flag. A third mine ends the board.
+- Practice: Play > Practice mode.
+- Account (optional): More > Sign in, with Sign in with Apple or Google. There is no username/password registration, so there are no credentials to provide: any Apple ID or Google account works. An account adds the Social tab (friends by @username, weekly/monthly/all-time leaderboard, nudges) and syncs progress between devices.
+- Account deletion, in the app: More > pencil on the profile card > Delete account. It offers "Remove Minesweeper from your account" or "Delete everything" (the whole account), both completed inside the app. Also explained at https://sendapr.com/delete-account/minesweeper/en/
+- User-generated content: only each player's display name, @username, a preset avatar and an optional country. On the Social tab, tap a friend to Remove, Block or Report them (reasons: offensive name or avatar, spam or harassment, another reason). Reports reach us at support@sendapr.com. Blocked players are listed in More > Blocked, with Unblock.
+- In-app purchase: "Remove ads" (com.sendallc.minesweeper.removeads, non-consumable, USD 1.99), submitted with this version. Find it in More, or tap "Remove ads" under the banner. "Restore purchases" is next to it.
+- Ads: Google AdMob banner, plus a full-screen ad after finishing the daily board and after every fourth finished practice board. The App Tracking Transparency prompt appears before ads are personalized.
+
+4. EXTERNAL SERVICES
+- Firebase (Google): Authentication (Sign in with Apple, Google Sign-In), Cloud Firestore (profiles, friends, scores), Cloud Functions (scoring, notifications), Cloud Messaging (friend notifications), App Check (App Attest), Analytics and Crashlytics.
+- Sentry: crash reports.
+- Google AdMob, with Google's consent form (UMP).
+- Apple StoreKit for the in-app purchase.
+No AI services and no third-party data providers. The daily boards ship inside the app.
+
+5. REGIONS
+The app works the same in every region where it is offered. It is in English and Spanish (More > Language). The only regional difference is Google's ad consent form, which appears only where the law requires it.
+
+6. REGULATED INDUSTRY OR THIRD-PARTY MATERIAL
+Not applicable: an original puzzle game with no gambling, financial, medical or licensed third-party content.

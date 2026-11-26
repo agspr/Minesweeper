@@ -158,9 +158,14 @@ Crash reporting: Firebase Crashlytics + Sentry project **`minesweeper`** (org
   app isn't public), so ad serving is limited until they are.
 - Build 16 (2026-11-24): AAB on Play internal testing, IPA on App Store
   Connect (VALID; export compliance answered by its Info.plist) and **attached
-  to version 1.0.0**, submitted with Remove Ads on 2026-11-25 and **rejected**
-  (the reason is in App Store Connect › App Review; not read yet — the browser
-  session had expired). Build 15 is also on
+  to version 1.0.0**, submitted with Remove Ads on 2026-11-25 and **rejected
+  under Guideline 2.1 – Information Needed** (2026-11-26): not a defect.
+  Apple wants a screen recording on a physical iPhone (launch, sign-in,
+  account deletion, report/block, the purchase) plus written answers. The
+  answers are in the review notes (`store/review/notas-app-review-en.txt`,
+  saved 2026-11-26); the recording is André's, guided by
+  `store/review/grabacion-app-review.md`. Then: attach the video, clean up
+  the demo friends, resubmit with Remove Ads. Build 15 is also on
   both (export compliance answered by hand, exempt).
 - App Store Connect, filled through the API: version **1.0.0** (was "1.0", which
   a 1.0.0 build can't attach to), en-US + es-MX name/subtitle/privacy URL,
