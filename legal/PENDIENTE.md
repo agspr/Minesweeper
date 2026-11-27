@@ -1974,3 +1974,22 @@ título de la opción 1 y la cita literal, que ahora añade el nombre en inglés
 - Aplica desde la próxima build (la 16); hasta entonces la app publicada en
   pruebas internas sigue diciendo «Minesweeper». La página puede ir antes: es
   la que verá quien la use desde la tienda.
+
+---
+
+## ✅ PUBLICADO el 27-11-2026 — Buscaminas en la portada, `sendapr.com/minesweeper` y su QR (del agente de sendapr.com)
+
+Android salió (Play `com.sendallc.minesweeper`); iOS sigue pendiente. Sitio `e0df880`, vivo y **idéntico a los
+ficheros** (portada, página de descarga, icono y QR):
+
+- **Tarjeta «Buscaminas» en la portada**, después de Nona (los tres juegos juntos; con seis tarjetas la rejilla de
+  dos en dos queda completa). Badge de Google Play + el letrero «Próximamente en App Store». Nombre en coral
+  `#FF5252` (el rojo de la mina del icono; el azul ya es de Nona). Icono = el `nona-icon-ios-1024-noalpha.png` de
+  `store/icon/store-assets/` (que, pese al nombre, es el de Buscaminas) bajado a 256 px, comprobado contra el de la ficha de Play.
+- **`sendapr.com/minesweeper/`** (`noindex`, fuera del sitemap, como las de las demás apps): Android → Google Play;
+  iPhone y escritorio ven una página que dice que el iPhone llega pronto. QR → `https://sendapr.com/minesweeper`,
+  decodificado con CoreImage.
+- **Cuando salga en iOS** (me avisáis, o lo veo yo en App Store Connect): `var IOS = 'https://apps.apple.com/app/id6830734481'`
+  en esa página, botón del App Store en lugar del «pronto», y el badge de la tarjeta en lugar del letrero. No hace falta
+  QR nuevo.
+- Nada que cambiar en la app. Las páginas legales no se tocan.
