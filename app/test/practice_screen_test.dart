@@ -161,14 +161,48 @@ void main() {
     await tester.pump();
     await entrarAlTablero(tester, c);
 
-    expect(c.board!.isFlagged(0), isFalse);
-    c.longPressCellOnBoard(0);
+    // Antes de abrir la salida no se marca nada (salida_obligada_test.dart).
+    c.tapCellOnBoard(c.board!.safeStart);
     await tester.pump();
-    expect(c.board!.isFlagged(0), isTrue);
+    final b = c.board!;
+    final oculta = List.generate(
+      b.boardCellCount,
+      (i) => i,
+    ).firstWhere((i) => !b.isRevealed(i));
 
-    c.longPressCellOnBoard(0);
+    expect(b.isFlagged(oculta), isFalse);
+    c.longPressCellOnBoard(oculta);
     await tester.pump();
-    expect(c.board!.isFlagged(0), isFalse);
+    expect(b.isFlagged(oculta), isTrue);
+
+    c.longPressCellOnBoard(oculta);
+    await tester.pump();
+    expect(b.isFlagged(oculta), isFalse);
+  });
+
+  testWidgets('tocar otra casilla antes de la salida lo dice en pantalla', (
+    tester,
+  ) async {
+    sized(tester);
+    final c = await loadedIn(tester);
+
+    await tester.pumpWidget(wrap(c));
+    await tester.pump();
+    await entrarAlTablero(tester, c);
+
+    const aviso = 'Empieza por la casilla marcada';
+    c.tapCellOnBoard(0); // la salida va siempre en el interior
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.textContaining(aviso), findsOneWidget);
+    expect(c.board!.isRevealed(0), isFalse);
+
+    // Se va solo, y abrir la salida no lo vuelve a sacar.
+    await tester.pump(const Duration(seconds: 3));
+    c.tapCellOnBoard(c.board!.safeStart);
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(c.board!.isRevealed(c.board!.safeStart), isTrue);
+    expect(c.avisosDeSalida.value, 1);
   });
 
   testWidgets('la pantalla de nivel se ve al entrar, con los tres niveles', (

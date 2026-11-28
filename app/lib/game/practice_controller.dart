@@ -87,6 +87,10 @@ class PracticeController extends ChangeNotifier {
   /// `SudokuBoard.place`). Solo sube: la pantalla lo escucha para avisar de
   /// que hay que borrarlo primero.
   final ValueNotifier<int> intentosDeSobrescribir = ValueNotifier(0);
+
+  /// Cuántas veces se tocó otra casilla antes de abrir la salida marcada (ver
+  /// `SudokuBoard.faltaLaSalida`; solo en Senda, que es el modo que la marca).
+  final ValueNotifier<int> avisosDeSalida = ValueNotifier(0);
   int _hintsUsed = 0;
 
   SudokuBoard? get board => _board;
@@ -289,6 +293,7 @@ class PracticeController extends ChangeNotifier {
   void tapCellOnBoard(int cell) {
     final b = _board;
     if (b == null || isFinished) return;
+    if (_soloLaSalida(b, cell)) return;
 
     if (b.isRevealed(cell)) {
       _selected = cell;
@@ -329,6 +334,7 @@ class PracticeController extends ChangeNotifier {
   void longPressCellOnBoard(int cell) {
     final b = _board;
     if (b == null || isFinished) return;
+    if (_soloLaSalida(b, cell)) return;
     if (!b.isRevealed(cell)) {
       _selected = cell;
       NonaHaptics.select();
@@ -336,10 +342,27 @@ class PracticeController extends ChangeNotifier {
     }
   }
 
+  /// Antes de abrir la salida marcada solo vale ella, como en la diaria
+  /// (`DailyController._soloLaSalida`): tocarla la abre, tocar otra avisa.
+  /// Devuelve `true` si el toque se quedó aquí.
+  bool _soloLaSalida(SudokuBoard b, int cell) {
+    if (!b.faltaLaSalida) return false;
+    if (cell != b.safeStart) {
+      NonaHaptics.select();
+      avisosDeSalida.value++;
+      return true;
+    }
+    _selected = cell;
+    NonaHaptics.tap();
+    revealSelected();
+    return true;
+  }
+
   /// Descubre la casilla seleccionada (o ejecuta acorde si procede).
   bool revealSelected() {
     final b = _board;
     if (b == null || _selected < 0 || isFinished) return false;
+    if (b.faltaLaSalida && _selected != b.safeStart) return false;
     if (b.isRevealed(_selected)) {
       if (b.canChord(_selected)) {
         _touch();
@@ -371,6 +394,7 @@ class PracticeController extends ChangeNotifier {
     if (b == null || _selected < 0 || isFinished) return;
     if (b.isRevealed(_selected)) return;
     if (b.isGiven(_selected)) return;
+    if (b.faltaLaSalida) return;
     _touch();
     b.toggleFlag(_selected);
     _save();
@@ -436,7 +460,11 @@ class PracticeController extends ChangeNotifier {
     final b = _board;
     if (b == null || isFinished) return;
     var cell = _selected;
-    if (cell < 0 || b.isRevealed(cell) || b.isMine(cell)) {
+    if (b.faltaLaSalida) {
+      // La primera pista es la salida: abrir otra casilla primero (la primera
+      // segura por orden de lectura) dejaría el tablero sin la garantía.
+      cell = b.safeStart;
+    } else if (cell < 0 || b.isRevealed(cell) || b.isMine(cell)) {
       cell = _firstUnsolvedSafe(b);
       if (cell < 0) return;
     }
@@ -452,6 +480,7 @@ class PracticeController extends ChangeNotifier {
   @override
   void dispose() {
     intentosDeSobrescribir.dispose();
+    avisosDeSalida.dispose();
     super.dispose();
   }
 

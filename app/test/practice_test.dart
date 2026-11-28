@@ -55,6 +55,9 @@ void main() {
   group('pistas (solo en el modo libre)', () {
     test('rellenan la casilla seleccionada con el dígito correcto', () async {
       final c = await make();
+      // Antes de abrir la salida, la pista abre la salida y no la elegida
+      // (salida_obligada_test.dart): aquí se prueba lo de después.
+      c.tapCellOnBoard(c.board!.safeStart);
       // SEGURA, no la primera vacía: si el tablero —aleatorio— ponía una mina
       // ahí, la pista se iba a otra casilla (ver la prueba de abajo) y esto
       // fallaba de vez en cuando sin que nada estuviera roto.

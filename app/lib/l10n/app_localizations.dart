@@ -606,6 +606,12 @@ abstract class L {
   /// In es, this message translates to:
   /// **'Usa el botón de borrar para quitarlo primero.'**
   String get eraseFirst;
+
+  /// Aviso al tocar otra casilla antes de abrir la salida marcada (diaria y práctica Senda). Es la condición de la promesa «sin adivinar»: el generador solo la garantiza abriendo primero la salida (SudokuBoard.faltaLaSalida).
+  ///
+  /// In es, this message translates to:
+  /// **'Empieza por la casilla marcada: es segura, y desde ahí no hace falta adivinar.'**
+  String get startOnMarkedCell;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

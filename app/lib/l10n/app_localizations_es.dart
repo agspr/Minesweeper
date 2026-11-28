@@ -321,4 +321,8 @@ class LEs extends L {
 
   @override
   String get eraseFirst => 'Usa el botón de borrar para quitarlo primero.';
+
+  @override
+  String get startOnMarkedCell =>
+      'Empieza por la casilla marcada: es segura, y desde ahí no hace falta adivinar.';
 }

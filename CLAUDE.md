@@ -32,6 +32,12 @@ moved to Minesweeper; when you find a user-visible Nona/sudoku leftover, that
   Tue/Thu medium (9×12, 18), weekends hard (10×14, 28). Every board is
   solvable **without guessing** from its safe start; hard boards are rejected
   by the generator unless they need at least one two-clue (subset) deduction.
+  **"No guessing" holds only from the marked start**, so until it is opened
+  it is the only cell that responds (daily and Senda practice; a tap
+  elsewhere shows «Empieza por la casilla marcada»; `SudokuBoard.faltaLaSalida`).
+  Before 2026-11-28 (builds ≤ 16) you could start anywhere, and on 263 of
+  2026's 365 days some other blank start forces a guess. Clásico practice
+  marks no start at all.
 - **Three strikes**: the third detonated mine loses the board.
 - **Scoring** (`lib/game/scoring.dart`, mirrored server-side in
   `Juegos Senda/backend/functions/scoring/minesweeper.json` + `scoring.js`):

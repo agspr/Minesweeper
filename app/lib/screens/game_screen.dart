@@ -386,11 +386,24 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             // pantalla completa (`escenas_del_final.dart`).
             return PuzzleLayout(
               header: header,
-              aviso: AvisoFlotante(
-                disparo: c.intentosDeSobrescribir,
-                texto: l.eraseFirst,
-                icono: Icons.backspace_outlined,
-                ocultarCon: c,
+              // Dos avisos en el mismo hueco: nunca coinciden, porque antes de
+              // abrir la salida no hay ningún número puesto que sobrescribir.
+              aviso: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  AvisoFlotante(
+                    disparo: c.intentosDeSobrescribir,
+                    texto: l.eraseFirst,
+                    icono: Icons.backspace_outlined,
+                    ocultarCon: c,
+                  ),
+                  AvisoFlotante(
+                    disparo: c.avisosDeSalida,
+                    texto: l.startOnMarkedCell,
+                    icono: Icons.adjust_rounded,
+                    ocultarCon: c,
+                  ),
+                ],
               ),
               board: SudokuBoardView(
                 board: board,

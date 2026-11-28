@@ -321,4 +321,8 @@ class LEn extends L {
 
   @override
   String get eraseFirst => 'Use the backspace button to erase it first.';
+
+  @override
+  String get startOnMarkedCell =>
+      'Start on the marked cell: it\'s safe, and from there you never have to guess.';
 }

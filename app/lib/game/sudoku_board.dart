@@ -63,6 +63,23 @@ class SudokuBoard {
   final int maxStrikes;
   final int safeStart;
 
+  /// Hay salida marcada y aún no se ha jugado nada: mientras sea así, la
+  /// salida es la única casilla que se puede tocar (lo hacen cumplir los
+  /// controladores, que además avisan).
+  ///
+  /// «Sin adivinar» solo es verdad DESDE la salida: el generador comprueba el
+  /// tablero abriéndola primero (`solveWithoutGuessing`). Empezando en otro
+  /// sitio no hay garantía —en 263 de los 365 días de 2026 hay algún otro 0
+  /// desde el que hace falta adivinar (medido el 28-11-2026), y una cifra
+  /// suelta es peor—, y si el
+  /// primer toque cae en una mina, `ensureFirstTapSafe` la cambia de sitio:
+  /// el tablero deja de ser el que se verificó y el que juegan los demás.
+  ///
+  /// Se mira `entries` (descubiertas y detonadas), no las banderas: una
+  /// partida a medias empezada en otro sitio con una versión anterior sigue
+  /// jugándose, no se queda bloqueada.
+  bool get faltaLaSalida => safeStart >= 0 && entries.every((e) => e == 0);
+
   final Difficulty _difficulty;
   late final List<List<int>> _neighbors;
   late final int _totalMines;

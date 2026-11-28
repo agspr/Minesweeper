@@ -97,6 +97,11 @@ class DailyController extends ChangeNotifier {
   /// que hay que borrarlo primero.
   final ValueNotifier<int> intentosDeSobrescribir = ValueNotifier(0);
 
+  /// Cuántas veces se tocó otra casilla antes de abrir la salida marcada (ver
+  /// `SudokuBoard.faltaLaSalida`). Solo sube: la pantalla lo escucha para
+  /// decir que se empieza por ahí.
+  final ValueNotifier<int> avisosDeSalida = ValueNotifier(0);
+
   int _accumulatedSeconds = 0;
   DateTime? _runningSince;
 
@@ -231,6 +236,7 @@ class DailyController extends ChangeNotifier {
   void tapCellOnBoard(int cell) {
     final b = _board;
     if (b == null || isFinished) return;
+    if (_soloLaSalida(b, cell)) return;
     startTimer();
 
     if (b.isRevealed(cell)) {
@@ -273,6 +279,7 @@ class DailyController extends ChangeNotifier {
   void longPressCellOnBoard(int cell) {
     final b = _board;
     if (b == null || isFinished) return;
+    if (_soloLaSalida(b, cell)) return;
     startTimer();
     if (!b.isRevealed(cell)) {
       _selected = cell;
@@ -281,10 +288,32 @@ class DailyController extends ChangeNotifier {
     }
   }
 
+  /// Antes de abrir la salida marcada solo vale ella (ver
+  /// `SudokuBoard.faltaLaSalida`): tocarla —cave, bandera o pulsación larga—
+  /// la abre, porque es segura y una bandera ahí no tiene sentido; tocar otra
+  /// no hace nada y avisa. Devuelve `true` si el toque se quedó aquí.
+  ///
+  /// Va antes de `startTimer`: un toque rechazado no pone el reloj en marcha.
+  bool _soloLaSalida(SudokuBoard b, int cell) {
+    if (!b.faltaLaSalida) return false;
+    if (cell != b.safeStart) {
+      NonaHaptics.select();
+      avisosDeSalida.value++;
+      return true;
+    }
+    startTimer();
+    _selected = cell;
+    NonaHaptics.tap();
+    revealSelected();
+    return true;
+  }
+
   /// Descubre la casilla seleccionada (o ejecuta acorde si es una pista con sus minas ya marcadas).
   bool revealSelected() {
     final b = _board;
     if (b == null || _selected < 0 || isFinished) return false;
+    // Lo mismo que `_soloLaSalida`, para quien llame sin pasar por el toque.
+    if (b.faltaLaSalida && _selected != b.safeStart) return false;
     if (b.isRevealed(_selected)) {
       if (b.canChord(_selected)) {
         _jugadas++;
@@ -316,6 +345,7 @@ class DailyController extends ChangeNotifier {
     if (b == null || _selected < 0 || isFinished) return;
     if (b.isRevealed(_selected)) return;
     if (b.isGiven(_selected)) return;
+    if (b.faltaLaSalida) return;
     _jugadas++;
     b.toggleFlag(_selected);
     _save();
@@ -530,6 +560,7 @@ class DailyController extends ChangeNotifier {
     pauseTimer();
     guardados.dispose();
     intentosDeSobrescribir.dispose();
+    avisosDeSalida.dispose();
     super.dispose();
   }
 }

@@ -133,5 +133,6 @@
   "noAdsNothingToRestore": "We couldn't find a purchase to restore.",
   "sceneRemind": "Remind",
   "sceneReminded": "Reminded",
-  "eraseFirst": "Use the backspace button to erase it first."
+  "eraseFirst": "Use the backspace button to erase it first.",
+  "startOnMarkedCell": "Start on the marked cell: it's safe, and from there you never have to guess."
 }

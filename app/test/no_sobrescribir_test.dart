@@ -115,6 +115,18 @@ void main() {
     });
 
     test('toque prolongado (long press) alterna bandera directamente', () async {
+      // Sin salida marcada: abrirla aquí despejaría el tablero entero (todo
+      // son ceros), y lo que se prueba es la pulsación larga. La salida tiene
+      // sus propias pruebas en salida_obligada_test.dart.
+      DailyBank.debugClear();
+      DailyBank.debugSeedYear(2026, {
+        hoy: {
+          'givens': emptyGivens,
+          'solution': sol,
+          'difficulty': 'easy',
+          'clues': 0,
+        },
+      });
       final c = await diaria();
       expect(c.isDigMode, isTrue);
       c.longPressCellOnBoard(0);
@@ -133,7 +145,13 @@ void main() {
 
     test('tocar en modo Bandera protege la casilla de cavar', () async {
       final c = await practica();
-      const cel = 0;
+      // Antes de abrir la salida no se marca nada (salida_obligada_test.dart).
+      c.tapCellOnBoard(c.board!.safeStart);
+      final b = c.board!;
+      final cel = List.generate(
+        b.boardCellCount,
+        (i) => i,
+      ).firstWhere((i) => !b.isRevealed(i));
       c.setFlagMode(true);
       c.tapCellOnBoard(cel);
       expect(c.board!.isFlagged(cel), isTrue);
